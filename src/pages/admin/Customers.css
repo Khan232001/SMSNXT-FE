@@ -1,0 +1,52 @@
+/* src/pages/admin/Customers.css */
+
+.card {
+    background-color: #fff;  /* White background */
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover {
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow on hover */
+  }
+  
+  .top-header {
+    margin-bottom: 20px;
+  }
+  
+  h1, h2 {
+    color: #34495e; /* Darker color for titles */
+  }
+  
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .data-table th, .data-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  .data-table th {
+    background-color: #f4f6f9;
+  }
+  
+  button {
+    padding: 8px 16px;
+    background-color: #2ecc71;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #27ae60;
+  }
+  

@@ -1,0 +1,44 @@
+.admin-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  .main-content {
+    display: flex;
+    flex-grow: 1;
+    padding: 0px;
+  }
+  
+  .plans-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #f5f5f5;
+  }
+  
+  .add-plan-btn {
+    margin-bottom: 20px;
+  }
+  
+  .modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    box-shadow: 24px;
+    outline: none;
+  }
+  
+  .modal-submit-btn {
+    margin-top: 20px;
+  }
+  
+  .edit-btn, .delete-btn {
+    margin-right: 10px;
+  }
+  
+  .sidebar{
+    margin-left: 0%;
+  }
