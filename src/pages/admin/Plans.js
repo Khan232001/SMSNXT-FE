@@ -1,9 +1,9 @@
+// src/pages/admin/Plans.js
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Typography, Modal, TextField } from '@mui/material';
 import Table from '../../components/Table';
 import Navbar from '../../components/Navbar'; // Assuming Navbar is in components folder
 import Sidebar from '../../components/Sidebar'; // Assuming Sidebar is in components folder
-import './Plans.css'; // Assuming a CSS file to style the page and components.
 
 function Plans() {
   const [plans, setPlans] = useState([]);
@@ -45,23 +45,28 @@ function Plans() {
   const handleClose = () => setOpen(false);
 
   return (
-    <Box className="admin-container">
+    <Box className="flex flex-col h-screen">
       {/* Navbar at the top */}
-      <Navbar /> <br/> <br/>
+      <Navbar /> <br /> <br />
 
-      <Box className="main-content">
+      <Box className="flex flex-grow">
         {/* Sidebar on the left */}
-        <Sidebar className="sidebar" />
+        <Sidebar className="w-1/4" />
 
         {/* Main content area for the Plans Management */}
-        <Box className="plans-content">
-          <Typography variant="h4" gutterBottom>
+        <Box className="flex-grow p-5 bg-gray-100">
+          <Typography variant="h4" gutterBottom className="text-2xl font-semibold">
             Plan & Customer Management
           </Typography> 
           
-          <Button variant="contained" color="primary" onClick={handleOpen} className="add-plan-btn">
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleOpen} 
+            className="mb-5"
+          >
             Add New Plan
-          </Button><br/><br/>
+          </Button>
 
           {/* Table for displaying plans */}
           <Table
@@ -70,10 +75,18 @@ function Plans() {
               ...plan,
               actions: (
                 <>
-                  <Button variant="outlined" color="primary" className="edit-btn">
+                  <Button 
+                    variant="outlined" 
+                    color="primary" 
+                    className="mr-2"
+                  >
                     Edit
                   </Button>
-                  <Button variant="outlined" color="secondary" className="delete-btn">
+                  <Button 
+                    variant="outlined" 
+                    color="secondary" 
+                    className="mr-2"
+                  >
                     Delete
                   </Button>
                 </>
@@ -83,8 +96,8 @@ function Plans() {
 
           {/* Modal for adding a new plan */}
           <Modal open={open} onClose={handleClose}>
-            <Box className="modal-content">
-              <Typography variant="h6">Add New Plan</Typography>
+            <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 shadow-lg">
+              <Typography variant="h6" className="text-lg font-semibold mb-4">Add New Plan</Typography>
               <TextField
                 label="Plan Name"
                 value={newPlan.name}
@@ -106,7 +119,12 @@ function Plans() {
                 fullWidth
                 margin="normal"
               />
-              <Button variant="contained" color="primary" onClick={handleAddPlan} className="modal-submit-btn">
+              <Button 
+                variant="contained" 
+                color="primary" 
+                onClick={handleAddPlan} 
+                className="mt-4"
+              >
                 Add Plan
               </Button>
             </Box>

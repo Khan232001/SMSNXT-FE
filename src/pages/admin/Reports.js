@@ -4,7 +4,6 @@ import Table from '../../components/Table';
 import TablePagination from '@mui/material/TablePagination'; // For pagination
 import Navbar from '../../components/Navbar'; // Assuming Navbar is in components folder
 import Sidebar from '../../components/Sidebar'; // Assuming Sidebar is in components folder
-import './Reports.css'; // Assuming there's a CSS file to handle styles
 
 function Reports() {
   const [reports, setReports] = useState([]);
@@ -31,17 +30,17 @@ function Reports() {
   };
 
   return (
-    <Box className="admin-container">
+    <Box className="flex flex-col h-screen">
       {/* Navbar at the top */}
       <Navbar />
-      
-      <Box className="main-content">
+
+      <Box className="flex flex-1">
         {/* Sidebar on the left */}
-        <Sidebar className="sidebar" />
+        <Sidebar className="w-64" />
 
         {/* Main content area for the reports */}
-        <Box className="reports-content">
-          <Typography variant="h4" gutterBottom>Detailed Reports</Typography>
+        <Box className="flex-grow p-5 overflow-auto">
+          <Typography variant="h4" className="mb-5">Detailed Reports</Typography>
 
           {/* Reports Table */}
           <Table
@@ -71,6 +70,7 @@ function Reports() {
             onPageChange={handlePageChange}
             rowsPerPage={rowsPerPage}
             onRowsPerPageChange={handleRowsPerPageChange}
+            className="mt-5"
           />
         </Box>
       </Box>

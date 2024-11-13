@@ -46,7 +46,7 @@ function SenderIDs() {
   );
 
   const drawerItems = (
-    <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
+    <Box className="w-64" role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
       <List>
         {['Dashboard', 'Plans & Customers', 'Orders', 'Payments', 'Sender IDs', 'Campaigns', 'Reports', 'Staff Management', 'Settings'].map((text, index) => (
           <ListItem button key={text}>
@@ -58,7 +58,7 @@ function SenderIDs() {
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box className="flex">
       {/* Sidebar Drawer */}
       <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
         {drawerItems}
@@ -70,25 +70,25 @@ function SenderIDs() {
           <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleDrawer(true)}>
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" className="flex-grow">
             Admin Panel
           </Typography>
         </Toolbar>
       </AppBar>
 
       {/* Main Content */}
-      <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
-        <Typography variant="h4" gutterBottom>Sender ID Management</Typography>
+      <Box component="main" className="flex-grow p-6 mt-16">
+        <Typography variant="h4" className="mb-6">Sender ID Management</Typography>
 
         {/* Search Bar */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <Box className="flex items-center mb-4">
           <TextField
             label="Search Sender ID"
             variant="outlined"
             size="small"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            sx={{ mr: 2 }}
+            className="mr-4"
           />
           <IconButton color="primary">
             <SearchIcon />
@@ -108,6 +108,7 @@ function SenderIDs() {
                   senderID.status === 'Pending' ? 'warning' :
                   'default'
                 }
+                className="mr-2"
               />
             ),
             actions: (
@@ -116,6 +117,7 @@ function SenderIDs() {
                 color="primary"
                 disabled={senderID.status === 'Approved'}
                 onClick={() => handleApprove(senderID.id)}
+                className="ml-2"
               >
                 {senderID.status === 'Approved' ? 'Approved' : 'Approve'}
               </Button>
@@ -131,6 +133,7 @@ function SenderIDs() {
           onPageChange={handlePageChange}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleRowsPerPageChange}
+          className="mt-5"
         />
       </Box>
     </Box>

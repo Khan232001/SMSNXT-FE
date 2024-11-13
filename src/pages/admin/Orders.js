@@ -3,7 +3,6 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { FaCheckCircle, FaTimesCircle, FaSyncAlt } from 'react-icons/fa';
 import Sidebar from '../../components/Sidebar';
 import Navbar from '../../components/Navbar';
-import './Order.css';
 
 const Order = () => {
   const orders = [
@@ -26,15 +25,15 @@ const Order = () => {
   ];
 
   return (
-    <div className="order-layout">
+    <div className="flex">
       <Sidebar />
-      <div className="order-main-content">
+      <div className="flex-grow p-5">
         <Navbar />
 
         {/* Order Table */}
-        <div className="order-container"><br/>
-          <h2 className="order-title">Subscription Orders</h2>
-          <TableContainer component={Paper} className="order-table-container">
+        <div className="p-5">
+          <h2 className="text-2xl font-semibold mb-5">Subscription Orders</h2>
+          <TableContainer component={Paper} className="mt-5">
             <Table>
               <TableHead>
                 <TableRow>
@@ -55,7 +54,7 @@ const Order = () => {
                     <TableCell>{order.plan}</TableCell>
                     <TableCell>{order.amount}</TableCell>
                     <TableCell>
-                      <span className={`order-status ${order.status.toLowerCase()}`}>
+                      <span className={`text-sm font-medium ${order.status === 'Pending' ? 'text-yellow-500' : order.status === 'Renewed' ? 'text-green-500' : 'text-red-500'}`}>
                         {order.status}
                       </span>
                     </TableCell>
@@ -65,7 +64,7 @@ const Order = () => {
                         variant="contained"
                         color="primary"
                         startIcon={<FaCheckCircle />}
-                        className="action-button"
+                        className="mr-2"
                       >
                         Approve
                       </Button>
@@ -73,7 +72,7 @@ const Order = () => {
                         variant="contained"
                         color="secondary"
                         startIcon={<FaTimesCircle />}
-                        className="action-button"
+                        className="mr-2"
                       >
                         Reject
                       </Button>
@@ -81,7 +80,7 @@ const Order = () => {
                         variant="contained"
                         color="default"
                         startIcon={<FaSyncAlt />}
-                        className="action-button"
+                        className="mr-2"
                       >
                         Renew
                       </Button>

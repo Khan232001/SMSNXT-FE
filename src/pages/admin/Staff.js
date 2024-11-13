@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button } from '@mui/material';
 import Table from '../components/Table';
 
 function Staff() {
@@ -16,11 +15,17 @@ function Staff() {
   }, []);
 
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom>Manage Staff</Typography>
+    <div className="p-8">
+      <h1 className="text-3xl font-semibold mb-6">Manage Staff</h1>
+      
+      {/* Table Component */}
       <Table columns={['Name', 'Role', 'Email', 'Status']} data={staff} />
-      <Button variant="contained" color="primary" sx={{ mt: 2 }}>Add New Staff</Button>
-    </Box>
+
+      {/* Button to Add New Staff */}
+      <button className="mt-4 px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600">
+        Add New Staff
+      </button>
+    </div>
   );
 }
 
