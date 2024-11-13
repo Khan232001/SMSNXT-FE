@@ -4,6 +4,10 @@ import { Box, Typography, Paper } from '@mui/material';
 import Sidebar from '../../components/Sidebar'; // Ensure the sidebar is imported
 import Navbar from '../../components/Navbar'; // Navbar for top layout
 import Table from '../../components/Table'; // Reusing the Table component for display
+<<<<<<< HEAD
+=======
+import './Payments.css'; // Custom CSS for styling
+>>>>>>> acd4fce (first commit)
 
 function Payments() {
   const [payments, setPayments] = useState([]);
@@ -23,18 +27,31 @@ function Payments() {
   }, []);
 
   return (
+<<<<<<< HEAD
     <Box className="flex">
+=======
+    <Box className="payment-layout">
+>>>>>>> acd4fce (first commit)
       {/* Sidebar */}
       <Sidebar />
 
       {/* Main content area */}
+<<<<<<< HEAD
       <Box className="flex-grow p-5">
+=======
+      <Box className="payment-main-content">
+>>>>>>> acd4fce (first commit)
         {/* Navbar */}
         <Navbar /> <br/>
 
         {/* Payment Processing Section */}
+<<<<<<< HEAD
         <Paper className="p-5 mt-5">
           <Typography variant="h4" gutterBottom className="text-2xl font-semibold mb-5">
+=======
+        <Paper className="payment-container">
+          <Typography variant="h4" gutterBottom className="payment-title">
+>>>>>>> acd4fce (first commit)
             Payment Processing
           </Typography>
 

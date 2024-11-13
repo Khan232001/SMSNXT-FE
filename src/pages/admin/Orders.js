@@ -3,6 +3,10 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { FaCheckCircle, FaTimesCircle, FaSyncAlt } from 'react-icons/fa';
 import Sidebar from '../../components/Sidebar';
 import Navbar from '../../components/Navbar';
+<<<<<<< HEAD
+=======
+import './Order.css';
+>>>>>>> acd4fce (first commit)
 
 const Order = () => {
   const orders = [
@@ -25,6 +29,7 @@ const Order = () => {
   ];
 
   return (
+<<<<<<< HEAD
     <div className="flex">
       <Sidebar />
       <div className="flex-grow p-5">
@@ -34,6 +39,17 @@ const Order = () => {
         <div className="p-5">
           <h2 className="text-2xl font-semibold mb-5">Subscription Orders</h2>
           <TableContainer component={Paper} className="mt-5">
+=======
+    <div className="order-layout">
+      <Sidebar />
+      <div className="order-main-content">
+        <Navbar />
+
+        {/* Order Table */}
+        <div className="order-container"><br/>
+          <h2 className="order-title">Subscription Orders</h2>
+          <TableContainer component={Paper} className="order-table-container">
+>>>>>>> acd4fce (first commit)
             <Table>
               <TableHead>
                 <TableRow>
@@ -54,7 +70,11 @@ const Order = () => {
                     <TableCell>{order.plan}</TableCell>
                     <TableCell>{order.amount}</TableCell>
                     <TableCell>
+<<<<<<< HEAD
                       <span className={`text-sm font-medium ${order.status === 'Pending' ? 'text-yellow-500' : order.status === 'Renewed' ? 'text-green-500' : 'text-red-500'}`}>
+=======
+                      <span className={`order-status ${order.status.toLowerCase()}`}>
+>>>>>>> acd4fce (first commit)
                         {order.status}
                       </span>
                     </TableCell>
@@ -64,7 +84,11 @@ const Order = () => {
                         variant="contained"
                         color="primary"
                         startIcon={<FaCheckCircle />}
+<<<<<<< HEAD
                         className="mr-2"
+=======
+                        className="action-button"
+>>>>>>> acd4fce (first commit)
                       >
                         Approve
                       </Button>
@@ -72,7 +96,11 @@ const Order = () => {
                         variant="contained"
                         color="secondary"
                         startIcon={<FaTimesCircle />}
+<<<<<<< HEAD
                         className="mr-2"
+=======
+                        className="action-button"
+>>>>>>> acd4fce (first commit)
                       >
                         Reject
                       </Button>
@@ -80,7 +108,11 @@ const Order = () => {
                         variant="contained"
                         color="default"
                         startIcon={<FaSyncAlt />}
+<<<<<<< HEAD
                         className="mr-2"
+=======
+                        className="action-button"
+>>>>>>> acd4fce (first commit)
                       >
                         Renew
                       </Button>
