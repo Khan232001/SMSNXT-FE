@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import AdminDashboard from './pages/admin/Dashboard';
+import AdminDashboard from './pages/admin/AdminDashboard';
 import UserDashboard from './pages/user/Dashboard';
 import Campaigns from './pages/admin/Campaigns';
 import Customers from './pages/admin/Customers';
@@ -23,6 +23,7 @@ import ContactManagement from './pages/user/ContactManagement';
 import Reporting from './pages/user/Reporting';
 import Messaging from './pages/user/Messaging';
 import SenderIDManagement from './pages/user/SenderIDManagement';
+import AdminLogin from './pages/admin/AdminLogin';
 
 function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -48,6 +49,7 @@ function App() {
             <Route path="/sender-id-management" element={<SenderIDManagement />} />
 
             {/* Admin Routes */}
+            <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/senderids" element={<SenderIDs />} />
             <Route path="/admin/reports" element={<Reports />} />

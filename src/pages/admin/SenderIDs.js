@@ -1,140 +1,120 @@
+// src/pages/admin/SenderIDs.js
 import React, { useEffect, useState } from 'react';
-import { AppBar, Toolbar, Box, Typography, Button, IconButton, Drawer, List, ListItem, ListItemText, TextField, Chip } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import Table from '../../components/Table';
-import TablePagination from '@mui/material/TablePagination';
-import SearchIcon from '@mui/icons-material/Search';
+import { Box, Typography, Paper, Button, Modal, TextField } from '@mui/material';
+import Sidebar from '../../components/Sidebar'; // Sidebar component
+import Navbar from '../../components/Navbar'; // Navbar component
+import Table from '../../components/Table'; // Reusable Table component
 
 function SenderIDs() {
   const [senderIDs, setSenderIDs] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [newSenderID, setNewSenderID] = useState('');
 
   useEffect(() => {
+    // Fetch sender IDs from the API
     const fetchSenderIDs = async () => {
-      const response = await fetch('/api/admin/sender-ids');
-      const data = await response.json();
-      setSenderIDs(data);
+      try {
+        const response = await fetch('/api/admin/senderIDs'); // Replace with real endpoint
+        const data = await response.json();
+        setSenderIDs(data);
+      } catch (error) {
+        console.error("Error fetching sender IDs:", error);
+      }
     };
     fetchSenderIDs();
   }, []);
 
-  const handleApprove = (id) => {
-    console.log(`Sender ID ${id} approved`);
-  };
-
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleRowsPerPageChange = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
-
-  const toggleDrawer = (open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
+  const handleAddSenderID = () => {
+    if (newSenderID) {
+      setSenderIDs((prevSenderIDs) => [...prevSenderIDs, { id: newSenderID }]);
+      setNewSenderID('');
+      setOpen(false);
+    } else {
+      alert('Please enter a sender ID');
     }
-    setDrawerOpen(open);
   };
 
-  const filteredSenderIDs = senderIDs.filter(senderID =>
-    senderID.senderId.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const drawerItems = (
-    <Box className="w-64" role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
-      <List>
-        {['Dashboard', 'Plans & Customers', 'Orders', 'Payments', 'Sender IDs', 'Campaigns', 'Reports', 'Staff Management', 'Settings'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  );
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   return (
-    <Box className="flex">
-      {/* Sidebar Drawer */}
-      <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
-        {drawerItems}
-      </Drawer>
+    <Box className="flex h-screen">
+      {/* Sidebar with fixed width */}
+      <Box sx={{ width: '250px' }}>
+        <Sidebar />
+      </Box>
 
-      {/* AppBar */}
-      <AppBar position="fixed">
-        <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleDrawer(true)}>
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" className="flex-grow">
-            Admin Panel
+      {/* Main content area */}
+      <Box className="flex-grow p-5">
+        {/* Navbar */}
+        <Navbar /> <br />
+
+        {/* Sender ID Management Section */}
+        <Paper className="p-5 mt-5">
+          <Typography variant="h4" gutterBottom className="text-2xl font-semibold mb-5">
+            Sender ID Management
           </Typography>
-        </Toolbar>
-      </AppBar>
 
-      {/* Main Content */}
-      <Box component="main" className="flex-grow p-6 mt-16">
-        <Typography variant="h4" className="mb-6">Sender ID Management</Typography>
+          {/* Button to add new Sender ID */}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleOpen}
+            className="mb-5"
+          >
+            Add New Sender ID
+          </Button>
 
-        {/* Search Bar */}
-        <Box className="flex items-center mb-4">
-          <TextField
-            label="Search Sender ID"
-            variant="outlined"
-            size="small"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="mr-4"
+          {/* Sender ID Table */}
+          <Table
+            columns={['Sender ID', 'Actions']}
+            data={senderIDs.map((senderID, index) => ({
+              ...senderID,
+              actions: (
+                <>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    className="mr-2"
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    className="mr-2"
+                  >
+                    Delete
+                  </Button>
+                </>
+              ),
+            }))}
           />
-          <IconButton color="primary">
-            <SearchIcon />
-          </IconButton>
-        </Box>
 
-        {/* Sender ID Table */}
-        <Table
-          columns={['Sender ID', 'Customer Name', 'Status', 'Actions']}
-          data={filteredSenderIDs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(senderID => ({
-            ...senderID,
-            status: (
-              <Chip
-                label={senderID.status}
-                color={
-                  senderID.status === 'Approved' ? 'success' :
-                  senderID.status === 'Pending' ? 'warning' :
-                  'default'
-                }
-                className="mr-2"
+          {/* Modal for adding new Sender ID */}
+          <Modal open={open} onClose={handleClose}>
+            <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 shadow-lg">
+              <Typography variant="h6" className="text-lg font-semibold mb-4">
+                Add New Sender ID
+              </Typography>
+              <TextField
+                label="Sender ID"
+                value={newSenderID}
+                onChange={(e) => setNewSenderID(e.target.value)}
+                fullWidth
+                margin="normal"
               />
-            ),
-            actions: (
               <Button
                 variant="contained"
                 color="primary"
-                disabled={senderID.status === 'Approved'}
-                onClick={() => handleApprove(senderID.id)}
-                className="ml-2"
+                onClick={handleAddSenderID}
+                className="mt-4"
               >
-                {senderID.status === 'Approved' ? 'Approved' : 'Approve'}
+                Add Sender ID
               </Button>
-            )
-          }))}
-        />
-
-        {/* Pagination */}
-        <TablePagination
-          component="div"
-          count={filteredSenderIDs.length}
-          page={page}
-          onPageChange={handlePageChange}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleRowsPerPageChange}
-          className="mt-5"
-        />
+            </Box>
+          </Modal>
+        </Paper>
       </Box>
     </Box>
   );

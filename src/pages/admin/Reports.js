@@ -32,14 +32,14 @@ function Reports() {
   return (
     <Box className="flex flex-col h-screen">
       {/* Navbar at the top */}
-      <Navbar />
+      <Navbar /> <br/> <br/>
 
-      <Box className="flex flex-1">
+      <Box className="flex flex-1 mt-12"> {/* Add margin-top to account for Navbar */}
         {/* Sidebar on the left */}
-        <Sidebar className="w-64" />
+        <Sidebar className="w-64 fixed h-full" />
 
         {/* Main content area for the reports */}
-        <Box className="flex-grow p-5 overflow-auto">
+        <Box className="flex-grow ml-64 p-5 overflow-auto">
           <Typography variant="h4" className="mb-5">Detailed Reports</Typography>
 
           {/* Reports Table */}

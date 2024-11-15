@@ -1,7 +1,6 @@
-// src/pages/admin/Campaigns.js
 import React, { useState } from "react";
 import { Grid, Paper, Typography, Button, TextField, Select, MenuItem, FormControl, InputLabel, Box } from "@mui/material";
-import { FaRegMoneyBillAlt, FaUsers, FaFlag, FaMailBulk } from 'react-icons/fa';
+import { FaRegMoneyBillAlt, FaUsers, FaMailBulk } from 'react-icons/fa';
 import { ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
@@ -26,9 +25,12 @@ const Campaigns = () => {
 
   return (
     <div className="flex">
+      {/* Sidebar should have a fixed width and should not overlap content */}
       <Sidebar />
-      <div className="flex-1 ml-12">
-        <Navbar />
+      
+      <div className="flex-1 ml-[240px]"> {/* Adjust left margin to match sidebar width */}
+        <Navbar /> <br/> <br/>
+        
         <div className="p-8 mt-5">
           <Grid container spacing={3}>
             {/* Dashboard Overview */}

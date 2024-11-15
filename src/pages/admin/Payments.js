@@ -1,9 +1,9 @@
 // src/pages/admin/Payments.js
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper } from '@mui/material';
-import Sidebar from '../../components/Sidebar'; // Ensure the sidebar is imported
-import Navbar from '../../components/Navbar'; // Navbar for top layout
-import Table from '../../components/Table'; // Reusing the Table component for display
+import Sidebar from '../../components/Sidebar'; // Sidebar component
+import Navbar from '../../components/Navbar'; // Navbar component
+import Table from '../../components/Table'; // Reusable Table component
 
 function Payments() {
   const [payments, setPayments] = useState([]);
@@ -12,7 +12,7 @@ function Payments() {
     // Fetch payment transactions from the API
     const fetchPayments = async () => {
       try {
-        const response = await fetch('/api/admin/payments'); // Update with real endpoint
+        const response = await fetch('/api/admin/payments'); // Replace with real endpoint
         const data = await response.json();
         setPayments(data);
       } catch (error) {
@@ -23,14 +23,16 @@ function Payments() {
   }, []);
 
   return (
-    <Box className="flex">
-      {/* Sidebar */}
-      <Sidebar />
+    <Box className="flex h-screen">
+      {/* Sidebar with fixed width */}
+      <Box sx={{ width: '250px' }}>
+        <Sidebar />
+      </Box>
 
       {/* Main content area */}
       <Box className="flex-grow p-5">
         {/* Navbar */}
-        <Navbar /> <br/>
+        <Navbar /> <br />
 
         {/* Payment Processing Section */}
         <Paper className="p-5 mt-5">

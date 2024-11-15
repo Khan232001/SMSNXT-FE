@@ -1,26 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Login.css';
-
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // Initialize navigate function
+  const navigate = useNavigate(); 
 
-  // Handle the login form submission
   const handleLogin = (e) => {
     e.preventDefault();
     
-    // Logic for handling login (for example, checking credentials)
+    
     if (email && password) {
-      // If login is successful, navigate to dashboard
-      navigate('/dashboard');
+      navigate('/admin/dashboard');
     } else {
       alert('Please enter valid credentials!');
     }
   };
 
-  // Handle admin login redirection
   const handleAdminLogin = () => {
     navigate('/admin/login');
   };
@@ -84,11 +80,6 @@ const Login = () => {
             </button>
           </div>
         </form>
-
-        {/* Admin Login Redirect Button */}
-        <div className="mt-6 text-center">
-        <a href="/admin/login" className="text-sm text-blue-500 hover:underline">Login as Admin</a>
-        </div>
       </div>
 
       {/* Right Side - Gradient Background with Wave Effect */}

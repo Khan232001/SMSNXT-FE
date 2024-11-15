@@ -25,9 +25,15 @@ const Order = () => {
   ];
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <div className="flex-grow p-5">
+    <div className="flex h-screen">
+      {/* Sidebar on the left */}
+      <div className="w-1/5"> {/* Ensure sidebar takes 25% of the screen width */}
+        <Sidebar />
+      </div>
+
+      {/* Content area */}
+      <div className="flex-grow p-5 bg-gray-100">
+        {/* Navbar at the top */}
         <Navbar />
 
         {/* Order Table */}
@@ -54,7 +60,15 @@ const Order = () => {
                     <TableCell>{order.plan}</TableCell>
                     <TableCell>{order.amount}</TableCell>
                     <TableCell>
-                      <span className={`text-sm font-medium ${order.status === 'Pending' ? 'text-yellow-500' : order.status === 'Renewed' ? 'text-green-500' : 'text-red-500'}`}>
+                      <span
+                        className={`text-sm font-medium ${
+                          order.status === 'Pending'
+                            ? 'text-yellow-500'
+                            : order.status === 'Renewed'
+                            ? 'text-green-500'
+                            : 'text-red-500'
+                        }`}
+                      >
                         {order.status}
                       </span>
                     </TableCell>
