@@ -1,40 +1,61 @@
-// src/pages/Login.js
-import React from 'react';
-import './Login.css'; // Custom CSS for additional styling
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';  
+import './Login.css'; 
 
 const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate(); // Initialize navigate function
+
+  // Handle the login form submission
+  const handleLogin = (e) => {
+    e.preventDefault();
+    
+    // Logic for handling login (for example, checking credentials)
+    if (email && password) {
+      // If login is successful, navigate to dashboard
+      navigate('/dashboard');
+    } else {
+      alert('Please enter valid credentials!');
+    }
+  };
+
   return (
     <div className="flex h-screen">
       {/* Left Side - Login Form with New Branding */}
       <div className="login-left w-1/2 flex flex-col justify-center items-center bg-white p-8">
         <div className="logo mb-9 text-2xl font-bold mb-4 text-primary text-center">
-            BYT
+          BYT
         </div>
-        
+
         <h2 className="text-3xl font-bold mb-4 text-primary text-center">Login</h2>
         <hr className="w-2/3 border-t-2 border-primary mb-6" /> {/* Line beneath the heading */}
 
-        <form className="w-full max-w-md">
+        <form className="w-full max-w-md" onSubmit={handleLogin}>
           <div className="mb-4">
-            <label className="block text-gray-700 text-lg font-bold mb-2" htmlFor="email"> {/* Increased font size */}
+            <label className="block text-gray-700 text-lg font-bold mb-2" htmlFor="email">
               Email or Username
             </label>
             <input
               id="email"
               type="text"
               placeholder="user@me.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 text-lg font-bold mb-2" htmlFor="password"> {/* Increased font size */}
+            <label className="block text-gray-700 text-lg font-bold mb-2" htmlFor="password">
               Password
             </label>
             <input
               id="password"
               type="password"
               placeholder="********"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -47,7 +68,7 @@ const Login = () => {
             <a href="#" className="text-sm text-blue-500 hover:underline">Forgot Password?</a>
           </div>
 
-          <button className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-primary-dark transition duration-300">
+          <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-primary-dark transition duration-300">
             Log In
           </button>
 

@@ -4,16 +4,16 @@ import Footer from '../../components/Footer';
 
 const Contact = () => {
   return (
-    <div className="bg-gray-100 text-gray-800 bg-blue-950">
+    <div className="bg-gradient-to-r from-blue-950 to-blue-900 text-gray-800">
       {/* Header */}
       <Header className="mb-10" />
 
       {/* Contact Info and Form Section */}
       <section className="pb-16 mt-20"> {/* Increased margin-top here */}
         <div className="container mx-auto px-4 lg:px-0">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 justify-center items-center">
             {/* Left Column - Contact Info */}
-            <div className="p-8 shadow-lg rounded-lg text-white">
+            <div className="p-8 shadow-lg rounded-lg text-white mx-auto my-8 lg:w-3/4"> {/* Removed bg-blue-950 for transparent background */}
               <h2 className="text-3xl font-semibold mb-4 text-center text-white">Get in Touch with Us</h2>
               <p className="mb-4 text-lg">
                 Our experts can help you find the right solution. Together we’ll create a tailored solution and start growing your business from day one.
@@ -38,7 +38,7 @@ const Contact = () => {
             </div>
 
             {/* Right Column - Contact Form */}
-            <div className="bg-white p-8 shadow-lg rounded-lg">
+            <div className="bg-white p-8 shadow-lg rounded-lg mx-auto my-8 lg:w-3/4">
               <h2 className="text-3xl font-semibold mb-8 text-center">Contact Sales</h2>
               <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Form Fields */}

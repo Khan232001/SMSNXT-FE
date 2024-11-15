@@ -46,11 +46,7 @@ function SenderIDs() {
   );
 
   const drawerItems = (
-<<<<<<< HEAD
     <Box className="w-64" role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
-=======
-    <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
->>>>>>> acd4fce (first commit)
       <List>
         {['Dashboard', 'Plans & Customers', 'Orders', 'Payments', 'Sender IDs', 'Campaigns', 'Reports', 'Staff Management', 'Settings'].map((text, index) => (
           <ListItem button key={text}>
@@ -62,11 +58,7 @@ function SenderIDs() {
   );
 
   return (
-<<<<<<< HEAD
     <Box className="flex">
-=======
-    <Box sx={{ display: 'flex' }}>
->>>>>>> acd4fce (first commit)
       {/* Sidebar Drawer */}
       <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
         {drawerItems}
@@ -78,41 +70,25 @@ function SenderIDs() {
           <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleDrawer(true)}>
             <MenuIcon />
           </IconButton>
-<<<<<<< HEAD
           <Typography variant="h6" className="flex-grow">
-=======
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
->>>>>>> acd4fce (first commit)
             Admin Panel
           </Typography>
         </Toolbar>
       </AppBar>
 
       {/* Main Content */}
-<<<<<<< HEAD
       <Box component="main" className="flex-grow p-6 mt-16">
         <Typography variant="h4" className="mb-6">Sender ID Management</Typography>
 
         {/* Search Bar */}
         <Box className="flex items-center mb-4">
-=======
-      <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
-        <Typography variant="h4" gutterBottom>Sender ID Management</Typography>
-
-        {/* Search Bar */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
->>>>>>> acd4fce (first commit)
           <TextField
             label="Search Sender ID"
             variant="outlined"
             size="small"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-<<<<<<< HEAD
             className="mr-4"
-=======
-            sx={{ mr: 2 }}
->>>>>>> acd4fce (first commit)
           />
           <IconButton color="primary">
             <SearchIcon />
@@ -132,10 +108,7 @@ function SenderIDs() {
                   senderID.status === 'Pending' ? 'warning' :
                   'default'
                 }
-<<<<<<< HEAD
                 className="mr-2"
-=======
->>>>>>> acd4fce (first commit)
               />
             ),
             actions: (
@@ -144,10 +117,7 @@ function SenderIDs() {
                 color="primary"
                 disabled={senderID.status === 'Approved'}
                 onClick={() => handleApprove(senderID.id)}
-<<<<<<< HEAD
                 className="ml-2"
-=======
->>>>>>> acd4fce (first commit)
               >
                 {senderID.status === 'Approved' ? 'Approved' : 'Approve'}
               </Button>
@@ -163,10 +133,7 @@ function SenderIDs() {
           onPageChange={handlePageChange}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleRowsPerPageChange}
-<<<<<<< HEAD
           className="mt-5"
-=======
->>>>>>> acd4fce (first commit)
         />
       </Box>
     </Box>

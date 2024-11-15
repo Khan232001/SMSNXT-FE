@@ -1,8 +1,4 @@
 import React, { useEffect, useState } from 'react';
-<<<<<<< HEAD
-=======
-import { Box, Typography, Button } from '@mui/material';
->>>>>>> acd4fce (first commit)
 import Table from '../components/Table';
 
 function Staff() {
@@ -19,7 +15,6 @@ function Staff() {
   }, []);
 
   return (
-<<<<<<< HEAD
     <div className="p-8">
       <h1 className="text-3xl font-semibold mb-6">Manage Staff</h1>
       
@@ -31,13 +26,6 @@ function Staff() {
         Add New Staff
       </button>
     </div>
-=======
-    <Box>
-      <Typography variant="h4" gutterBottom>Manage Staff</Typography>
-      <Table columns={['Name', 'Role', 'Email', 'Status']} data={staff} />
-      <Button variant="contained" color="primary" sx={{ mt: 2 }}>Add New Staff</Button>
-    </Box>
->>>>>>> acd4fce (first commit)
   );
 }
 

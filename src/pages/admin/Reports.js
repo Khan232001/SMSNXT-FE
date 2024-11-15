@@ -4,10 +4,6 @@ import Table from '../../components/Table';
 import TablePagination from '@mui/material/TablePagination'; // For pagination
 import Navbar from '../../components/Navbar'; // Assuming Navbar is in components folder
 import Sidebar from '../../components/Sidebar'; // Assuming Sidebar is in components folder
-<<<<<<< HEAD
-=======
-import './Reports.css'; // Assuming there's a CSS file to handle styles
->>>>>>> acd4fce (first commit)
 
 function Reports() {
   const [reports, setReports] = useState([]);
@@ -34,7 +30,6 @@ function Reports() {
   };
 
   return (
-<<<<<<< HEAD
     <Box className="flex flex-col h-screen">
       {/* Navbar at the top */}
       <Navbar />
@@ -46,19 +41,6 @@ function Reports() {
         {/* Main content area for the reports */}
         <Box className="flex-grow p-5 overflow-auto">
           <Typography variant="h4" className="mb-5">Detailed Reports</Typography>
-=======
-    <Box className="admin-container">
-      {/* Navbar at the top */}
-      <Navbar />
-      
-      <Box className="main-content">
-        {/* Sidebar on the left */}
-        <Sidebar className="sidebar" />
-
-        {/* Main content area for the reports */}
-        <Box className="reports-content">
-          <Typography variant="h4" gutterBottom>Detailed Reports</Typography>
->>>>>>> acd4fce (first commit)
 
           {/* Reports Table */}
           <Table
@@ -88,10 +70,7 @@ function Reports() {
             onPageChange={handlePageChange}
             rowsPerPage={rowsPerPage}
             onRowsPerPageChange={handleRowsPerPageChange}
-<<<<<<< HEAD
             className="mt-5"
-=======
->>>>>>> acd4fce (first commit)
           />
         </Box>
       </Box>
