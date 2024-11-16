@@ -3,7 +3,7 @@ import { Grid, Paper, Typography, Button, TextField, Select, MenuItem, FormContr
 import { FaRegMoneyBillAlt, FaUsers, FaMailBulk } from 'react-icons/fa';
 import { ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import Navbar from "../../components/Navbar";
-import Sidebar from "../../components/Sidebar";
+import Sidebar from "../../components/AdminSidebar";
 
 const campaignData = [
   { name: 'Campaign 1', uv: 4000, pv: 2400, amt: 2400 },

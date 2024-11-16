@@ -14,7 +14,7 @@ import Home from './pages/Home';
 import Pricing from './pages/user/Pricing';
 import Contact from './pages/user/Contact';
 import NotFound from './pages/NotFound';
-import Sidebar from './components/Sidebar';
+import Sidebar from './components/AdminSidebar';
 import Navbar from './components/Navbar';
 import SubscriptionPlans from './pages/user/SubscriptionPlans';
 import OrderHistory from './pages/user/OrderHistory';

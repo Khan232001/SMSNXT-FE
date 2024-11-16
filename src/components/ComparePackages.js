@@ -1,6 +1,14 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";  // Importing useNavigate from react-router-dom
 
 const ComparePackages = () => {
+  const navigate = useNavigate();  // Initialize the navigate function
+
+  // Function to handle the redirection when "Contact Sales" button is clicked
+  const handleContactSales = () => {
+    navigate("/contact");  // Redirect to '/contact' route
+  };
+
   return (
     <section id="compare-packages" className="bg-gradient-to-r from-blue-950 to-blue-900 py-16 text-white">
       <div className="container mx-auto px-6">
@@ -22,7 +30,10 @@ const ComparePackages = () => {
               <li>Campaign Messaging Tool</li>
               <li>Reporting & Dashboards</li>
             </ul>
-            <button className="mt-5 bg-pink-200 text-black py-3 px-6 rounded-full hover:bg-pink-300 transition-colors">
+            <button
+              className="mt-5 bg-pink-200 text-black py-3 px-6 rounded-full hover:bg-pink-300 transition-colors"
+              onClick={handleContactSales}  // Added onClick handler for redirection
+            >
               Try for Free
             </button>
           </div>
@@ -38,7 +49,10 @@ const ComparePackages = () => {
               <li>Reporting & Dashboards</li>
               <li>Enterprise APIs</li>
             </ul>
-            <button className="mt-5 bg-blue-200 text-black py-3 px-6 rounded-full hover:bg-blue-300 transition-colors">
+            <button
+              className="mt-5 bg-blue-200 text-black py-3 px-6 rounded-full hover:bg-blue-300 transition-colors"
+              onClick={handleContactSales}  // Added onClick handler for redirection
+            >
               Contact Sales
             </button>
           </div>
@@ -55,7 +69,10 @@ const ComparePackages = () => {
               <li>CRM Integrations</li>
               <li>Reporting & Dashboards</li>
             </ul>
-            <button className="mt-5 bg-green-200 text-black py-3 px-6 rounded-full hover:bg-green-300 transition-colors">
+            <button
+              className="mt-5 bg-green-200 text-black py-3 px-6 rounded-full hover:bg-green-300 transition-colors"
+              onClick={handleContactSales}  // Added onClick handler for redirection
+            >
               Contact Sales
             </button>
           </div>
@@ -72,7 +89,10 @@ const ComparePackages = () => {
               <li>OMS Integrations</li>
               <li>Reporting & Dashboards</li>
             </ul>
-            <button className="mt-5 bg-yellow-100 text-black py-3 px-6 rounded-full hover:bg-yellow-200 transition-colors">
+            <button
+              className="mt-5 bg-yellow-100 text-black py-3 px-6 rounded-full hover:bg-yellow-200 transition-colors"
+              onClick={handleContactSales}  // Added onClick handler for redirection
+            >
               Contact Sales
             </button>
           </div>

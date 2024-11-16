@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Navbar from './Navbar';
-import Sidebar from './Sidebar';
+import Sidebar from './AdminSidebar';
 import './AdminLayout.css';  // Layout-specific styles
 
 const AdminLayout = ({ children }) => {

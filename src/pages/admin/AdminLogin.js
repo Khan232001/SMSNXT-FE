@@ -29,7 +29,7 @@ const Login = () => {
           BYT
         </div>
 
-        <h2 className="text-3xl font-bold mb-4 text-primary text-center">Login</h2>
+        <h2 className="text-3xl font-bold mb-4 text-primary text-center">Admin Login</h2>
         <hr className="w-2/3 border-t-2 border-primary mb-6" /> {/* Line beneath the heading */}
 
         <form className="w-full max-w-md" onSubmit={handleLogin}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
 import { FaCheckCircle, FaTimesCircle, FaSyncAlt } from 'react-icons/fa';
-import Sidebar from '../../components/Sidebar';
+import Sidebar from '../../components/AdminSidebar';
 import Navbar from '../../components/Navbar';
 
 const Order = () => {

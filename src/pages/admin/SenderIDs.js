@@ -1,9 +1,9 @@
 // src/pages/admin/SenderIDs.js
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Button, Modal, TextField } from '@mui/material';
-import Sidebar from '../../components/Sidebar'; // Sidebar component
-import Navbar from '../../components/Navbar'; // Navbar component
-import Table from '../../components/Table'; // Reusable Table component
+import Sidebar from '../../components/AdminSidebar'; 
+import Navbar from '../../components/Navbar'; 
+import Table from '../../components/Table'; 
 
 function SenderIDs() {
   const [senderIDs, setSenderIDs] = useState([]);

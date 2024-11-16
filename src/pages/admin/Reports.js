@@ -3,7 +3,7 @@ import { Box, Typography, Chip } from '@mui/material';
 import Table from '../../components/Table';
 import TablePagination from '@mui/material/TablePagination'; // For pagination
 import Navbar from '../../components/Navbar'; // Assuming Navbar is in components folder
-import Sidebar from '../../components/Sidebar'; // Assuming Sidebar is in components folder
+import Sidebar from '../../components/AdminSidebar'; // Assuming Sidebar is in components folder
 
 function Reports() {
   const [reports, setReports] = useState([]);

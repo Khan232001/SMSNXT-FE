@@ -1,9 +1,9 @@
 // src/pages/admin/Payments.js
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper } from '@mui/material';
-import Sidebar from '../../components/Sidebar'; // Sidebar component
-import Navbar from '../../components/Navbar'; // Navbar component
-import Table from '../../components/Table'; // Reusable Table component
+import Sidebar from '../../components/AdminSidebar'; 
+import Navbar from '../../components/Navbar'; 
+import Table from '../../components/Table';
 
 function Payments() {
   const [payments, setPayments] = useState([]);

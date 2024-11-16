@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Typography, Modal, TextField } from '@mui/material';
-import Table from '../../components/Table'; // Reusable Table component
-import Navbar from '../../components/Navbar'; // Navbar for top layout
-import Sidebar from '../../components/Sidebar'; // Sidebar for navigation
+import Table from '../../components/Table'; 
+import Navbar from '../../components/Navbar'; 
+import Sidebar from '../../components/AdminSidebar'; 
 
 function Plans() {
   const [plans, setPlans] = useState([]);
