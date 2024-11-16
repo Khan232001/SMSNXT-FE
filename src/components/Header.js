@@ -116,6 +116,9 @@ const Header = () => {
           <Link to="resources" className="hover:text-blue-500 ">
             Resources
           </Link>
+          <Link to="login" className="hover:text-blue-500 ">
+            Login
+          </Link>
           <a href="contact">
             <button className="bg-black text-white px-4 py-2 rounded-lg hover:bg-blue-500">
               Start Free

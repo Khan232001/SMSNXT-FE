@@ -24,6 +24,8 @@ import Reporting from './pages/user/Reporting';
 import Messaging from './pages/user/Messaging';
 import SenderIDManagement from './pages/user/SenderIDManagement';
 import AdminLogin from './pages/admin/AdminLogin';
+import Settings from './pages/admin/Settings';
+import SmsGateway from './pages/admin/SmsGateway';
 
 function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -58,6 +60,8 @@ function App() {
             <Route path="/admin/campaigns" element={<Campaigns />} />
             <Route path="/admin/customers" element={<Customers />} />
             <Route path="/admin/orders" element={<Order />} />
+            <Route path="/admin/system-settings" element={<Settings />} />
+            <Route path="/admin/sms-gateway" element={<SmsGateway />} />
 
             {/* Catch-all Route */}
             <Route path="*" element={<NotFound />} />

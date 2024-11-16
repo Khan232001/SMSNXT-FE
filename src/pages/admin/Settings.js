@@ -1,72 +1,139 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Box, Typography, Button, Switch, TextField } from '@mui/material';
+import Navbar from '../../components/Navbar'; 
+import Sidebar from '../../components/AdminSidebar'; 
 
-function Settings() {
-  const [settings, setSettings] = useState({
-    siteName: '',
-    adminEmail: '',
-    contactNumber: ''
-  });
+const SystemSettings = () => {
+  const [settings, setSettings] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch settings data
+    // Fetch system settings data
     const fetchSettings = async () => {
-      const response = await fetch('/api/admin/settings');
-      const data = await response.json();
-      setSettings(data);
+      try {
+        const response = await fetch('/api/admin/system-settings');
+        const data = await response.json();
+        setSettings(data);
+      } catch (error) {
+        console.error('Error fetching system settings:', error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchSettings();
   }, []);
 
-  const handleSave = () => {
-    // Logic to save settings (API call)
-    console.log('Save settings', settings);
+  const handleToggleChange = (key) => {
+    setSettings((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
   };
 
+  const handleInputChange = (key, value) => {
+    setSettings((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const handleSaveSettings = async () => {
+    try {
+      const response = await fetch('/api/admin/system-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settings),
+      });
+      if (response.ok) {
+        alert('Settings updated successfully!');
+      } else {
+        alert('Failed to update settings. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+    }
+  };
+
+  if (loading) {
+    return <Typography>Loading settings...</Typography>;
+  }
+
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-semibold mb-6">System & Website Settings</h1>
+    <Box className="flex flex-col h-screen">
+      {/* Navbar at the top */}
+      <Navbar /> <br /><br />
 
-      <div className="mb-4">
-        <label htmlFor="siteName" className="block text-lg font-medium">Site Name</label>
-        <input
-          id="siteName"
-          type="text"
-          value={settings.siteName}
-          onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-          className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
-        />
-      </div>
+      <Box className="flex flex-1 mt-12">
+        {/* Sidebar on the left */}
+        <Sidebar className="w-64 fixed h-full" />
 
-      <div className="mb-4">
-        <label htmlFor="adminEmail" className="block text-lg font-medium">Admin Email</label>
-        <input
-          id="adminEmail"
-          type="email"
-          value={settings.adminEmail}
-          onChange={(e) => setSettings({ ...settings, adminEmail: e.target.value })}
-          className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
-        />
-      </div>
+        {/* Main content area */}
+        <Box className="flex-grow ml-64 p-5 overflow-auto">
+          <Typography variant="h4" className="mb-5">System Settings</Typography>
 
-      <div className="mb-6">
-        <label htmlFor="contactNumber" className="block text-lg font-medium">Contact Number</label>
-        <input
-          id="contactNumber"
-          type="text"
-          value={settings.contactNumber}
-          onChange={(e) => setSettings({ ...settings, contactNumber: e.target.value })}
-          className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
-        />
-      </div>
+          {/* Settings Form */}
+          <Box className="space-y-6">
+            <Box>
+              <Typography variant="h6">Enable Notifications</Typography>
+              <Switch
+                checked={settings.enableNotifications || false}
+                onChange={() => handleToggleChange('enableNotifications')}
+              />
+            </Box>
 
-      <button
-        onClick={handleSave}
-        className="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600"
-      >
-        Save Settings
-      </button>
-    </div>
+            <Box>
+              <Typography variant="h6">Website Title</Typography>
+              <TextField
+                fullWidth
+                variant="outlined"
+                value={settings.websiteTitle || ''}
+                onChange={(e) => handleInputChange('websiteTitle', e.target.value)}
+              />
+            </Box>
+
+            <Box>
+              <Typography variant="h6">Default Language</Typography>
+              <TextField
+                fullWidth
+                variant="outlined"
+                value={settings.defaultLanguage || ''}
+                onChange={(e) => handleInputChange('defaultLanguage', e.target.value)}
+              />
+            </Box>
+
+            <Box>
+              <Typography variant="h6">Maintenance Mode</Typography>
+              <Switch
+                checked={settings.maintenanceMode || false}
+                onChange={() => handleToggleChange('maintenanceMode')}
+              />
+            </Box>
+
+            <Box>
+              <Typography variant="h6">API Key</Typography>
+              <TextField
+                fullWidth
+                variant="outlined"
+                value={settings.apiKey || ''}
+                onChange={(e) => handleInputChange('apiKey', e.target.value)}
+              />
+            </Box>
+          </Box><br></br>
+          {/* Save Button */}
+          <Button
+            variant="contained"
+            color="primary"
+            className="mt-8"
+            onClick={handleSaveSettings}
+          >
+            Save Settings
+          </Button>
+        </Box>
+      </Box>
+    </Box>
   );
-}
+};
 
-export default Settings;
+export default SystemSettings;
