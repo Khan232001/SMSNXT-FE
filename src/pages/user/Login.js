@@ -89,6 +89,9 @@ const Login = () => {
         <div className="mt-6 text-center">
         <a href="/admin/login" className="text-sm text-blue-500 hover:underline">Login as Admin</a>
         </div>
+        <div className="mt-6 text-center">
+        <a href="/signup" className="text-sm text-blue-500 hover:underline">SignUp</a>
+        </div>
       </div>
 
       {/* Right Side - Gradient Background with Wave Effect */}
