@@ -18,6 +18,13 @@ const Sidebar = ({ open }) => {
         </ListItem>
 
         <Divider className="border-gray-600" />
+        
+        {/* Home */}
+        <ListItem button component={Link} to="/dashboard" className="flex items-center hover:bg-gray-700 p-2 rounded-md mb-2">
+          <FaClipboardList className="text-xl mr-4" />
+          <ListItemText primary="Home" />
+        </ListItem>
+
 
         {/* Quick & Group Messaging */}
         <ListItem button component={Link} to="/quick-group-messaging" className="flex items-center hover:bg-gray-700 p-2 rounded-md mb-2">
@@ -49,13 +56,13 @@ const Sidebar = ({ open }) => {
         {/* Campaign Management */}
         <ListItem button component={Link} to="/campaign-management" className="flex items-center hover:bg-gray-700 p-2 rounded-md mb-2">
           <FaFlag className="text-xl mr-4" />
-          <ListItemText primary="Campaign Management" />
+          <ListItemText primary="Campaign" />
         </ListItem>
 
         {/* Contact Management */}
         <ListItem button component={Link} to="/contact-management" className="flex items-center hover:bg-gray-700 p-2 rounded-md mb-2">
           <FaUsers className="text-xl mr-4" />
-          <ListItemText primary="Contact Management" />
+          <ListItemText primary="Contact" />
         </ListItem>
 
         {/* Reporting */}

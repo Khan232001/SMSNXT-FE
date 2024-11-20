@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import UserNavbar from '../../components/UserNavbar'; // Importing UserNavbar
-import UserSidebar from '../../components/UserSidebar'; // Importing UserSidebar
+import UserNavbar from '../../components/UserNavbar';
+import UserSidebar from '../../components/UserSidebar';
 
 const SubscriptionPlans = () => {
   // Sample subscription plans data
@@ -15,39 +15,44 @@ const SubscriptionPlans = () => {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh' }}>
+    <div className="flex flex-col md:flex-row h-screen">
       {/* Sidebar */}
-      <UserSidebar />
+      <div className="md:w-64 w-full md:fixed">
+        <UserSidebar />
+      </div>
 
       {/* Main Content */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft: '250px' }}>
+      <div className="flex-1 md:ml-64 bg-gray-100">
         {/* Navbar */}
-        <UserNavbar />
+        <div className="fixed top-0 left-0 right-0 z-10 h-16 bg-white shadow-md md:ml-64">
+          <UserNavbar />
+        </div>
 
         {/* Subscription Plans Content */}
-        <div className="container mx-auto p-6 mt-24">
-          <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
-            <table className="min-w-full table-auto">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Plan Name</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Price</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Duration</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                {plans.map((plan) => (
-                  <tr key={plan.id} className="border-t border-gray-200">
-                    <td className="px-6 py-4 text-sm text-gray-700">{plan.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-700">${plan.price}</td>
-                    <td className="px-6 py-4 text-sm text-gray-700">{plan.duration}</td>
-                    <td className="px-6 py-4 text-sm text-gray-700">{plan.description}</td>
-                    
+        <div className="mt-16 p-4 md:p-6">
+          <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full table-auto border-collapse">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Plan Name</th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Price</th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Duration</th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Description</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {plans.map((plan) => (
+                    <tr key={plan.id} className="border-t border-gray-200">
+                      <td className="px-6 py-4 text-sm text-gray-700">{plan.name}</td>
+                      <td className="px-6 py-4 text-sm text-gray-700">${plan.price}</td>
+                      <td className="px-6 py-4 text-sm text-gray-700">{plan.duration}</td>
+                      <td className="px-6 py-4 text-sm text-gray-700">{plan.description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

@@ -16,4 +16,38 @@
       background-position: 0% 50%;
     }
   }
-  
+  /* Mobile-first responsive design */
+.flex {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.h-screen {
+  height: 100vh;
+}
+
+.login-left {
+  padding: 2rem;
+}
+
+
+.wave-background h3,
+.wave-background p {
+  text-align: center;
+}
+
+@media (min-width: 1024px) {
+  .flex {
+    flex-wrap: nowrap;
+  }
+
+  .login-left {
+    justify-content: center;
+    align-items: center;
+  }
+
+  .wave-background h3,
+  .wave-background p {
+    text-align: left;
+  }
+}

@@ -1,45 +1,96 @@
 import React, { useState } from 'react';
 import UserNavbar from '../../components/UserNavbar'; 
 import UserSidebar from '../../components/UserSidebar'; 
+import Papa from 'papaparse'; 
 
 const CampaignManagement = () => {
-  // Sample campaigns data
-  const [campaigns, setCampaigns] = useState([
-    { id: 1, name: 'Black Friday Sale', status: 'Active', startDate: '2024-11-01', endDate: '2024-11-30', targetAudience: 'Subscribers' },
-    { id: 2, name: 'Holiday Promotions', status: 'Inactive', startDate: '2024-12-01', endDate: '2024-12-31', targetAudience: 'New Users' },
-    { id: 3, name: 'Monthly Newsletter', status: 'Active', startDate: '2024-10-01', endDate: '2024-10-31', targetAudience: 'All Users' },
-  ]);
+  const [campaigns, setCampaigns] = useState([]);
+  const [uploadedRecipients, setUploadedRecipients] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const handleCreateCampaign = () => {
+    const campaignName = prompt('Enter Campaign Name');
+    if (campaignName) {
+      setCampaigns([...campaigns, { 
+        id: campaigns.length + 1, 
+        name: campaignName, 
+        status: 'Draft', 
+        startDate: 'TBD', 
+        endDate: 'TBD', 
+        targetAudience: `${uploadedRecipients.length} Recipients` 
+      }]);
+    }
+  };
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        complete: (results) => {
+          setUploadedRecipients(results.data);
+          alert(`Successfully imported ${results.data.length} recipients!`);
+        },
+        error: (error) => {
+          alert('Error parsing CSV: ' + error.message);
+        },
+      });
+    }
+  };
 
   const handleDeleteCampaign = (id) => {
     setCampaigns(campaigns.filter(campaign => campaign.id !== id));
   };
 
-  const handleCreateCampaign = () => {
-    alert('Redirect to create campaign form');
-  };
-
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <div className="w-64 fixed left-0 top-0 bottom-0">
-        <UserSidebar /> 
+      <div className={`fixed top-0 left-0 z-20 bg-white shadow-md lg:relative lg:w-64 lg:block ${isSidebarOpen ? 'w-64' : 'hidden'}`}>
+        <UserSidebar />
       </div>
 
-      <div className="flex-1 ml-64 bg-gray-100">
+      <div className="flex-1 flex flex-col bg-gray-100 relative">
         {/* Navbar */}
-        <UserNavbar />
+        <div className="fixed top-0 left-0 right-0 z-10 h-16 bg-white shadow-md flex justify-between items-center px-4 lg:px-6">
+          <button
+            className="text-gray-600 focus:outline-none lg:hidden"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <UserNavbar />
+        </div>
 
-        <div className="container mx-auto p-6">
-          <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-gray-700">Campaign Management</h2>
-            <button
-              onClick={handleCreateCampaign}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Create New Campaign
-            </button>
+        {/* Main Content */}
+        <div className="mt-16 flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col lg:flex-row justify-between items-center mb-6 space-y-4 lg:space-y-0">
+            <h2 className="text-2xl font-semibold text-gray-700 text-center lg:text-left">
+              Campaign Management
+            </h2>
+
+            <div className="flex flex-col lg:flex-row lg:space-x-3 space-y-3 lg:space-y-0 w-full lg:w-auto">
+              <button
+                onClick={handleCreateCampaign}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 w-full lg:w-auto"
+              >
+                Create New Campaign
+              </button>
+
+              <label className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 cursor-pointer w-full lg:w-auto">
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                Import Recipients (CSV)
+              </label>
+            </div>
           </div>
 
+          {/* Campaign Table */}
           <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
             <table className="min-w-full table-auto">
               <thead>
