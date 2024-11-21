@@ -90,9 +90,11 @@ const QuickGroupMessaging = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, height: '100vh' }}>
       {/* Sidebar */}
-      <UserSidebar />
+      <Box sx={{ display: { xs: 'none', sm: 'block' }, width: { sm: '240px' } }}>
+        <UserSidebar />
+      </Box>
 
       {/* Main Content */}
       <Box
@@ -101,71 +103,71 @@ const QuickGroupMessaging = () => {
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
-          padding: 3,
+          padding: { xs: 2, sm: 3 },
           bgcolor: 'background.default',
           overflow: 'auto',
-          marginLeft: { xs: 0, sm: '240px' }, // Adjust for responsive sidebar
-          paddingTop: '64px', // Ensure the content starts below the Navbar (64px is typical Navbar height)
+          marginLeft: { xs: 0, sm: '240px' }, // Responsive margin for sidebar
+          paddingTop: { xs: '56px', sm: '64px' }, // Navbar height adjustment
         }}
       >
         {/* Navbar */}
-        <UserNavbar /> <br/>
+        <UserNavbar />
 
-        {/* Messaging Area (Side by Side) */}
+        {/* Messaging Area */}
         <Box
           sx={{
             display: 'flex',
-            justifyContent: 'space-between',
+            flexDirection: { xs: 'column', md: 'row' },
             gap: 2,
-            height: 'calc(100vh - 164px)', // Leave space for navbar and margins
+            height: 'calc(100vh - 164px)', // Adjust height based on navbar
           }}
         >
-          {/* Chat Display Component - Chat History (Displays only messages, aligned left) */}
+          {/* Chat History */}
           <Box
             sx={{
               flex: 1,
               bgcolor: 'background.paper',
               boxShadow: 3,
               borderRadius: 2,
-              padding: 3,
-              maxHeight: '100%',
+              padding: { xs: 2, sm: 3 },
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'flex-start',
+              maxHeight: '100%',
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
               <GroupIcon color="primary" />
-              <Typography variant="h6">Chat History</Typography>
+              <Typography variant="h6" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+                Chat History
+              </Typography>
             </Box>
             <Divider />
-            {/* Chat Display Area (History only, align all messages to left) */}
             <ChatDisplay messages={messages} alignRight={false} />
           </Box>
 
-          {/* Chat Input Component (Displays messages + input area) */}
+          {/* Chat Input and Display */}
           <Box
             sx={{
               flex: 1,
               bgcolor: 'background.paper',
               boxShadow: 3,
               borderRadius: 2,
-              padding: 3,
+              padding: { xs: 2, sm: 3 },
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
+              maxHeight: '100%',
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
               <GroupIcon color="primary" />
-              <Typography variant="h6">Quick Group Messaging</Typography>
+              <Typography variant="h6" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+                Quick Group Messaging
+              </Typography>
             </Box>
             <Divider />
-
-            {/* Chat Display Area (Align 'You' messages to the right) */}
             <ChatDisplay messages={messages} alignRight={true} />
-
-            {/* Chat Input Area */}
             <ChatInput
               message={message}
               setMessage={setMessage}
@@ -179,3 +181,4 @@ const QuickGroupMessaging = () => {
 };
 
 export default QuickGroupMessaging;
+

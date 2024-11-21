@@ -8,19 +8,31 @@ const ContactManagement = () => {
     { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', phone: '234-567-8901' },
     { id: 3, name: 'Sam Wilson', email: 'sam.wilson@example.com', phone: '345-678-9012' },
   ]);
-  
-  const [isModalOpen, setIsModalOpen] = useState(false); // State to handle modal visibility
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
+
+  // States for creating a group
   const [groupName, setGroupName] = useState('');
   const [groupDescription, setGroupDescription] = useState('');
+
+  // States for adding a new contact
+  const [newContactName, setNewContactName] = useState('');
+  const [newContactEmail, setNewContactEmail] = useState('');
+  const [newContactPhone, setNewContactPhone] = useState('');
 
   const handleAddContact = () => {
     const newContact = {
       id: Date.now(),
-      name: 'New Contact',
-      email: 'new.contact@example.com',
-      phone: '000-000-0000',
+      name: newContactName,
+      email: newContactEmail,
+      phone: newContactPhone,
     };
     setContacts([...contacts, newContact]);
+    setIsAddContactModalOpen(false);
+    setNewContactName('');
+    setNewContactEmail('');
+    setNewContactPhone('');
   };
 
   const handleDeleteContact = (id) => {
@@ -32,11 +44,14 @@ const ContactManagement = () => {
   };
 
   const handleCreateGroup = () => {
-    // You can handle the group creation logic here (e.g., store in database, etc.)
+    if (!groupName || !groupDescription) {
+      alert('Group name and description are required!');
+      return;
+    }
     alert(`Group Created: ${groupName}\nDescription: ${groupDescription}`);
-    setIsModalOpen(false); // Close the modal after creating the group
-    setGroupName(''); // Reset the group name
-    setGroupDescription(''); // Reset the group description
+    setIsModalOpen(false);
+    setGroupName('');
+    setGroupDescription('');
   };
 
   return (
@@ -58,7 +73,7 @@ const ContactManagement = () => {
             <h2 className="text-2xl font-semibold text-blue-700">Contact Management</h2>
             <div className="space-x-2">
               <button
-                onClick={handleAddContact}
+                onClick={() => setIsAddContactModalOpen(true)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-800"
               >
                 Add New Contact
@@ -72,7 +87,6 @@ const ContactManagement = () => {
                   onChange={handleImportCSV}
                 />
               </label>
-              {/* Create Group Button */}
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-800"
@@ -155,6 +169,56 @@ const ContactManagement = () => {
                 className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-800"
               >
                 Create Group
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for Adding New Contact */}
+      {isAddContactModalOpen && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-md w-96">
+            <h3 className="text-xl font-semibold text-blue-700 mb-4">Add New Contact</h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Name</label>
+              <input
+                type="text"
+                value={newContactName}
+                onChange={(e) => setNewContactName(e.target.value)}
+                className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <input
+                type="email"
+                value={newContactEmail}
+                onChange={(e) => setNewContactEmail(e.target.value)}
+                className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Phone</label>
+              <input
+                type="text"
+                value={newContactPhone}
+                onChange={(e) => setNewContactPhone(e.target.value)}
+                className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex justify-between">
+              <button
+                onClick={() => setIsAddContactModalOpen(false)}
+                className="px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddContact}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-800"
+              >
+                Add Contact
               </button>
             </div>
           </div>
