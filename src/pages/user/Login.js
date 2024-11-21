@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import '../Login.css';
 
 const Login = () => {
@@ -18,7 +18,6 @@ const Login = () => {
 
   return (
     <div className="flex flex-col lg:flex-row h-screen">
-      {/* Left Side - Login Form */}
       <div className="login-left w-full lg:w-1/2 flex flex-col justify-center items-center bg-white p-8">
         <div className="logo mb-6 text-2xl font-bold text-primary">BYT</div>
         <h2 className="text-3xl font-bold mb-4 text-primary text-center">Login</h2>
@@ -58,9 +57,13 @@ const Login = () => {
               <input type="checkbox" className="form-checkbox" />
               <span className="ml-2 text-gray-700">Keep me logged in</span>
             </label>
-            <a href="#" className="text-sm text-blue-500 hover:underline">
+            <button
+              type="button"
+              onClick={() => {/* Add Forgot Password Logic Here */}}
+              className="text-sm text-blue-500 hover:underline bg-transparent border-none cursor-pointer"
+            >
               Forgot Password?
-            </a>
+            </button>
           </div>
 
           <button
@@ -81,18 +84,17 @@ const Login = () => {
         </form>
 
         <div className="mt-6 text-center">
-          <a href="/admin/login" className="text-sm text-blue-500 hover:underline">
+          <Link to="/admin/login" className="text-sm text-blue-500 hover:underline">
             Login as Admin
-          </a>
+          </Link>
         </div>
         <div className="mt-6 text-center">
-          <a href="/signup" className="text-sm text-blue-500 hover:underline">
+          <Link to="/sign" className="text-sm text-blue-500 hover:underline">
             Sign Up
-          </a>
+          </Link>
         </div>
       </div>
 
-      {/* Right Side - Gradient Background */}
       <div className="w-full lg:w-1/2 flex justify-center items-center p-8 wave-background">
         <div className="text-white max-w-md text-center lg:text-left">
           <h3 className="text-4xl font-bold mb-4">Plan a Year of SMS Campaigns in Minutes</h3>

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../Login.css";
+import "./Login.css";
 
-const Signup = () => {
+const Login3 = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -31,10 +31,10 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex flex-col lg:flex-row h-screen">
       {/* Left Side - Signup Form */}
-      <div className="signup-left w-1/2 flex flex-col justify-center items-center bg-white p-8">
-        <div className="logo mb-9 text-2xl font-bold mb-4 text-primary text-center">
+      <div className="signup-left w-full lg:w-1/2 flex flex-col justify-center items-center bg-white p-8">
+        <div className="logo mb-6 text-2xl font-bold text-primary text-center">
           BYT
         </div>
         <h2 className="text-3xl font-bold mb-4 text-primary text-center">
@@ -163,7 +163,7 @@ const Signup = () => {
       </div>
 
       {/* Right Side - Gradient Background with Wave Effect */}
-      <div className="w-1/2 flex justify-center items-center p-8 wave-background">
+      <div className="hidden lg:flex w-full lg:w-1/2 justify-center items-center p-8 wave-background">
         <div className="text-white max-w-md relative z-10">
           <h3 className="text-4xl font-bold mb-4">Welcome to BYT!</h3>
           <p className="text-lg">
@@ -175,4 +175,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Login3;
