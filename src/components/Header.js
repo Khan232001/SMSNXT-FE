@@ -7,8 +7,8 @@ const Header = () => {
   return (
     <nav className="bg-white shadow-md p-5 text-gray-900 flex justify-between items-center fixed w-full top-0 z-50">
       {/* Logo */}
-      <div className="text-2xl text- ml-10">
-        <Link to="/">BYT</Link>
+      <div className="bold text-2xl text- ml-10">
+        <Link to="/">SMSNXT</Link>
       </div>
 
       {/* Links for larger screens */}
