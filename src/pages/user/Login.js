@@ -19,7 +19,7 @@ const Login = () => {
   return (
     <div className="flex flex-col lg:flex-row h-screen">
       <div className="login-left w-full lg:w-1/2 flex flex-col justify-center items-center bg-white p-8">
-        <div className="logo mb-6 text-2xl font-bold text-primary">BYT</div>
+        <div className="logo mb-6 text-2xl font-bold text-primary">smsNXT</div>
         <h2 className="text-3xl font-bold mb-4 text-primary text-center">Login</h2>
         <hr className="w-2/3 border-t-2 border-primary mb-6" />
 

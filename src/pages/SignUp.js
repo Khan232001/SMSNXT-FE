@@ -6,22 +6,26 @@ const Login3 = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [termsChecked, setTermsChecked] = useState(false);
-  const [privacyChecked, setPrivacyChecked] = useState(false);
-  const navigate = useNavigate(); // Initialize navigate function
+  const [consentChecked, setConsentChecked] = useState(false);
+  const navigate = useNavigate();
 
-  // Handle the signup form submission
   const handleSignup = (e) => {
     e.preventDefault();
 
     // Validate input fields
-    if (!firstName || !lastName || !email || !password) {
+    if (!firstName || !lastName || !email || !phone || !password) {
       alert("All fields are required!");
       return;
     }
-    if (!termsChecked || !privacyChecked) {
-      alert("You must agree to the terms and privacy policy!");
+    if (!termsChecked) {
+      alert("You must agree to the Terms of Service!");
+      return;
+    }
+    if (!consentChecked) {
+      alert("You must consent to being contacted!");
       return;
     }
 
@@ -35,7 +39,7 @@ const Login3 = () => {
       {/* Left Side - Signup Form */}
       <div className="signup-left w-full lg:w-1/2 flex flex-col justify-center items-center bg-white p-8">
         <div className="logo mb-6 text-2xl font-bold text-primary text-center">
-          BYT
+        smsNXT
         </div>
         <h2 className="text-3xl font-bold mb-4 text-primary text-center">
           Sign Up
@@ -97,6 +101,23 @@ const Login3 = () => {
           <div className="mb-4">
             <label
               className="block text-gray-700 text-lg font-bold mb-2"
+              htmlFor="phone"
+            >
+              Phone Number
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              placeholder="123-456-7890"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-lg font-bold mb-2"
               htmlFor="password"
             >
               Password
@@ -122,8 +143,12 @@ const Login3 = () => {
               <span className="ml-2 text-gray-700">
                 I agree to the{" "}
                 <a href="/terms" className="text-blue-500 hover:underline">
-                  Terms and Conditions
-                </a>
+                  Terms of Service
+                </a>{" "}
+                and{" "}
+                <a href="/policy" className="text-blue-500 hover:underline">
+                  Privacy Policy
+                </a>.
               </span>
             </label>
           </div>
@@ -133,14 +158,13 @@ const Login3 = () => {
               <input
                 type="checkbox"
                 className="form-checkbox"
-                checked={privacyChecked}
-                onChange={(e) => setPrivacyChecked(e.target.checked)}
+                checked={consentChecked}
+                onChange={(e) => setConsentChecked(e.target.checked)}
               />
               <span className="ml-2 text-gray-700">
-                I agree to the{" "}
-                <a href="/policy" className="text-blue-500 hover:underline">
-                  Privacy Policy
-                </a>
+                I consent to smsNXT contacting me using the number provided
+                above. Message and data rates may apply. Consent is not a
+                condition of purchase.
               </span>
             </label>
           </div>
@@ -165,7 +189,7 @@ const Login3 = () => {
       {/* Right Side - Gradient Background with Wave Effect */}
       <div className="hidden lg:flex w-full lg:w-1/2 justify-center items-center p-8 wave-background">
         <div className="text-white max-w-md relative z-10">
-          <h3 className="text-4xl font-bold mb-4">Welcome to BYT!</h3>
+          <h3 className="text-4xl font-bold mb-4">Welcome to smsNXT!</h3>
           <p className="text-lg">
             Sign up to create and manage your SMS campaigns effortlessly.
           </p>
