@@ -1,16 +1,27 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../../store/slices/authSlice';
 import '../Login.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { isLoading, error } = useSelector((state) => state.auth);
 
   const handleLogin = (e) => {
     e.preventDefault();
+
     if (email && password) {
-      navigate('/dashboard');
+      dispatch(loginUser({ email, password })).then((res) => {
+        if (res.meta.requestStatus === 'fulfilled') {
+          navigate('/dashboard');
+        } else {
+          alert(res.payload || 'Login failed. Please try again.');
+        }
+      });
     } else {
       alert('Please enter valid credentials!');
     }
@@ -59,7 +70,6 @@ const Login = () => {
             </label>
             <button
               type="button"
-              onClick={() => {/* Add Forgot Password Logic Here */}}
               className="text-sm text-blue-500 hover:underline bg-transparent border-none cursor-pointer"
             >
               Forgot Password?
@@ -69,9 +79,12 @@ const Login = () => {
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
+            disabled={isLoading}
           >
-            Log In
+            {isLoading ? 'Logging in...' : 'Log In'}
           </button>
+
+          {error && <p className="text-red-500 mt-2">{error}</p>}
 
           <div className="mt-4 text-center">
             <p className="text-gray-500">or</p>
