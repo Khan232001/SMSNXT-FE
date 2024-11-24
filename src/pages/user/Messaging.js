@@ -92,7 +92,7 @@ const QuickGroupMessaging = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, height: '100vh' }}>
       {/* Sidebar */}
-      <Box sx={{ display: { xs: 'none', sm: 'block' }, width: { sm: '240px' } }}>
+      <Box sx={{ display: { xs: 'none', sm: 'block' }, width: { sm: '240px' }, position: 'fixed', top: 0, left: 0, height: '100vh' }}>
         <UserSidebar />
       </Box>
 
@@ -106,7 +106,7 @@ const QuickGroupMessaging = () => {
           padding: { xs: 2, sm: 3 },
           bgcolor: 'background.default',
           overflow: 'auto',
-          marginLeft: { xs: 0, sm: '240px' }, // Responsive margin for sidebar
+          marginLeft: { xs: 0, sm: '240px' }, // Remove excessive space between sidebar and content
           paddingTop: { xs: '56px', sm: '64px' }, // Navbar height adjustment
         }}
       >
@@ -181,4 +181,3 @@ const QuickGroupMessaging = () => {
 };
 
 export default QuickGroupMessaging;
-

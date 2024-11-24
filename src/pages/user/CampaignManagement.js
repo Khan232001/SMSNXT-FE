@@ -1,27 +1,33 @@
 import React, { useState } from 'react';
-import UserNavbar from '../../components/UserNavbar'; 
-import UserSidebar from '../../components/UserSidebar'; 
-import Papa from 'papaparse'; 
+import UserNavbar from '../../components/UserNavbar';
+import UserSidebar from '../../components/UserSidebar';
+import Papa from 'papaparse';
 
 const CampaignManagement = () => {
   const [campaigns, setCampaigns] = useState([]);
   const [uploadedRecipients, setUploadedRecipients] = useState([]);
+  const [filteredRecipients, setFilteredRecipients] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // Function to create a new campaign
   const handleCreateCampaign = () => {
     const campaignName = prompt('Enter Campaign Name');
     if (campaignName) {
-      setCampaigns([...campaigns, { 
-        id: campaigns.length + 1, 
-        name: campaignName, 
-        status: 'Draft', 
-        startDate: 'TBD', 
-        endDate: 'TBD', 
-        targetAudience: `${uploadedRecipients.length} Recipients` 
-      }]);
+      setCampaigns([
+        ...campaigns,
+        {
+          id: campaigns.length + 1,
+          name: campaignName,
+          status: 'Draft',
+          startDate: 'TBD',
+          endDate: 'TBD',
+          targetAudience: `${uploadedRecipients.length} Recipients`,
+        },
+      ]);
     }
   };
 
+  // Function to handle file upload and parse CSV
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -29,6 +35,7 @@ const CampaignManagement = () => {
         header: true,
         complete: (results) => {
           setUploadedRecipients(results.data);
+          setFilteredRecipients(results.data); 
           alert(`Successfully imported ${results.data.length} recipients!`);
         },
         error: (error) => {
@@ -38,8 +45,18 @@ const CampaignManagement = () => {
     }
   };
 
+  // Function to handle deleting a campaign
   const handleDeleteCampaign = (id) => {
-    setCampaigns(campaigns.filter(campaign => campaign.id !== id));
+    setCampaigns(campaigns.filter((campaign) => campaign.id !== id));
+  };
+
+  // Function to filter recipients based on user input (e.g., filter by name, email, etc.)
+  const handleFilterRecipients = (e) => {
+    const filterText = e.target.value.toLowerCase();
+    const filtered = uploadedRecipients.filter((recipient) =>
+      recipient.name.toLowerCase().includes(filterText) || recipient.email.toLowerCase().includes(filterText)
+    );
+    setFilteredRecipients(filtered);
   };
 
   return (
@@ -66,9 +83,7 @@ const CampaignManagement = () => {
         {/* Main Content */}
         <div className="mt-16 flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col lg:flex-row justify-between items-center mb-6 space-y-4 lg:space-y-0">
-            <h2 className="text-2xl font-semibold text-gray-700 text-center lg:text-left">
-              Campaign Management
-            </h2>
+            <h2 className="text-2xl font-semibold text-gray-700 text-center lg:text-left">Campaign Management</h2>
 
             <div className="flex flex-col lg:flex-row lg:space-x-3 space-y-3 lg:space-y-0 w-full lg:w-auto">
               <button
@@ -90,8 +105,20 @@ const CampaignManagement = () => {
             </div>
           </div>
 
+          {/* Filter Recipients */}
+          {uploadedRecipients.length > 0 && (
+            <div className="mb-6 flex items-center space-x-4">
+              <input
+                type="text"
+                placeholder="Filter recipients..."
+                onChange={handleFilterRecipients}
+                className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md"
+              />
+            </div>
+          )}
+
           {/* Campaign Table */}
-          <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
+          <div className="overflow-x-auto bg-white shadow-lg rounded-lg mb-6">
             <table className="min-w-full table-auto">
               <thead>
                 <tr className="bg-gray-100">
@@ -130,6 +157,30 @@ const CampaignManagement = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Recipients Table */}
+          {filteredRecipients.length > 0 && (
+            <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
+              <table className="min-w-full table-auto">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Name</th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Email</th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Phone</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredRecipients.map((recipient, index) => (
+                    <tr key={index} className="border-t border-gray-200">
+                      <td className="px-6 py-4 text-sm text-gray-700">{recipient.name}</td>
+                      <td className="px-6 py-4 text-sm text-gray-700">{recipient.email}</td>
+                      <td className="px-6 py-4 text-sm text-gray-700">{recipient.phone}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>
