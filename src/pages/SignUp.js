@@ -39,7 +39,7 @@ const Login3 = () => {
       {/* Left Side - Signup Form */}
       <div className="signup-left w-full lg:w-1/2 flex flex-col justify-center items-center bg-white p-8">
         <div className="logo mb-6 text-2xl font-bold text-primary text-center">
-        smsNXT
+          smsNXT
         </div>
         <h2 className="text-3xl font-bold mb-4 text-primary text-center">
           Sign Up
@@ -148,7 +148,8 @@ const Login3 = () => {
                 and{" "}
                 <a href="/policy" className="text-blue-500 hover:underline">
                   Privacy Policy
-                </a>.
+                </a>
+                .
               </span>
             </label>
           </div>
@@ -186,15 +187,21 @@ const Login3 = () => {
         </div>
       </div>
 
-      {/* Right Side - Gradient Background with Wave Effect */}
-      <div className="hidden lg:flex w-full lg:w-1/2 justify-center items-center p-8 wave-background">
-        <div className="text-white max-w-md relative z-10">
-          <h3 className="text-4xl font-bold mb-4">Welcome to smsNXT!</h3>
-          <p className="text-lg">
-            Sign up to create and manage your SMS campaigns effortlessly.
-          </p>
-        </div>
-      </div>
+     {/* Right Side - Gradient Background with Wave Effect */}
+<div className="hidden lg:flex w-full lg:w-1/2 justify-center items-center p-8 wave-background">
+  <div className="text-white max-w-lg relative z-10 text-center">
+    <h3 className="text-6xl font-extrabold mb-6 tracking-wide">NXT</h3>
+    <p className="text-2xl font-bold mb-4 leading-relaxed">
+      Next Generation Business Texting Platform
+    </p>
+    <p className="text-xl font-medium leading-relaxed">
+      Experience the next generation business texting for enhanced customer 
+      interaction and measurable results.
+    </p>
+  </div>
+</div>
+
+
     </div>
   );
 };
