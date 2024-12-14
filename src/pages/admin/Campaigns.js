@@ -23,6 +23,97 @@ const Campaigns = () => {
     console.log(`Creating new campaign: ${newCampaignName}`);
   };
 
+const createMessagingService = async (friendlyName) => {
+  try {
+    const response = await fetch('/api/campaigns/create-messaging-service', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ friendlyName }),
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert(`Messaging service created successfully: ${result.message}`);
+    } else {
+      alert(`Error creating messaging service: ${result.message}`);
+    }
+  } catch (error) {
+    console.error('Error creating messaging service:', error);
+  }
+};
+
+const addPhoneNumberToService = async (serviceSid, phoneNumberSid) => {
+  try {
+    const response = await fetch(`/api/campaigns/add-phone-number-to-service/${serviceSid}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phoneNumberSid }),
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert(`Phone number added successfully: ${result.message}`);
+    } else {
+      alert(`Error adding phone number: ${result.message}`);
+    }
+  } catch (error) {
+    console.error('Error adding phone number:', error);
+  }
+};
+
+const sendMessageWithService = async (serviceSid, to, body) => {
+  try {
+    const response = await fetch(`/api/campaigns/send-message-with-service/${serviceSid}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to, body }),
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert(`Message sent successfully: ${result.message}`);
+    } else {
+      alert(`Error sending message: ${result.message}`);
+    }
+  } catch (error) {
+    console.error('Error sending message:', error);
+  }
+};
+
+const getMessagesFromService = async (serviceSid) => {
+  try {
+    const response = await fetch(`/api/campaigns/get-messages-from-service/${serviceSid}`, {
+      method: 'GET',
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      console.log('Messages fetched:', result.data);
+    } else {
+      alert(`Error fetching messages: ${result.message}`);
+    }
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+  }
+};
+
+const deleteMessagingService = async (serviceSid) => {
+  try {
+    const response = await fetch(`/api/campaigns/delete-messaging-service/${serviceSid}`, {
+      method: 'DELETE',
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert(`Messaging service deleted successfully: ${result.message}`);
+    } else {
+      alert(`Error deleting messaging service: ${result.message}`);
+    }
+  } catch (error) {
+    console.error('Error deleting messaging service:', error);
+  }
+};
+
   return (
     <div className="flex">
       {/* Sidebar should have a fixed width and should not overlap content */}
