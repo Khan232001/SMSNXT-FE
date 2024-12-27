@@ -22,6 +22,7 @@ import SubscriptionPlans from "./pages/user/SubscriptionPlans";
 import OrderHistory from "./pages/user/OrderHistory";
 import CampaignManagement from "./pages/user/CampaignManagement";
 import ContactManagement from "./pages/user/ContactManagement";
+import TagsManagement from "./pages/user/TagsManagement";
 import Reporting from "./pages/user/Reporting";
 import Messaging from "./pages/user/Messaging";
 import SenderIDManagement from "./pages/user/SenderIDManagement";
@@ -52,6 +53,7 @@ function App() {
           <Route path="/order-recharge-history" element={<OrderHistory />} />
           <Route path="/campaign-management" element={<CampaignManagement />} />
           <Route path="/contact-management" element={<ContactManagement />} />
+          <Route path="/tags-management" element={<TagsManagement />} />
           <Route path="/reporting" element={<Reporting />} />
           <Route path="/quick-group-messaging" element={<Messaging />} />
           <Route path="/sender-id-management" element={<SenderIDManagement />} />

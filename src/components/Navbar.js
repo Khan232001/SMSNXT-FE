@@ -25,6 +25,7 @@ const Navbar = ({ toggleDrawer }) => {
     { path: "/order-recharge-history", label: "Order Recharge History" },
     { path: "/campaign-management", label: "Campaign Management" },
     { path: "/contact-management", label: "Contact Management" },
+    { path: "/tags-management", label: "Tags Management" },
     { path: "/reporting", label: "Reporting" },
     { path: "/quick-group-messaging", label: "Quick Group Messaging" },
     { path: "/sender-id-management", label: "Sender ID Management" },

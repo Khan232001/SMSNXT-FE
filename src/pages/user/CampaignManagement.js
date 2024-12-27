@@ -5,6 +5,8 @@ import Papa from 'papaparse';
 import { Listbox, ListboxButton, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/solid';
 import Tooltip from '../../components/Tooltip';
+import UploadImage from '../../components/UploadImage';
+import FetchImage from '../../components/FetchImage';
 
 const tags = [
   { id: 1, name: 'Select an option', value: '' },
@@ -172,6 +174,24 @@ const CampaignManagement = () => {
   const [message, setMessage] = useState(
     "Hi <FIRST_NAME>, it's <MANAGER_FIRST_NAME> at <COMPANY_NAME>. Reply Stop to Unsubscribe"
   );
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isFetchModalOpen, setIsFetchModalOpen] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState("");
+
+  const handleUploadModal = () => {
+    setIsUploadModalOpen((isUploadModalOpen)=>!isUploadModalOpen);
+  };
+  
+  const handleFetchModal = () => {
+    setIsFetchModalOpen((isFetchModalOpen)=>!isFetchModalOpen);
+  };
+  // const handleCloseModal = () => {
+  //   setIsModalOpen(false);
+  // };
+  
+  const handleProceed = (selectedImage) => {
+    setSelectedImageUrl(selectedImage.secure_url); // Save the selected image URL
+  };
   // Function to split the message into chunks of 160 characters
   const splitMessage = (text) => {
     const chunkSize = 160;
@@ -446,17 +466,37 @@ const CampaignManagement = () => {
                   {/* Add Media and Select Media Buttons */}
             <div className='flex flex-col gap-4 mt-4'>
                 <button
-                  // onClick={handleAddMedia}
+                  onClick={handleUploadModal}
                   className='px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600'
                 >
                   Add Media
                 </button>
+                <UploadImage isOpen={isUploadModalOpen} onClose={handleUploadModal} />
                 <button
-                  // onClick={handleSelectMedia}
+                  onClick={handleFetchModal}
                   className='px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300'
                 >
                   Select Media
                 </button>
+                {/* Display selected image */}
+                  {selectedImageUrl && (
+                    <div className="mt-4">
+                      <p>Selected Image:</p>
+                      <img
+                        src={selectedImageUrl}
+                        alt="Selected"
+                        className="w-full max-w-sm"
+                      />
+                    </div>
+                  )}
+
+                  {/* FetchImageModal */}
+                  <FetchImage
+                    isOpen={isFetchModalOpen}
+                    onClose={handleFetchModal}
+                    onProceed={handleProceed}
+                  />
+                
               </div>
               <div>
               <input
