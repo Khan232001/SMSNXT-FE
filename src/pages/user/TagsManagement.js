@@ -4,11 +4,18 @@ import UserSidebar from "../../components/UserSidebar";
 import api from "../../utils/api";
 import { FaTrashCan } from "react-icons/fa6";
 import { FaEdit } from "react-icons/fa";
+import { RiContactsLine } from "react-icons/ri";
 
 const TagsManagement = () => {
   const [tags, setTags] = useState([]);
+  const [contacts, setContacts] = useState([]);
+  const [allContacts, setAllContacts] = useState([]); // All fetched contacts for selection
+  const [selectedContacts, setSelectedContacts] = useState([]); // Contacts selected from Select Contacts Modal
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddContactsModalOpen, setIsAddContactsModalOpen] = useState(false);
+  const [isSelectContactsModalOpen, setIsSelectContactsModalOpen] =
+    useState(false);
 
   const [tagName, setTagName] = useState("");
   const [signupKeyword, setSignupKeyword] = useState("");
@@ -17,6 +24,10 @@ const TagsManagement = () => {
   const [editTagName, setEditTagName] = useState("");
   const [editSignupKeyword, setEditSignupKeyword] = useState("");
 
+  const [currentTagId, setCurrentTagId] = useState(null);
+  const [currentTagName, setCurrentTagName] = useState("");
+  const [currentSignupKeyword, setCurrentSignupKeyword] = useState("");
+
   // Fetch Tags from API
   useEffect(() => {
     fetchTags();
@@ -24,14 +35,100 @@ const TagsManagement = () => {
 
   const fetchTags = async () => {
     try {
-      const response = await api.get("/tags"); // Fetch tags data from API
-      setTags(response.data.data || []); // Update state with fetched data
+      const response = await api.get("/tags");
+      setTags(response.data.data || []);
     } catch (error) {
       console.error("Failed to fetch tags:", error);
-      alert("Failed to fetch tags.");
     }
   };
 
+  const fetchContacts = async (tagId) => {
+    try {
+      const response = await api.get(`/tags/${tagId}/contacts`); // Fetch contacts for the specific tag
+      setContacts(response.data.data || []);
+    } catch (error) {
+      console.error("Failed to fetch contacts:", error);
+      alert("Failed to fetch contacts.");
+    }
+  };
+
+  const fetchAllContacts = async () => {
+    try {
+      const response = await api.get("/contacts"); // Fetch all available contacts
+      // Exclude already added contacts
+      const availableContacts = response.data.data.filter(
+        (contact) =>
+          !contacts.some((addedContact) => addedContact._id === contact._id)
+      );
+      setAllContacts(availableContacts);
+    } catch (error) {
+      console.error("Failed to fetch all contacts:", error);
+      alert("Failed to fetch contacts.");
+    }
+  };
+
+  const handleAddContacts = (tagId, tagName, signupKeyword) => {
+    setCurrentTagId(tagId);
+    setCurrentTagName(tagName);
+    setCurrentSignupKeyword(signupKeyword);
+    setIsAddContactsModalOpen(!isAddContactsModalOpen);
+    fetchContacts(tagId);
+  };
+
+  const handleAddContactsCancel = () => {
+    setIsAddContactsModalOpen(!isAddContactsModalOpen);
+    setCurrentTagId(null);
+    setCurrentTagName("");
+    setCurrentSignupKeyword("");
+    fetchTags(); 
+  };
+
+  const handleOpenSelectContactsModal = () => {
+    setIsSelectContactsModalOpen(!isSelectContactsModalOpen);
+    fetchAllContacts();
+  };
+
+  const handleCheckboxChange = (contact) => {
+    const isAlreadySelected = selectedContacts.some(
+      (selected) => selected._id === contact._id
+    );
+    if (isAlreadySelected) {
+      setSelectedContacts((prev) =>
+        prev.filter((selected) => selected._id !== contact._id)
+      );
+    } else {
+      setSelectedContacts((prev) => [...prev, contact]);
+    }
+  };
+
+  const handleSaveSelectedContacts = () => {
+    setContacts((prev) => [...prev, ...selectedContacts]); // Add selected contacts to the parent modal
+    setSelectedContacts([]); // Clear selections
+    setIsSelectContactsModalOpen(!isSelectContactsModalOpen); // Close modal
+  
+    // Re-fetch available contacts to exclude added ones
+    fetchAllContacts();
+  };
+
+  const handleSaveContactsToTag = async () => {
+    try {
+      const contactIds = contacts.map((contact) => contact._id); // Get contact IDs
+      const response = await api.put(`/tags/${currentTagId}`, {
+        contacts: contactIds,
+      });
+      if (response.status === 200) {
+        // alert("Contacts saved to tag successfully!");
+        setIsAddContactsModalOpen(!isAddContactsModalOpen);
+        fetchTags(); 
+      } else {
+        alert("Failed to save contacts to tag.");
+      }
+    } catch (error) {
+      console.error("Failed to save contacts to tag:", error);
+      alert("An error occurred while saving contacts to the tag.");
+    }
+  };
+  
   const handleDeleteTag = async (id) => {
     try {
       await api.delete(`/tags/${id}`);
@@ -43,27 +140,24 @@ const TagsManagement = () => {
   };
 
   const handleAddTagCancel = () => {
-    setIsAddModalOpen(false);
+    setIsAddModalOpen(!isAddModalOpen);
     setTagName("");
     setSignupKeyword("");
   };
 
   const handleEditTagCancel = () => {
-    setIsEditModalOpen(false);
+    setIsEditModalOpen(!isEditModalOpen);
     setEditTagId(null);
     setEditTagName("");
     setEditSignupKeyword("");
   };
 
   const handleSaveNewTag = async () => {
-    const newTag = {
-      name: tagName,
-      signupKeyword: signupKeyword,
-    };
+    const newTag = { name: tagName, signupKeyword: signupKeyword };
 
     try {
       const response = await api.post("/tags", newTag);
-      setTags((prevTags) => [...prevTags, response.data.data]); // Add new tag to state
+      setTags((prevTags) => [...prevTags, response.data.data]);
       handleAddTagCancel();
     } catch (error) {
       console.error("Error:", error);
@@ -72,17 +166,14 @@ const TagsManagement = () => {
   };
 
   const handleEditTag = (id, name, signupKeyword) => {
-    setIsEditModalOpen(true);
+    setIsEditModalOpen(!isEditModalOpen);
     setEditTagId(id);
     setEditTagName(name);
     setEditSignupKeyword(signupKeyword);
   };
 
   const handleSaveEditedTag = async () => {
-    const updatedTag = {
-      name: editTagName,
-      signupKeyword: editSignupKeyword,
-    };
+    const updatedTag = { name: editTagName, signupKeyword: editSignupKeyword };
 
     try {
       const response = await api.put(`/tags/${editTagId}`, updatedTag);
@@ -129,25 +220,41 @@ const TagsManagement = () => {
             </button>
           </div>
 
-          {/* Table */}
+          {/* Tags Table */}
           <div className="overflow-x-auto rounded-md">
             <table className="table-auto w-full border-collapse border border-gray-200">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="border border-gray-200 px-4 py-2 text-left">Tag Name</th>
-                  <th className="border border-gray-200 px-4 py-2 text-left">Signup Keyword</th>
-                  <th className="border border-gray-200 px-4 py-2 text-left">Count (Unique/Total)</th>
-                  <th className="border border-gray-200 px-4 py-2 text-left">Actions</th>
-                  <th className="border border-gray-200 px-4 py-2 text-left">Created At</th>
+                  <th className="border border-gray-200 px-4 py-2 text-left">
+                    Tag Name
+                  </th>
+                  <th className="border border-gray-200 px-4 py-2 text-left">
+                    Signup Keyword
+                  </th>
+                  <th className="border border-gray-200 px-4 py-2 text-left">
+                    Count (Unique/Total)
+                  </th>
+                  <th className="border border-gray-200 px-4 py-2 text-left">
+                    Actions
+                  </th>
+                  <th className="border border-gray-200 px-4 py-2 text-left">
+                    Created At
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {tags.length > 0 ? (
                   tags.map((tag) => (
                     <tr key={tag._id} className="hover:bg-gray-50">
-                      <td className="border border-gray-200 px-4 py-2">{tag.name}</td>
-                      <td className="border border-gray-200 px-4 py-2">{tag.signupKeyword || "-"}</td>
-                      <td className="border border-gray-200 px-4 py-2">{`${tag.contacts?.length || 0} / ${tag.contacts?.length || 0}`}</td>
+                      <td className="border border-gray-200 px-4 py-2">
+                        {tag.name}
+                      </td>
+                      <td className="border border-gray-200 px-4 py-2">
+                        {tag.signupKeyword || "-"}
+                      </td>
+                      <td className="border border-gray-200 px-4 py-2">
+                        {`${tag.contacts?.length || 0} / ${tag.contacts?.length || 0}`}
+                      </td>
                       <td className="px-4 py-2 flex space-x-2 items-center">
                         <button
                           onClick={() =>
@@ -155,6 +262,17 @@ const TagsManagement = () => {
                           }
                         >
                           <FaEdit className="text-gray-500" />
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleAddContacts(
+                              tag._id,
+                              tag.name,
+                              tag.signupKeyword
+                            )
+                          }
+                        >
+                          <RiContactsLine className="text-gray-500" />
                         </button>
                         <button onClick={() => handleDeleteTag(tag._id)}>
                           <FaTrashCan className="text-gray-500" />
@@ -179,7 +297,7 @@ const TagsManagement = () => {
             </table>
           </div>
 
-          {/* Add Tags Modal */}
+          {/* Add Tag Modal */}
           {isAddModalOpen && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
               <div className="bg-white rounded-lg shadow-lg w-96 p-6">
@@ -226,7 +344,7 @@ const TagsManagement = () => {
             </div>
           )}
 
-          {/* Edit Tags Modal */}
+          {/* Edit Tag Modal */}
           {isEditModalOpen && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
               <div className="bg-white rounded-lg shadow-lg w-96 p-6">
@@ -265,6 +383,179 @@ const TagsManagement = () => {
                   <button
                     className="bg-blue-600 text-white rounded-md px-4 py-2"
                     onClick={handleSaveEditedTag}
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+        {/* Add Contacts Modal */}
+        {isAddContactsModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-5xl p-6">
+              <h2 className="text-xl font-semibold mb-4">Add Contacts to Tag</h2>
+
+              {/* Tag Details */}
+              <div className="mb-4">
+                <p>
+                  <strong>Tag Name:</strong> {currentTagName}
+                </p>
+                <p>
+                  <strong>Signup Keyword:</strong> {currentSignupKeyword}
+                </p>
+              </div>
+
+              {/* Contacts Table */}
+              <div className="overflow-x-auto mb-4">
+                <table className="table-auto w-full border-collapse border border-gray-200">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="border border-gray-200 px-4 py-2 text-left">
+                        Name
+                      </th>
+                      <th className="border border-gray-200 px-4 py-2 text-left">
+                        Mobile
+                      </th>
+                      <th className="border border-gray-200 px-4 py-2 text-left">
+                        Email
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {contacts.length > 0 ? (
+                      contacts.map((contact) => (
+                        <tr key={contact._id} className="hover:bg-gray-50">
+                          <td className="border border-gray-200 px-4 py-2">
+                            {contact.name}
+                          </td>
+                          <td className="border border-gray-200 px-4 py-2">
+                            {contact.phoneNumber}
+                          </td>
+                          <td className="border border-gray-200 px-4 py-2">
+                            {contact.email || "-"}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          className="border border-gray-200 px-4 py-2 text-center"
+                          colSpan="3"
+                        >
+                          No contacts added yet.
+                        </td>
+                      </tr>
+          )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Add Contact Button */}
+      <button
+        className="bg-blue-600 text-white rounded-md px-4 py-2 mb-4"
+        onClick={handleOpenSelectContactsModal}
+      >
+        Add Contact
+      </button>
+
+      {/* Footer */}
+      <div className="flex justify-end space-x-2">
+        <button
+          className="bg-gray-300 text-gray-700 rounded-md px-4 py-2"
+          onClick={handleAddContactsCancel}
+        >
+          Cancel
+        </button>
+        <button
+          className="bg-green-600 text-white rounded-md px-4 py-2"
+          onClick={handleSaveContactsToTag} // Save contacts to tag
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+          {/* Select Contacts Modal */}
+          {isSelectContactsModalOpen && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl p-6">
+                <h2 className="text-xl font-semibold mb-4">Select Contacts</h2>
+
+                {/* Contacts Table */}
+                <div className="overflow-x-auto">
+                  <table className="table-auto w-full border-collapse border border-gray-200">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="border border-gray-200 px-4 py-2 text-left">
+                          Select
+                        </th>
+                        <th className="border border-gray-200 px-4 py-2 text-left">
+                          Name
+                        </th>
+                        <th className="border border-gray-200 px-4 py-2 text-left">
+                          Mobile
+                        </th>
+                        <th className="border border-gray-200 px-4 py-2 text-left">
+                          Email
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {allContacts.length > 0 ? (
+                        allContacts.map((contact) => (
+                          <tr key={contact._id} className="hover:bg-gray-50">
+                            <td className="border border-gray-200 px-4 py-2">
+                              <input
+                                type="checkbox"
+                                checked={selectedContacts.some(
+                                  (selected) => selected._id === contact._id
+                                )}
+                                onChange={() =>
+                                  handleCheckboxChange(contact)
+                                }
+                              />
+                            </td>
+                            <td className="border border-gray-200 px-4 py-2">
+                              {contact.name}
+                            </td>
+                            <td className="border border-gray-200 px-4 py-2">
+                              {contact.phoneNumber}
+                            </td>
+                            <td className="border border-gray-200 px-4 py-2">
+                              {contact.email || "-"}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            className="border border-gray-200 px-4 py-2 text-center"
+                            colSpan="4"
+                          >
+                            No contacts available.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Footer */}
+                <div className="flex justify-end mt-4 space-x-2">
+                  <button
+                    className="bg-gray-300 text-gray-700 rounded-md px-4 py-2"
+                    onClick={() => setIsSelectContactsModalOpen((prev) => !prev)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="bg-blue-600 text-white rounded-md px-4 py-2"
+                    onClick={handleSaveSelectedContacts}
                   >
                     Save
                   </button>
