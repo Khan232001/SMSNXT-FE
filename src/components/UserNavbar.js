@@ -12,7 +12,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from '@mui/icons-material/Search';
+import SearchIcon from "@mui/icons-material/Search";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { useNavigate } from "react-router-dom";
@@ -55,6 +55,16 @@ const Navbar = ({ toggleDrawer }) => {
 
   const handleProfileClose = () => {
     setProfileAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    // Clear local storage data
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    // Redirect to login page
+    navigate("/login");
+    setProfileAnchorEl(null); // Close the profile menu
   };
 
   const handleSearchChange = (event) => {
@@ -168,7 +178,7 @@ const Navbar = ({ toggleDrawer }) => {
       >
         <MenuItem onClick={handleProfileClose}>Profile</MenuItem>
         <MenuItem onClick={handleProfileClose}>Settings</MenuItem>
-        <MenuItem onClick={handleProfileClose}>Log Out</MenuItem>
+        <MenuItem onClick={handleLogout}>Log Out</MenuItem>
       </Menu>
     </div>
   );

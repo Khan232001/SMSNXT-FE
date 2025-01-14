@@ -1,31 +1,36 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { loginUser } from '../../store/slices/authSlice';
-import '../Login.css';
+import api from '../../utils/api'; // Import your api.js
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { isLoading, error } = useSelector((state) => state.auth);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-
-    if (email && password) {
-      dispatch(loginUser({ email, password })).then((res) => {
-        if (res.meta.requestStatus === 'fulfilled') {
-          navigate('/dashboard');
-        } else {
-          alert(res.payload || 'Login failed. Please try again.');
-        }
-      });
-    } else {
-      alert('Please enter valid credentials!');
+    setIsLoading(true);
+    setError(null);
+  
+    try {
+      const response = await api.post('/user/login', { email, password });
+      console.log("API Response:", response.data); // Debug API response structure
+  
+      // Save the token and user info to localStorage
+      localStorage.setItem('token', response.data.data.token); // Ensure the key matches backend response
+      localStorage.setItem('user', JSON.stringify(response.data.data.user));
+  
+      // Redirect to dashboard
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="flex flex-col lg:flex-row h-screen">

@@ -33,9 +33,17 @@ const TagsManagement = () => {
     fetchTags();
   }, []);
 
+  const token = localStorage.getItem("token");
+
+  const authHeaders = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
   const fetchTags = async () => {
     try {
-      const response = await api.get("/tags");
+      const response = await api.get("/tags", authHeaders);
       setTags(response.data.data || []);
     } catch (error) {
       console.error("Failed to fetch tags:", error);
@@ -44,7 +52,7 @@ const TagsManagement = () => {
 
   const fetchContacts = async (tagId) => {
     try {
-      const response = await api.get(`/tags/${tagId}/contacts`); // Fetch contacts for the specific tag
+      const response = await api.get(`/tags/${tagId}/contacts`, authHeaders); // Fetch contacts for the specific tag
       setContacts(response.data.data || []);
     } catch (error) {
       console.error("Failed to fetch contacts:", error);
@@ -54,7 +62,7 @@ const TagsManagement = () => {
 
   const fetchAllContacts = async () => {
     try {
-      const response = await api.get("/contacts"); // Fetch all available contacts
+      const response = await api.get("/contacts", authHeaders); // Fetch all available contacts
       // Exclude already added contacts
       const availableContacts = response.data.data.filter(
         (contact) =>
@@ -115,6 +123,7 @@ const TagsManagement = () => {
       const contactIds = contacts.map((contact) => contact._id); // Get contact IDs
       const response = await api.put(`/tags/${currentTagId}`, {
         contacts: contactIds,
+        authHeaders
       });
       if (response.status === 200) {
         // alert("Contacts saved to tag successfully!");
@@ -128,10 +137,32 @@ const TagsManagement = () => {
       alert("An error occurred while saving contacts to the tag.");
     }
   };
+
+  const handleDeleteContactFromTag = async (contactId) => {
+    try {
+      const response = await api.delete(`/tags/${currentTagId}/contacts`, {
+        data: { contactId },
+        ...authHeaders
+      });
+  
+      if (response.status === 200) {
+        // alert("Contact removed from tag successfully!");
+  
+        // Refresh the contacts in the modal after deletion
+        fetchContacts(currentTagId);
+      } else {
+        alert("Failed to remove contact from tag.");
+      }
+    } catch (error) {
+      console.error("Failed to remove contact from tag:", error);
+      alert("An error occurred while removing the contact from the tag.");
+    }
+  };
+  
   
   const handleDeleteTag = async (id) => {
     try {
-      await api.delete(`/tags/${id}`);
+      await api.delete(`/tags/${id}`, authHeaders);
       setTags((prevTags) => prevTags.filter((tag) => tag._id !== id));
     } catch (error) {
       console.error("Failed to delete tag:", error);
@@ -156,7 +187,7 @@ const TagsManagement = () => {
     const newTag = { name: tagName, signupKeyword: signupKeyword };
 
     try {
-      const response = await api.post("/tags", newTag);
+      const response = await api.post("/tags", newTag, authHeaders);
       setTags((prevTags) => [...prevTags, response.data.data]);
       handleAddTagCancel();
     } catch (error) {
@@ -176,7 +207,7 @@ const TagsManagement = () => {
     const updatedTag = { name: editTagName, signupKeyword: editSignupKeyword };
 
     try {
-      const response = await api.put(`/tags/${editTagId}`, updatedTag);
+      const response = await api.put(`/tags/${editTagId}`, updatedTag, authHeaders);
       setTags((prevTags) =>
         prevTags.map((tag) =>
           tag._id === editTagId ? { ...tag, ...response.data.data } : tag
@@ -398,14 +429,24 @@ const TagsManagement = () => {
               <h2 className="text-xl font-semibold mb-4">Add Contacts to Tag</h2>
 
               {/* Tag Details */}
-              <div className="mb-4">
-                <p>
-                  <strong>Tag Name:</strong> {currentTagName}
-                </p>
-                <p>
-                  <strong>Signup Keyword:</strong> {currentSignupKeyword}
-                </p>
+              <div className="flex justify-between">
+                <div className="mb-4">
+                  <p>
+                    <strong>Tag Name:</strong> {currentTagName}
+                  </p>
+                  <p>
+                    <strong>Signup Keyword:</strong> {currentSignupKeyword}
+                  </p>
+                </div>
+                {/* Add Contact Button */}
+                <button
+                  className="bg-blue-600 text-white rounded-md px-4 py-2 mb-4"
+                  onClick={handleOpenSelectContactsModal}
+                >
+                  Add Contact
+                </button>
               </div>
+
 
               {/* Contacts Table */}
               <div className="overflow-x-auto mb-4">
@@ -420,6 +461,9 @@ const TagsManagement = () => {
                       </th>
                       <th className="border border-gray-200 px-4 py-2 text-left">
                         Email
+                      </th>
+                      <th className="border border-gray-200 px-4 py-2 text-left">
+                        Action
                       </th>
                     </tr>
                   </thead>
@@ -436,6 +480,14 @@ const TagsManagement = () => {
                           <td className="border border-gray-200 px-4 py-2">
                             {contact.email || "-"}
                           </td>
+                          <td className="border border-gray-200 px-4 py-2">
+                          <button
+                            className="text-white rounded-md px-4 py-1"
+                            onClick={() => handleDeleteContactFromTag(contact._id)}
+                          >
+                            <FaTrashCan className="text-gray-500" />
+                          </button>
+                        </td>
                         </tr>
                       ))
                     ) : (
@@ -447,37 +499,30 @@ const TagsManagement = () => {
                           No contacts added yet.
                         </td>
                       </tr>
-          )}
-          </tbody>
-        </table>
-      </div>
+                      )}
+                      </tbody>
+                    </table>
+                  </div>
 
-      {/* Add Contact Button */}
-      <button
-        className="bg-blue-600 text-white rounded-md px-4 py-2 mb-4"
-        onClick={handleOpenSelectContactsModal}
-      >
-        Add Contact
-      </button>
-
-      {/* Footer */}
-      <div className="flex justify-end space-x-2">
-        <button
-          className="bg-gray-300 text-gray-700 rounded-md px-4 py-2"
-          onClick={handleAddContactsCancel}
-        >
-          Cancel
-        </button>
-        <button
-          className="bg-green-600 text-white rounded-md px-4 py-2"
-          onClick={handleSaveContactsToTag} // Save contacts to tag
-        >
-          Save
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+                  
+                  {/* Footer */}
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      className="bg-gray-300 text-gray-700 rounded-md px-4 py-2"
+                      onClick={handleAddContactsCancel}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="bg-blue-600 text-white rounded-md px-4 py-2"
+                      onClick={handleSaveContactsToTag} // Save contacts to tag
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
 
           {/* Select Contacts Modal */}

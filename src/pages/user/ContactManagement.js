@@ -29,12 +29,16 @@ const ContactManagement = () => {
     fetchContacts();
   }, []);
 
+  const token = localStorage.getItem('token');
   const fetchContacts = async () => {
     try {
-      const response = await api.get('/contacts');
+      console.log(token)
+      const response = await api.get('/contacts', {
+        headers: { Authorization: `Bearer ${token}` }, // Include token in headers
+      });
       setContacts(response.data.data || []);
     } catch (error) {
-      alert('Failed to fetch contacts.');
+      // alert('Failed to fetch contacts.');
     }
   };
 
@@ -46,11 +50,13 @@ const ContactManagement = () => {
     };
 
     try {
-      const response = await api.post('/contacts', newContact);
+      const response = await api.post('/contacts', newContact, {
+        headers: { Authorization: `Bearer ${token}` }, // Include token in headers
+      });
       setContacts([...contacts, response.data.data]);
-      handleAddContactCancel(); // Clear fields and close modal
+      handleAddContactCancel();
     } catch (error) {
-      alert('Failed to add contact.');
+      // alert('Failed to add contact.');
     }
   };
 
@@ -77,15 +83,17 @@ const ContactManagement = () => {
     };
 
     try {
-      const response = await api.put(`/contacts/${currentContact._id}`, updatedContact);
+      const response = await api.put(`/contacts/${currentContact._id}`, updatedContact, {
+        headers: { Authorization: `Bearer ${token}` }, // Include token in headers
+      });
       setContacts((prevContacts) =>
         prevContacts.map((contact) =>
           contact._id === currentContact._id ? response.data.data : contact
         )
       );
-      handleEditContactCancel(); // Clear fields and close modal
+      handleEditContactCancel();
     } catch (error) {
-      alert('Failed to update contact.');
+      // alert('Failed to update contact.');
     }
   };
 
@@ -98,11 +106,14 @@ const ContactManagement = () => {
   };
 
   const handleDeleteContact = async (id) => {
+    const token = localStorage.getItem('token'); // Retrieve token from localStorage
     try {
-      await api.delete(`/contacts/${id}`);
+      await api.delete(`/contacts/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }, // Include token in headers
+      });
       setContacts((prevContacts) => prevContacts.filter((contact) => contact._id !== id));
     } catch (error) {
-      alert('Failed to delete contact.');
+      // alert('Failed to delete contact.');
     }
   };
 

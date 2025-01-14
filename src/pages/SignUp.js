@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../utils/api"; // Import your API utility
 import "./Login.css";
 
 const Login3 = () => {
@@ -10,9 +11,11 @@ const Login3 = () => {
   const [password, setPassword] = useState("");
   const [termsChecked, setTermsChecked] = useState(false);
   const [consentChecked, setConsentChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
 
     // Validate input fields
@@ -29,9 +32,30 @@ const Login3 = () => {
       return;
     }
 
-    // Signup logic (e.g., API call)
-    alert("Signup successful! Redirecting to dashboard...");
-    navigate("/dashboard"); // Navigate to dashboard after successful signup
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await api.post("/user/signup", {
+        firstName,
+        lastName,
+        email,
+        phoneNumber: phone, 
+        password,
+      });
+
+      // Save the token and user data in localStorage
+      localStorage.setItem('token', response.data.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.data.user));
+
+      // Redirect to dashboard or login
+      alert("Signup successful! Redirecting to dashboard...");
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.response?.data?.message || "Signup failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -44,8 +68,7 @@ const Login3 = () => {
         <h2 className="text-3xl font-bold mb-4 text-primary text-center">
           Sign Up
         </h2>
-        <hr className="w-2/3 border-t-2 border-primary mb-6" />{" "}
-        {/* Line beneath the heading */}
+        <hr className="w-2/3 border-t-2 border-primary mb-6" />
         <form className="w-full max-w-md" onSubmit={handleSignup}>
           <div className="mb-4">
             <label
@@ -173,9 +196,11 @@ const Login3 = () => {
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-primary-dark transition duration-300"
+            disabled={isLoading}
           >
-            Sign Up
+            {isLoading ? "Signing Up..." : "Sign Up"}
           </button>
+          {error && <p className="text-red-500 mt-2">{error}</p>}
         </form>
         <div className="mt-4 text-center">
           <p className="text-gray-500">
@@ -187,21 +212,19 @@ const Login3 = () => {
         </div>
       </div>
 
-     {/* Right Side - Gradient Background with Wave Effect */}
-<div className="hidden lg:flex w-full lg:w-1/2 justify-center items-center p-8 wave-background">
-  <div className="text-white max-w-lg relative z-10 text-center">
-    <h3 className="text-6xl font-extrabold mb-6 tracking-wide">NXT</h3>
-    <p className="text-2xl font-bold mb-4 leading-relaxed">
-      Next Generation Business Texting Platform
-    </p>
-    <p className="text-xl font-medium leading-relaxed">
-      Experience the next generation business texting for enhanced customer 
-      interaction and measurable results.
-    </p>
-  </div>
-</div>
-
-
+      {/* Right Side - Gradient Background */}
+      <div className="hidden lg:flex w-full lg:w-1/2 justify-center items-center p-8 wave-background">
+        <div className="text-white max-w-lg relative z-10 text-center">
+          <h3 className="text-6xl font-extrabold mb-6 tracking-wide">NXT</h3>
+          <p className="text-2xl font-bold mb-4 leading-relaxed">
+            Next Generation Business Texting Platform
+          </p>
+          <p className="text-xl font-medium leading-relaxed">
+            Experience the next generation business texting for enhanced
+            customer interaction and measurable results.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
