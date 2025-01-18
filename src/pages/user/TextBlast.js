@@ -10,6 +10,7 @@ import UploadImage from '../../components/UploadImage';
 import Cookies from "js-cookie";
 import FetchImage from '../../components/FetchImage';
 import { useNavigate } from "react-router-dom";
+import { current } from '@reduxjs/toolkit';
 
 const tags = [
   { id: 1, name: 'Select an option', value: '' },
@@ -165,7 +166,7 @@ const CustomSelect = ({
 
 const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) => {
   const [activeStep, setActiveStep] = useState(1);
-  const [textBlastName, setTextBlastName] = useState(selectedCampaign ? selectedCampaign.name : "");
+  const [textBlastName, setTextBlastName] = useState('');
   const [campaigns, setCampaigns] = useState([]);
   const [uploadedRecipients, setUploadedRecipients] = useState([]);
   const [filteredRecipients, setFilteredRecipients] = useState([]);
@@ -192,10 +193,45 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
   const handleTimeZoneChange = (e) => setTimeZone(e.target.value);
 
   const [tags, setTags] = useState([]);
+  const [isActive, setIsActive] = useState(false);
+
 
   useEffect(() => {
-    fetchTags();
-  }, []);
+    if (selectedCampaign) {
+      const selectedTagData = selectedCampaign.tags.map((tagObj) => {
+        const tag = tags.find((tag) => tag.id === tagObj.tagId.toString());
+        return tag ? { id: tag.id, name: tag.name, value: tag.value } : null;
+      }).filter((tag) => tag !== null);
+  
+      setSelectedTags(selectedTagData);
+    }
+  }, [tags, selectedCampaign]);
+  
+  useEffect(() => {
+
+    if (selectedCampaign) {
+      setTextBlastName(selectedCampaign.name || '');
+      
+      const formattedDate = new Date(selectedCampaign.schedule.date).toISOString().split('T')[0];
+      setScheduleDate(formattedDate); 
+  
+      setMessage(selectedCampaign.message.textSegments.join('\n') || '');
+      if(selectedCampaign.status === 'active'){
+        setIsActive(true)
+      }
+      else{
+        setIsActive(false)
+      }
+      setSendTimeOption(selectedCampaign.schedule.sendTimeOption)
+      setFromTime(selectedCampaign.schedule.fromTime || '');
+      setToTime(selectedCampaign.schedule.toTime || '');
+      setTimeZone(selectedCampaign.schedule.timeZone || 'Eastern Time (ET)');
+      setSelectedImageUrl(selectedCampaign.message.image || '');
+    }
+    fetchTags()
+
+  },  []);
+  
 
   const token = localStorage.getItem("token");
   const authHeaders = {
@@ -208,7 +244,7 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
 
   const fetchTags = async () => {
     try {
-      const token = localStorage.getItem("token"); // Get token from localStorage
+      const token = localStorage.getItem("token");
 
       if (!token) {
         throw new Error("Unauthorized: No token found");
@@ -228,6 +264,7 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
     }
   };
   
+
   const handleCancel = () => {
     Cookies.remove("selectedImage");
     setCreateTextBlast(false); 
@@ -246,9 +283,8 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
   // };
   
   const handleProceed = (selectedImage) => {
-    setSelectedImageUrl(selectedImage.secure_url); // Save the selected image URL
+    setSelectedImageUrl(imageUrl)
   };
-  // Function to split the message into chunks of 160 characters
   const splitMessage = (text) => {
     const chunkSize = 160;
     const chunks = [];
@@ -262,44 +298,91 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
   const segmentCount = messageChunks.length;
   const [sendTimeOption, setSendTimeOption] = useState('now');
   const imageUrl = Cookies.get("selectedImage");
-  const totalSegments = segmentCount + (imageUrl ? 1 : 0);
 
-  const handleSaveCampaign = async () => {
-    // Gather the data needed for the campaign
-    const campaignData = {
-      name: textBlastName,
-      tags: selectedTags.map((tag) => ({
-        tagId: tag.value,
-        tagName: tag.name,
-      })),
-      message: {
-        textSegments: messageChunks,
-        image: imageUrl,
-      },
-      schedule: {
-        sendTimeOption: sendTimeOption, // Whether to send now or schedule
-        date: scheduleDate,
-        fromTime: fromTime,
-        toTime: toTime,
-        timeZone: timeZone,
-      },
-      dailyLimit: 500,
+  const totalSegments = segmentCount + (selectedImageUrl ? 1 : 0);
+
+
+  let schedule = {};
+  if (sendTimeOption === "now") {
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0]; 
+    const formattedTime = currentDate.toTimeString().split(' ')[0].slice(0, 5);
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    schedule = { 
+      sendTimeOption: sendTimeOption, 
+      date: formattedDate,
+      fromTime: formattedTime,
+      toTime: formattedTime,
+      timeZone: timeZone,
+    };
+  } else {
+    schedule = {
+      sendTimeOption,
+      date: scheduleDate,
+      fromTime: fromTime,
+      toTime: toTime,
+      timeZone: timeZone,
+    };
+  }
+
+  const campaignData = {
+    name: textBlastName,
+    // status: isActive ? 'active' : 'inactive',
+    tags: selectedTags.map((tag) => ({
+      tagId: tag.value,
+      tagName: tag.name,
+    })),
+    message: {
+      textSegments: messageChunks,
+      image: imageUrl,
+    },
+    schedule,
+    dailyLimit: 500,
+  };
+  const handleActivateCampaign = async () => {
+    setIsActive((prev) => !prev); 
+  
+    const updatedCampaignData = {
+      ...campaignData, 
+      status: isActive ? 'inactive' : 'active', 
     };
   
-    // Make the API call to upsert the campaign
     try {
-      const response = await api.post("/campaign", campaignData, authHeaders);
+      let response;
+      if (selectedCampaign) {
+        response = await api.put(`/campaign/${selectedCampaign._id}`, updatedCampaignData, authHeaders);
+      } else {
+        response = await api.post("/campaign", updatedCampaignData, authHeaders);
+      }
   
-      // Handle success
-      // alert("Campaign saved successfully!");
-      console.log(response.data); 
-      navigate("/campaign-management");
+      console.log(response.data);
     } catch (error) {
-      // Handle error
-      console.error("Error saving campaign:", error);
-      // alert("Failed to save campaign. Please try again.");
+      console.error("Error updating campaign:", error);
     }
   };
+  
+  const handleSaveCampaign = async () => {
+    const updatedCampaignData = {
+      ...campaignData,
+      status: isActive ? 'active' : 'inactive',
+    };
+  
+    try {
+      let response;
+      if (selectedCampaign) {
+        response = await api.put(`/campaign/${selectedCampaign._id}`, updatedCampaignData, authHeaders);
+      } else {
+        response = await api.post("/campaign", updatedCampaignData, authHeaders);
+      }
+  
+      console.log(response.data);
+      setCreateTextBlast(false);
+    } catch (error) {
+      console.error("Error saving campaign:", error);
+    }
+  };
+    
   
 
   const steps = [
@@ -413,7 +496,7 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
                 </label>
                 <div className="w-2/3">
                   <CustomSelect
-                    options={tags} // Use fetched tags
+                    options={tags}
                     selected={selectedTags}
                     onChange={setSelectedTags}
                     label="Tags"
@@ -559,7 +642,7 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
                   Select Media
                 </button>
                 {/* Display selected image */}
-                  {selectedImageUrl && (
+                  {/* {selectedImageUrl && (
                     <div className="mt-4">
                       <p>Selected Image:</p>
                       <img
@@ -568,7 +651,7 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
                         className="w-full max-w-sm"
                       />
                     </div>
-                  )}
+                  )} */}
 
                   {/* FetchImageModal */}
                   <FetchImage
@@ -608,10 +691,10 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
                         </div>
                       ))}
                         {/* Retrieve image URL from cookies */}
-                      {imageUrl && (
+                      {selectedImageUrl && (
                         <div className="mt-4 flex justify-center">
                           <img
-                            src={imageUrl}
+                            src={selectedImageUrl}
                             alt="Selected"
                             className="max-w-full max-h-40 rounded-lg"
                           />
@@ -928,6 +1011,21 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
             {textBlastName || 'Text Blasts'}
           </h1>
           <div className='flex gap-3'>
+            {isActive ?
+            <button
+            onClick={handleActivateCampaign}
+            className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+          >
+            Deactivate
+          </button> :
+          
+          <button
+              onClick={handleActivateCampaign}
+              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+            >
+              Activate
+            </button>
+            }
           <button
               onClick={handleSaveCampaign}
               className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"

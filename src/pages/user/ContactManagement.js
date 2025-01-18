@@ -22,20 +22,23 @@ const ContactManagement = () => {
   const [editContactName, setEditContactName] = useState('');
   const [editContactEmail, setEditContactEmail] = useState('');
   const [editContactPhone, setEditContactPhone] = useState('');
-  const [currentContact, setCurrentContact] = useState(null); // Current contact being edited
+  const [currentContact, setCurrentContact] = useState(null); 
 
-  // Fetch contacts from API
   useEffect(() => {
     fetchContacts();
   }, []);
 
-  const token = localStorage.getItem('token');
-  const fetchContacts = async () => {
+    const token = localStorage.getItem('token');
+    const authHeaders = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const fetchContacts = async () => {
     try {
       console.log(token)
-      const response = await api.get('/contacts', {
-        headers: { Authorization: `Bearer ${token}` }, // Include token in headers
-      });
+      const response = await api.get('/contacts', authHeaders);
       setContacts(response.data.data || []);
     } catch (error) {
       // alert('Failed to fetch contacts.');
@@ -50,9 +53,7 @@ const ContactManagement = () => {
     };
 
     try {
-      const response = await api.post('/contacts', newContact, {
-        headers: { Authorization: `Bearer ${token}` }, // Include token in headers
-      });
+      const response = await api.post('/contacts', newContact, authHeaders);
       setContacts([...contacts, response.data.data]);
       handleAddContactCancel();
     } catch (error) {
@@ -83,9 +84,7 @@ const ContactManagement = () => {
     };
 
     try {
-      const response = await api.put(`/contacts/${currentContact._id}`, updatedContact, {
-        headers: { Authorization: `Bearer ${token}` }, // Include token in headers
-      });
+      const response = await api.put(`/contacts/${currentContact._id}`, updatedContact, authHeaders);
       setContacts((prevContacts) =>
         prevContacts.map((contact) =>
           contact._id === currentContact._id ? response.data.data : contact
@@ -106,11 +105,8 @@ const ContactManagement = () => {
   };
 
   const handleDeleteContact = async (id) => {
-    const token = localStorage.getItem('token'); // Retrieve token from localStorage
     try {
-      await api.delete(`/contacts/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }, // Include token in headers
-      });
+      await api.delete(`/contacts/${id}`, authHeaders);
       setContacts((prevContacts) => prevContacts.filter((contact) => contact._id !== id));
     } catch (error) {
       // alert('Failed to delete contact.');

@@ -3,7 +3,7 @@ import UserNavbar from '../../components/UserNavbar';
 import UserSidebar from '../../components/UserSidebar';
 import TextBlast from './TextBlast';
 import Papa from 'papaparse';
-import api from "../../utils/api"; // Assuming you have an api utility for making requests
+import api from "../../utils/api"; 
 
 const CampaignManagement = () => {
   const [campaigns, setCampaigns] = useState([]);
@@ -22,7 +22,7 @@ const CampaignManagement = () => {
 
   useEffect(() => {
     fetchCampaigns();
-  }, []);
+  }, [createTextBlast]);
 
   const fetchCampaigns = async () => {
     try {
@@ -34,7 +34,8 @@ const CampaignManagement = () => {
   };
 
   const handleCreateCampaign = () => {
-    setCreateTextBlast((prev) => !prev);
+    setCreateTextBlast(true); 
+    setSelectedCampaign(null); 
   };
 
   const handleFileUpload = (event) => {
@@ -57,7 +58,7 @@ const CampaignManagement = () => {
   const handleDeleteCampaign = async (id) => {
     try {
       await api.delete(`/campaign/${id}`, authHeaders);
-      setCampaigns(campaigns.filter((campaign) => campaign._id !== id)); // Use _id for MongoDB documents
+      setCampaigns(campaigns.filter((campaign) => campaign._id !== id));
     } catch (error) {
       console.error("Failed to delete campaign:", error);
     }
@@ -73,10 +74,9 @@ const CampaignManagement = () => {
     setFilteredRecipients(filtered);
   };
 
-  // Handle edit campaign
   const handleEditCampaign = (campaign) => {
-    setSelectedCampaign(campaign); // Set selected campaign data
-    setCreateTextBlast(true); // Open TextBlast form for editing
+    setSelectedCampaign(campaign); 
+    setCreateTextBlast(true); 
   };
 
   return (
@@ -202,12 +202,11 @@ const CampaignManagement = () => {
         </div>
       )}
 
-      {/* Pass selectedCampaign to TextBlast for editing */}
       {createTextBlast && (
         <TextBlast
           createTextBlast={createTextBlast}
           setCreateTextBlast={setCreateTextBlast}
-          selectedCampaign={selectedCampaign}
+          selectedCampaign={selectedCampaign} 
         />
       )}
     </>

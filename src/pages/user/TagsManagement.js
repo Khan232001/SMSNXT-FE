@@ -28,7 +28,6 @@ const TagsManagement = () => {
   const [currentTagName, setCurrentTagName] = useState("");
   const [currentSignupKeyword, setCurrentSignupKeyword] = useState("");
 
-  // Fetch Tags from API
   useEffect(() => {
     fetchTags();
   }, [tags]);
@@ -52,7 +51,7 @@ const TagsManagement = () => {
 
   const fetchContacts = async (tagId) => {
     try {
-      const response = await api.get(`/tags/${tagId}/contacts`, authHeaders); // Fetch contacts for the specific tag
+      const response = await api.get(`/tags/${tagId}/contacts`, authHeaders); 
       setContacts(response.data.data || []);
     } catch (error) {
       console.error("Failed to fetch contacts:", error);
@@ -62,7 +61,7 @@ const TagsManagement = () => {
 
   const fetchAllContacts = async () => {
     try {
-      const response = await api.get("/contacts", authHeaders); // Fetch all available contacts
+      const response = await api.get("/contacts", authHeaders); 
       // Exclude already added contacts
       const availableContacts = response.data.data.filter(
         (contact) =>
@@ -110,17 +109,16 @@ const TagsManagement = () => {
   };
 
   const handleSaveSelectedContacts = () => {
-    setContacts((prev) => [...prev, ...selectedContacts]); // Add selected contacts to the parent modal
-    setSelectedContacts([]); // Clear selections
-    setIsSelectContactsModalOpen(!isSelectContactsModalOpen); // Close modal
+    setContacts((prev) => [...prev, ...selectedContacts]); 
+    setSelectedContacts([]); 
+    setIsSelectContactsModalOpen(!isSelectContactsModalOpen);
   
-    // Re-fetch available contacts to exclude added ones
     fetchAllContacts();
   };
 
   const handleSaveContactsToTag = async () => {
     try {
-      const contactIds = contacts.map((contact) => contact._id); // Get contact IDs
+      const contactIds = contacts.map((contact) => contact._id); 
       const response = await api.put(`/tags/${currentTagId}`, {
         contacts: contactIds,
         authHeaders
@@ -148,7 +146,6 @@ const TagsManagement = () => {
       if (response.status === 200) {
         // alert("Contact removed from tag successfully!");
   
-        // Refresh the contacts in the modal after deletion
         fetchContacts(currentTagId);
       } else {
         alert("Failed to remove contact from tag.");

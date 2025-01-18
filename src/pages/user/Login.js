@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../../utils/api'; // Import your api.js
+import api from '../../utils/api'; 
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -16,10 +16,9 @@ const Login = () => {
   
     try {
       const response = await api.post('/user/login', { email, password });
-      console.log("API Response:", response.data); // Debug API response structure
+      // console.log("API Response:", response.data);
   
-      // Save the token and user info to localStorage
-      localStorage.setItem('token', response.data.data.token); // Ensure the key matches backend response
+      localStorage.setItem('token', response.data.data.token); 
       localStorage.setItem('user', JSON.stringify(response.data.data.user));
   
       // Redirect to dashboard
