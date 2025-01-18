@@ -4,7 +4,7 @@ import planReducer from './slices/planSlice';
 import userReducer from './slices/userSlice';
 import campaignReducer from './slices/campaignSlice';
 import reportReducer from './slices/reportSlice';
-
+import textBlastReducer from "./slices/textBlastSlice";
 const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -12,6 +12,7 @@ const store = configureStore({
     user: userReducer,
     campaigns: campaignReducer,
     reports: reportReducer,
+    textBlast: textBlastReducer,
   },
 });
 

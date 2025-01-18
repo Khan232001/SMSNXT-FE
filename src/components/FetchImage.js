@@ -1,54 +1,52 @@
 import React, { useState, useEffect } from "react";
+import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
 import Cookies from "js-cookie";
+import { storage } from "../firebaseConfig";
 
 const FetchImage = ({ isOpen, onClose, onProceed }) => {
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(""); 
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchImages = async () => {
       setLoading(true);
       try {
-        const response = await fetch(
-          `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/resources/image`, 
-          {
-            headers: {
-              Authorization: `Basic ${btoa(
-                `${process.env.REACT_APP_CLOUDINARY_API_KEY}:${process.env.REACT_APP_CLOUDINARY_API_SECRET}`
-              )}`,
-            },
-          }
+        const storageRef = ref(storage, "uploads/");
+        const result = await listAll(storageRef);
+
+        const imageUrls = await Promise.all(
+          result.items.map(async (itemRef) => {
+            const url = await getDownloadURL(itemRef);
+            return {
+              name: itemRef.name,
+              url,
+            };
+          })
         );
-  
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status} ${response.statusText}`);
-        }
-  
-        const data = await response.json();
-        console.log("API Response:", data);
-        setImages(data.resources || []);
+
+        setImages(imageUrls);
       } catch (error) {
         console.error("Error fetching images:", error);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
-  
+
     if (isOpen) {
       fetchImages();
     }
   }, [isOpen]);
-  
+
   const handleImageSelect = (image) => {
     setSelectedImage(image);
   };
 
   const handleProceed = () => {
     if (selectedImage) {
-      Cookies.set("selectedImage", selectedImage.secure_url);
-      alert("Image selected and saved!");
+      Cookies.set("selectedImage", selectedImage.url);
+      // alert("Image selected and saved!");
       onProceed(selectedImage);
       onClose();
     } else {
@@ -61,7 +59,7 @@ const FetchImage = ({ isOpen, onClose, onProceed }) => {
   };
 
   const filteredImages = images.filter((image) =>
-    image.public_id.toLowerCase().includes(searchTerm.toLowerCase())
+    image.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (!isOpen) return null;
@@ -89,20 +87,20 @@ const FetchImage = ({ isOpen, onClose, onProceed }) => {
           ) : filteredImages.length > 0 ? (
             filteredImages.map((image) => (
               <div
-                key={image.public_id}
+                key={image.name}
                 className={`border rounded-lg p-2 cursor-pointer ${
-                  selectedImage?.public_id === image.public_id
+                  selectedImage?.name === image.name
                     ? "border-blue-500"
                     : "border-gray-300"
                 }`}
                 onClick={() => handleImageSelect(image)}
               >
                 <img
-                  src={image.secure_url}
-                  alt={image.public_id}
+                  src={image.url}
+                  alt={image.name}
                   className="w-full h-32 object-cover rounded"
                 />
-                <p className="text-sm text-center mt-2">{image.public_id}</p>
+                <p className="text-sm text-center mt-2">{image.name}</p>
               </div>
             ))
           ) : (
@@ -131,7 +129,3 @@ const FetchImage = ({ isOpen, onClose, onProceed }) => {
 };
 
 export default FetchImage;
-
-
-
-

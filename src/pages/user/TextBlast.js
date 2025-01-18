@@ -1,12 +1,15 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, useEffect } from 'react';
 import UserNavbar from '../../components/UserNavbar';
+import api from "../../utils/api";
 import UserSidebar from '../../components/UserSidebar';
 import Papa from 'papaparse';
 import { Listbox, ListboxButton, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/solid';
 import Tooltip from '../../components/Tooltip';
 import UploadImage from '../../components/UploadImage';
+import Cookies from "js-cookie";
 import FetchImage from '../../components/FetchImage';
+import { useNavigate } from "react-router-dom";
 
 const tags = [
   { id: 1, name: 'Select an option', value: '' },
@@ -160,9 +163,9 @@ const CustomSelect = ({
   );
 };
 
-const TextBlast = ({ createTextBlast, setCreateTextBlast }) => {
+const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) => {
   const [activeStep, setActiveStep] = useState(1);
-  const [textBlastName, setTextBlastName] = useState('');
+  const [textBlastName, setTextBlastName] = useState(selectedCampaign ? selectedCampaign.name : "");
   const [campaigns, setCampaigns] = useState([]);
   const [uploadedRecipients, setUploadedRecipients] = useState([]);
   const [filteredRecipients, setFilteredRecipients] = useState([]);
@@ -178,8 +181,57 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast }) => {
   const [isFetchModalOpen, setIsFetchModalOpen] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState("");
   
+  const [scheduleDate, setScheduleDate] = useState('');
+  const [fromTime, setFromTime] = useState('');
+  const [toTime, setToTime] = useState('');
+  const [timeZone, setTimeZone] = useState('Eastern Time (ET)');
+
+  const handleScheduleDateChange = (e) => setScheduleDate(e.target.value);
+  const handleFromTimeChange = (e) => setFromTime(e.target.value);
+  const handleToTimeChange = (e) => setToTime(e.target.value);
+  const handleTimeZoneChange = (e) => setTimeZone(e.target.value);
+
+  const [tags, setTags] = useState([]);
+
+  useEffect(() => {
+    fetchTags();
+  }, []);
+
+  const token = localStorage.getItem("token");
+  const authHeaders = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+   const navigate = useNavigate(); 
+
+  const fetchTags = async () => {
+    try {
+      const token = localStorage.getItem("token"); // Get token from localStorage
+
+      if (!token) {
+        throw new Error("Unauthorized: No token found");
+      }
+
+      const response = await api.get("/tags", authHeaders);
+
+      const fetchedTags = response.data.data.map((tag) => ({
+        id: tag._id,
+        name: tag.name,
+        value: tag._id,
+      }));
+      setTags([{ id: 1, name: "Select an option", value: "" }, ...fetchedTags]); 
+    } catch (error) {
+      console.error("Failed to fetch tags:", error);
+      alert("Could not load tags. Please try again.");
+    }
+  };
+  
   const handleCancel = () => {
+    Cookies.remove("selectedImage");
     setCreateTextBlast(false); 
+
   };
 
   const handleUploadModal = () => {
@@ -209,6 +261,46 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast }) => {
   const messageChunks = splitMessage(message);
   const segmentCount = messageChunks.length;
   const [sendTimeOption, setSendTimeOption] = useState('now');
+  const imageUrl = Cookies.get("selectedImage");
+  const totalSegments = segmentCount + (imageUrl ? 1 : 0);
+
+  const handleSaveCampaign = async () => {
+    // Gather the data needed for the campaign
+    const campaignData = {
+      name: textBlastName,
+      tags: selectedTags.map((tag) => ({
+        tagId: tag.value,
+        tagName: tag.name,
+      })),
+      message: {
+        textSegments: messageChunks,
+        image: imageUrl,
+      },
+      schedule: {
+        sendTimeOption: sendTimeOption, // Whether to send now or schedule
+        date: scheduleDate,
+        fromTime: fromTime,
+        toTime: toTime,
+        timeZone: timeZone,
+      },
+      dailyLimit: 500,
+    };
+  
+    // Make the API call to upsert the campaign
+    try {
+      const response = await api.post("/campaign", campaignData, authHeaders);
+  
+      // Handle success
+      // alert("Campaign saved successfully!");
+      console.log(response.data); 
+      navigate("/campaign-management");
+    } catch (error) {
+      // Handle error
+      console.error("Error saving campaign:", error);
+      // alert("Failed to save campaign. Please try again.");
+    }
+  };
+  
 
   const steps = [
     { number: 1, name: 'Setup' },
@@ -313,44 +405,27 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast }) => {
               </div>
 
               {/* Send To and Collapsible Section Container */}
-              <div className='col-span-2 space-y-4'>
-                {/* Send To */}
-                <div>
-                  <label className='block'>
-                    <span className='text-blue-900 text-[1.25rem] font-[900] flex items-center mb-4'>
-                      Send To
-                      <Tooltip text='You can select one or multiple tags to send the text blast to.'>
-                        <svg
-                          className='w-4 h-4 ml-1 text-gray-500'
-                          fill='currentColor'
-                          viewBox='0 0 20 20'
-                        >
-                          <path
-                            fillRule='evenodd'
-                            d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z'
-                            clipRule='evenodd'
-                          />
-                        </svg>
-                      </Tooltip>
-                    </span>
-                    <span className='text-gray-700 font-bold block mb-2'>
-                      Tag(s)
-                    </span>
-                    <div className='w-2/3'>
-                      <CustomSelect
-                        options={tags}
-                        selected={selectedTags}
-                        onChange={setSelectedTags}
-                        label='Tags'
-                        isMulti={true}
-                      />
-                    </div>
-                    <span className='text-red-500 text-sm mt-1'>
-                      This field is required
-                    </span>
-                  </label>
+              <div>
+                {/* send to */}
+                <label className="block mb-2 text-lg font-bold text-blue-900">
+                  Send To
+                  <Tooltip text="You can select one or multiple tags to send the text blast to." />
+                </label>
+                <div className="w-2/3">
+                  <CustomSelect
+                    options={tags} // Use fetched tags
+                    selected={selectedTags}
+                    onChange={setSelectedTags}
+                    label="Tags"
+                    isMulti={true}
+                  />
                 </div>
-                
+                {selectedTags.length === 0 && (
+                  <span className="text-red-500 text-sm mt-1">
+                    This field is required
+                  </span>
+                )}
+          
                 {/* Who Not To Send To - Collapsible Section */}
                 <div className='border-t pt-4'>
                   <button
@@ -461,9 +536,9 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast }) => {
                       {message.length}
                     </span>
                     /160{" "}
-                    {segmentCount > 1 && (
+                    {totalSegments > 1 && (
                       <span className="ml-2 text-red-500 font-medium">
-                        Segments: {segmentCount}
+                        Segments: {totalSegments}
                       </span>
                     )}
                   </p>
@@ -532,14 +607,129 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast }) => {
                           {chunk}
                         </div>
                       ))}
+                        {/* Retrieve image URL from cookies */}
+                      {imageUrl && (
+                        <div className="mt-4 flex justify-center">
+                          <img
+                            src={imageUrl}
+                            alt="Selected"
+                            className="max-w-full max-h-40 rounded-lg"
+                          />
+                        </div>
+                       )}
                     </div>
+        
                   </div>
                 </div>
               </div>
             </div>
           </div>
         );
-      case 3:
+        case 3:
+          return (
+            <div className="space-y-6">
+              <h3 className="text-lg font-medium">Schedule your campaign</h3>
+        
+              <div className="mt-8">
+                <div className="flex items-center mb-4">
+                  <h4 className="text-blue-900 text-[1.25rem] font-[900] flex items-center">
+                    When To Send
+                    <Tooltip text="You can set when your text blast will be sent out. If you choose now the message will go out out in the next 30 minutes. If you schedule the message, it will start going out and be completed during the allotted time you selected." />
+                  </h4>
+                </div>
+        
+                <div className="flex space-x-6">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="sendTime"
+                      value="now"
+                      checked={sendTimeOption === "now"}
+                      onChange={handleSendTimeChange}
+                      className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                    />
+                    <span className="ml-2 text-gray-700">Now</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="sendTime"
+                      value="schedule"
+                      checked={sendTimeOption === "schedule"}
+                      onChange={handleSendTimeChange}
+                      className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                    />
+                    <span className="ml-2 text-gray-700">Schedule</span>
+                  </label>
+                </div>
+        
+                {sendTimeOption === "schedule" && (
+                  <div className="mt-6 space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Date
+                      </label>
+                      <input
+                        type="date"
+                        value={scheduleDate}
+                        onChange={handleScheduleDateChange}
+                        className="w-full bg-white rounded-xl px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors duration-200"
+                      />
+                    </div>
+        
+                    <div className="grid grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          From
+                        </label>
+                        <input
+                          type="time"
+                          value={fromTime}
+                          onChange={handleFromTimeChange}
+                          className="w-full bg-white rounded-xl px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          To
+                        </label>
+                        <input
+                          type="time"
+                          value={toTime}
+                          onChange={handleToTimeChange}
+                          className="w-full bg-white rounded-xl px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors duration-200"
+                        />
+                      </div>
+                    </div>
+        
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Time Zone
+                      </label>
+                      <select
+                        value={timeZone}
+                        onChange={handleTimeZoneChange}
+                        className="w-full bg-white rounded-xl px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors duration-200"
+                      >
+                        <option>Eastern Time (ET)</option>
+                        <option>Central Time (CT)</option>
+                        <option>Mountain Time (MT)</option>
+                        <option>Pacific Time (PT)</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+        
+                <div className="mt-6">
+                  <p className="text-sm">
+                    <span className="font-bold">Daily TextBlast Limit:</span>{" "}
+                    <span className="text-gray-600">500</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        case 4:
         return (
           <div className='space-y-6'>
             <h3 className='text-lg font-medium'>Schedule your campaign</h3>
@@ -737,12 +927,22 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast }) => {
           <h1 className='text-2xl font-bold mb-4'>
             {textBlastName || 'Text Blasts'}
           </h1>
+          <div className='flex gap-3'>
           <button
+              onClick={handleSaveCampaign}
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            >
+              Save Campaign
+            </button>
+            <button
                 onClick={handleCancel}
                 className="px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400"
               >
                 Cancel
-              </button>
+            </button>
+          </div>
+          
+           
           </div>
       
           

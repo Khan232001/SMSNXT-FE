@@ -31,7 +31,7 @@ const TagsManagement = () => {
   // Fetch Tags from API
   useEffect(() => {
     fetchTags();
-  }, []);
+  }, [tags]);
 
   const token = localStorage.getItem("token");
 
