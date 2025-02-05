@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import UserNavbar from '../../components/UserNavbar';
 import UserSidebar from '../../components/UserSidebar';
 import api from '../../utils/api';
+import Papa from 'papaparse';
 
 const ContactManagement = () => {
   const [contacts, setContacts] = useState([]);
@@ -23,6 +24,11 @@ const ContactManagement = () => {
   const [editContactEmail, setEditContactEmail] = useState('');
   const [editContactPhone, setEditContactPhone] = useState('');
   const [currentContact, setCurrentContact] = useState(null); 
+
+  //pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage] = useState(20);
 
   useEffect(() => {
     fetchContacts();
@@ -57,6 +63,9 @@ const ContactManagement = () => {
       setContacts([...contacts, response.data.data]);
       handleAddContactCancel();
     } catch (error) {
+      if (error.response && error.response.status === 400) {
+        alert(error.response.data.message)
+      }
       // alert('Failed to add contact.');
     }
   };
@@ -113,9 +122,54 @@ const ContactManagement = () => {
     }
   };
 
-  const handleImportCSV = async () => {
-    alert('CSV import feature coming soon!');
-  };
+  const handleImportCSV = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    Papa.parse(file, {
+        complete: async (result) => {
+            const parsedData = result.data;
+
+            // Ensure parsedData is an array and has at least one row
+            if (!Array.isArray(parsedData) || parsedData.length === 0) {
+                alert("Empty or invalid CSV file.");
+                return;
+            }
+
+            // Extract headers dynamically
+            const headers = Object.keys(parsedData[0]);
+            console.log("CSV Headers:", headers);
+
+            if (!headers.includes("Name") || !headers.includes("Email") || !headers.includes("Phone")) {
+                alert("Invalid CSV format. Ensure columns: 'Name', 'Email', 'Phone'.");
+                return;
+            }
+
+            // Convert CSV rows to JSON
+            const contacts = parsedData.map(row => ({
+                name: row.Name,
+                email: row.Email,
+                phoneNumber: row.Phone
+            })).filter(contact => contact.name && contact.email && contact.phoneNumber); 
+
+            if (contacts.length === 0) {
+                alert("No valid contacts found in the CSV file.");
+                return;
+            }
+
+            try {
+                const response = await api.post("/contacts/import", { contacts }, authHeaders);
+
+                alert(response.data.message);
+                fetchContacts(); // Refresh contacts
+            } catch (error) {
+                alert("Failed to import contacts.");
+            }
+        },
+        header: true, // Treat the first row as headers
+    });
+};
+
 
   const handleCreateGroup = () => {
     if (!groupName || !groupDescription) {
@@ -126,6 +180,10 @@ const ContactManagement = () => {
     setGroupName('');
     setGroupDescription('');
     setIsModalOpen(false);
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   return (
@@ -208,10 +266,44 @@ const ContactManagement = () => {
                 )}
               </tbody>
             </table>
+            {/* Pagination Controls */}
+      <div className='flex justify-between items-center space-x-2 p-4 border-t'>
+              <div className='flex-1'>
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === 1
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      : 'bg-blue-500 text-white hover:bg-blue-700'
+                  }`}
+                >
+                  Previous
+                </button>
+              </div>
+
+              <span className='text-gray-600 flex-1 text-center'>
+                Page {currentPage} of {totalPages}
+              </span>
+
+              <div className='flex-1 text-right'>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === totalPages
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      : 'bg-blue-500 text-white hover:bg-blue-700'
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
-
       {/* Add Contact Modal */}
       {isAddContactModalOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">

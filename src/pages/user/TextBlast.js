@@ -357,6 +357,15 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
       }
   
       console.log(response.data);
+      if (isActive) {
+        console.log("campaign inactive")
+        
+      }
+      else {
+        await api.post(`/campaign/send-campaign/${selectedCampaign._id}`, {}, authHeaders);
+        console.log("Campaign messages are being sent.");
+      }
+
     } catch (error) {
       console.error("Error updating campaign:", error);
     }
@@ -679,7 +688,7 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
                   <div className="bg-white h-full rounded-2xl overflow-hidden shadow-lg">
                     <div className="bg-gray-100 p-2 text-sm font-medium text-gray-600 flex justify-between items-center">
                       <span>Blueciate Inc.</span>
-                      <span>9726079081</span>
+                      <span>+1 4692836689</span>
                     </div>
                     <div className="flex flex-col justify-start p-4 overflow-auto h-full">
                       {messageChunks.map((chunk, index) => (
