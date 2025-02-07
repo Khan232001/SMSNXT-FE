@@ -340,14 +340,16 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
     schedule,
     dailyLimit: 500,
   };
-  const handleActivateCampaign = async () => {
-    setIsActive((prev) => !prev); 
   
+  const handleActivateCampaign = async () => {
+    const newStatus = !isActive;  // Determine new status before updating state
+    setIsActive(newStatus);  
+
     const updatedCampaignData = {
       ...campaignData, 
-      status: isActive ? 'inactive' : 'active', 
+      status: newStatus ? 'active' : 'inactive', 
     };
-  
+
     try {
       let response;
       if (selectedCampaign) {
@@ -355,13 +357,12 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
       } else {
         response = await api.post("/campaign", updatedCampaignData, authHeaders);
       }
-  
+
       console.log(response.data);
-      if (isActive) {
-        console.log("campaign inactive")
-        
-      }
-      else {
+      if (!newStatus) {
+        console.log("Campaign is now inactive");
+      } else {
+        console.log("Sending campaign messages...");
         await api.post(`/campaign/send-campaign/${selectedCampaign._id}`, {}, authHeaders);
         console.log("Campaign messages are being sent.");
       }
@@ -369,7 +370,8 @@ const TextBlast = ({ createTextBlast, setCreateTextBlast, selectedCampaign }) =>
     } catch (error) {
       console.error("Error updating campaign:", error);
     }
-  };
+};
+
   
   const handleSaveCampaign = async () => {
     const updatedCampaignData = {
