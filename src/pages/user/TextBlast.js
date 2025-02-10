@@ -12,6 +12,8 @@ import FetchImage from "../../components/FetchImage";
 import { useNavigate } from "react-router-dom";
 import { current } from "@reduxjs/toolkit";
 import FormValidationError from "../../components/FormValidatorError";
+import {MultiSelect} from "react-multi-select-component";
+import Modal from "../../components/Modal";
 
 const tags = [
   { id: 1, name: "Select an option", value: "" },
@@ -23,6 +25,12 @@ const textBlasts = [
   { id: 1, name: "Select an option", value: "" },
   { id: 2, name: "Text Blast 1", value: "blast1" },
   { id: 3, name: "Text Blast 2", value: "blast2" },
+];
+
+const options = [
+  { label: "Contact 1 ", value: "Contact 1" },
+  { label: "Contact 2 ", value: "Contact 2" },
+  { label: "Contact 3 ", value: "Contact 3" },
 ];
 
 const CustomSelect = ({
@@ -208,6 +216,17 @@ const TextBlast = ({
   const [tags, setTags] = useState([]);
   const [isActive, setIsActive] = useState(false);
 
+  const [selectedRecipients, setSelectedRecipients] = useState([]);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
+  const handleConfirmModal = () => {
+    setIsConfirmModalOpen((isConfirmModalOpen) => !isConfirmModalOpen);
+  };  
+
+  const handleCloseConfirmModal = () => {
+    setIsConfirmModalOpen(false);
+  };
+
   useEffect(() => {
     if (selectedCampaign) {
       const selectedTagData = selectedCampaign.tags
@@ -382,12 +401,14 @@ const TextBlast = ({
     try {
       let response;
       if (selectedCampaign) {
+        console.log('updatedCampaignData111');
         response = await api.put(
           `/campaign/${selectedCampaign._id}`,
           updatedCampaignData,
           authHeaders
         );
       } else {
+        console.log('updatedCampaignData2222');
         response = await api.post(
           "/campaign",
           updatedCampaignData,
@@ -396,6 +417,9 @@ const TextBlast = ({
       }
 
       console.log(response.data);
+      if(response?.data?.message === 'Campaign created successfully'){
+        handleCloseConfirmModal()
+      }
       if (isActive) {
         console.log("campaign inactive");
       } else {
@@ -871,21 +895,21 @@ const TextBlast = ({
         return (
           <div className="space-y-2">
             <div className="flex justify-end mt-[-3rem]">
-             {isActive ? (
+             {/* {isActive ? (
                 <button
                   onClick={handleActivateCampaign}
                   className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
                 >
                   Deactivate
                 </button>
-              ) : (
+              ) : ( */}
                 <button
-                  onClick={handleActivateCampaign}
+                  onClick={handleConfirmModal}
                   className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
                 >
                   Activate
                 </button>
-              )}
+              {/* )} */}
               </div>
             <div className="flex gap-8 mt-8 mx-auto max-w-7xl">
   {/* Message Preview Section */}
@@ -936,6 +960,26 @@ const TextBlast = ({
   </div>
 
   {/* Schedule Details Section */}
+  <div className="flex-1 flex flex-col gap-4">
+  <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+  <div className="flex items-center gap-2 mb-6">
+  <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      strokeWidth="2" 
+      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+    />
+  </svg>
+      <h3 className="text-xl font-bold text-gray-800">Select Recipients</h3>
+    </div>
+    <MultiSelect
+    options={options}
+    value={selectedRecipients}
+    onChange={setSelectedRecipients}
+    labelledBy="Select"
+  />
+  </div>
   <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
     <div className="flex items-center gap-2 mb-6">
       <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1013,6 +1057,7 @@ const TextBlast = ({
       </div>
     )}
   </div>
+  </div>
 </div>
           </div>
         );
@@ -1028,6 +1073,7 @@ const TextBlast = ({
   };
 
   return (
+    <>
     <div className="flex h-screen">
       {/* Sidebar */}
       <div
@@ -1133,22 +1179,28 @@ const TextBlast = ({
               >
                 Previous
               </button>
+              {activeStep === steps.length ? (
+''
+              ):(
               <button
                 onClick={handleNextStep}
-                disabled={activeStep === steps.length}
+                // disabled={activeStep === steps.length}
                 className={`px-4 py-1 rounded-md ${
                   activeStep === steps.length
-                    ? "bg-blue-300 cursor-not-allowed"
+                    ? "display:none"
                     : "bg-blue-500 hover:bg-blue-600"
                 } text-white`}
               >
-                {activeStep === steps.length ? "Finish" : "Next"}
+                {activeStep === steps.length ? "" : "Next"}
               </button>
+              )}
             </div>
           </div>
         </div>
       </div>
     </div>
+    <Modal confirm={true} handleConfirm={handleActivateCampaign}   open={isConfirmModalOpen} children={<div>Are you sure you want to Activate this campaign?</div>}  handleClose={handleCloseConfirmModal} title="Confirm Campaign"/>
+    </>
   );
 };
 
