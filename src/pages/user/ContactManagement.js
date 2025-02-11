@@ -167,14 +167,14 @@ const ContactManagement = () => {
           return;
         }
 
-        const tags = selectedTags.map(tag => tag.value); // Get selected tag IDs
+        const tags = selectedTags.map(tag => tag.value); 
 
         const contacts = parsedData
           .map(row => ({
             name: row[nameKey]?.trim(),
             email: row[emailKey]?.trim(),
             phoneNumber: row[phoneKey]?.trim(),
-            tags: tags, // Attach selected tags to each contact
+            tags: tags, 
           }))
           .filter(contact => contact.name && contact.email && contact.phoneNumber);
 
@@ -183,7 +183,6 @@ const ContactManagement = () => {
           return;
         }
 
-        // Send to backend with import mode
         try {
           const response = await api.post('/contacts/import', { contacts, importMode }, authHeaders);
           const { totalImported, totalSkipped, skippedContacts } = response.data;
