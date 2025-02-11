@@ -430,9 +430,10 @@ const TextBlast = ({
     // setIsActive((prev) => !prev);
 
     const updatedCampaignData = {
-      ...campaignData, 
-      status: newStatus ? 'active' : 'inactive', 
+      ...campaignData,
+      status: isActive === 'inactive' ? 'active' : 'inactive',
     };
+    
 
 
     try {
