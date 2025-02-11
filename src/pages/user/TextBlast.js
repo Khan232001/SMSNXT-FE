@@ -214,10 +214,24 @@ const TextBlast = ({
   const handleTimeZoneChange = (e) => setTimeZone(e.target.value);
 
   const [tags, setTags] = useState([]);
-  const [isActive, setIsActive] = useState(false);
+  const [isActive, setIsActive] = useState('inactive');
 
-  const [selectedRecipients, setSelectedRecipients] = useState([]);
+  const [selectedRecipients, setSelectedRecipients] = useState(['']);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
+  const [sendMesageOpen , setSendMessageOpen]=useState(false)
+
+  const handleSendMessageOpen = () => {
+    setSendMessageOpen((sendMesageOpen) => !sendMesageOpen);
+  }
+
+  const handleSendMessageClose = () => {
+    setSendMessageOpen(false);
+  }
+
+  const handleRecipientsChange = (e) => {
+    setSelectedRecipients(e.target.value);
+  };
 
   const handleConfirmModal = () => {
     setIsConfirmModalOpen((isConfirmModalOpen) => !isConfirmModalOpen);
@@ -390,10 +404,30 @@ const TextBlast = ({
     schedule,
     dailyLimit: 500,
   };
-  
+
+
+  const handleSendMessage = async () => {
+    console.log('selectedCampaign');
+    const data = {
+      phoneNumber: selectedRecipients,
+      message: message,
+      image: imageUrl,
+    }
+    console.log(data,'data');
+    try {
+      const response = await api.post(`/campaign/send-test-message`, data, authHeaders);
+      console.log(response.data,'dsdssds');
+      if(response?.data?.message === 'Test message sent successfully.'){
+        handleSendMessageOpen()
+        setSelectedRecipients([''])
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  }
+
   const handleActivateCampaign = async () => {
-    const newStatus = !isActive;  // Determine new status before updating state
-    setIsActive(newStatus);  
+    // setIsActive((prev) => !prev);
 
     const updatedCampaignData = {
       ...campaignData, 
@@ -404,7 +438,7 @@ const TextBlast = ({
     try {
       let response;
       if (selectedCampaign) {
-        console.log('updatedCampaignData111');
+        console.log(updatedCampaignData,'updatedCampaignData111');
         response = await api.put(
           `/campaign/${selectedCampaign._id}`,
           updatedCampaignData,
@@ -423,6 +457,7 @@ const TextBlast = ({
       console.log(response.data);
       if(response?.data?.message === 'Campaign created successfully'){
         handleCloseConfirmModal()
+        setIsActive(response?.data?.status)
       }
       if (isActive) {
         console.log("campaign inactive");
@@ -909,7 +944,7 @@ const TextBlast = ({
                   onClick={handleConfirmModal}
                   className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
                 >
-                  Activate
+                {isActive === 'inactive' ? 'Schedule' : 'Scheduled'}
                 </button>
               {/* )} */}
               </div>
@@ -973,14 +1008,23 @@ const TextBlast = ({
       d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
     />
   </svg>
-      <h3 className="text-xl font-bold text-gray-800">Select Recipients</h3>
+      <h3 className="text-xl font-bold text-gray-800">Recipients Number</h3>
     </div>
-    <MultiSelect
+    <input type="text" placeholder="Enter Number of Recipients" 
+    value={selectedRecipients}
+    onChange={handleRecipientsChange}
+    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    {/* <MultiSelect
     options={options}
     value={selectedRecipients}
     onChange={setSelectedRecipients}
     labelledBy="Select"
-  />
+  /> */}
+  <div className="flex justify-end mt-4">
+  <button  onClick={handleSendMessage} className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+  Send Message
+</button>
+  </div>
   </div>
   <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
     <div className="flex items-center gap-2 mb-6">
@@ -1202,6 +1246,7 @@ const TextBlast = ({
       </div>
     </div>
     <Modal confirm={true} handleConfirm={handleActivateCampaign}   open={isConfirmModalOpen} children={<div>Are you sure you want to Activate this campaign?</div>}  handleClose={handleCloseConfirmModal} title="Confirm Campaign"/>
+    <Modal    open={sendMesageOpen} children={<div>Test message sent successfully</div>}  handleClose={handleSendMessageClose} title=" Message Confirmation"/>
     </>
   );
 };
