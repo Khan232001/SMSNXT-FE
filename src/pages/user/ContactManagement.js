@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import UserNavbar from '../../components/UserNavbar';
 import UserSidebar from '../../components/UserSidebar';
+import Tooltip from '../../components/Tooltip';
 import api from '../../utils/api';
 import Papa from 'papaparse';
 
@@ -29,6 +30,13 @@ const ContactManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage] = useState(20);
+
+  // stats for import contact
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false); 
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [availableTags, setAvailableTags] = useState([]); 
+  const [selectedTags, setSelectedTags] = useState([]); 
+  const [parsedContacts, setParsedContacts] = useState([]);
 
   useEffect(() => {
     fetchContacts();
@@ -66,7 +74,6 @@ const ContactManagement = () => {
       if (error.response && error.response.status === 400) {
         alert(error.response.data.message)
       }
-      // alert('Failed to add contact.');
     }
   };
 
@@ -101,7 +108,6 @@ const ContactManagement = () => {
       );
       handleEditContactCancel();
     } catch (error) {
-      // alert('Failed to update contact.');
     }
   };
 
@@ -118,7 +124,6 @@ const ContactManagement = () => {
       await api.delete(`/contacts/${id}`, authHeaders);
       setContacts((prevContacts) => prevContacts.filter((contact) => contact._id !== id));
     } catch (error) {
-      // alert('Failed to delete contact.');
     }
   };
 
@@ -130,27 +135,32 @@ const ContactManagement = () => {
         complete: async (result) => {
             const parsedData = result.data;
 
-            // Ensure parsedData is an array and has at least one row
             if (!Array.isArray(parsedData) || parsedData.length === 0) {
                 alert("Empty or invalid CSV file.");
                 return;
             }
 
-            // Extract headers dynamically
-            const headers = Object.keys(parsedData[0]);
+            const rawHeaders = Object.keys(parsedData[0]);
+            const headers = rawHeaders.map(header => header.trim().toLowerCase());
+
             console.log("CSV Headers:", headers);
 
-            if (!headers.includes("Name") || !headers.includes("Email") || !headers.includes("Phone")) {
+            const nameKey = rawHeaders.find(h => h.trim().toLowerCase() === "name");
+            const emailKey = rawHeaders.find(h => h.trim().toLowerCase() === "email");
+            const phoneKey = rawHeaders.find(h => h.trim().toLowerCase() === "phone");
+
+            if (!nameKey || !emailKey || !phoneKey) {
                 alert("Invalid CSV format. Ensure columns: 'Name', 'Email', 'Phone'.");
                 return;
             }
 
-            // Convert CSV rows to JSON
-            const contacts = parsedData.map(row => ({
-                name: row.Name,
-                email: row.Email,
-                phoneNumber: row.Phone
-            })).filter(contact => contact.name && contact.email && contact.phoneNumber); 
+            const contacts = parsedData
+                .map(row => ({
+                    name: row[nameKey]?.trim(),
+                    email: row[emailKey]?.trim(),
+                    phoneNumber: row[phoneKey]?.trim(),
+                }))
+                .filter(contact => contact.name && contact.email && contact.phoneNumber);
 
             if (contacts.length === 0) {
                 alert("No valid contacts found in the CSV file.");
@@ -158,15 +168,30 @@ const ContactManagement = () => {
             }
 
             try {
-                const response = await api.post("/contacts/import", { contacts }, authHeaders);
+                const response = await api.post("/contacts/import", { contacts });
 
-                alert(response.data.message);
-                fetchContacts(); // Refresh contacts
+                const { totalImported, totalSkipped, skippedContacts } = response.data;
+
+                let message = `✅ Imported: ${totalImported} contacts.\n`;
+                if (totalSkipped > 0) {
+                    message += `⚠️ Skipped: ${totalSkipped} due to duplicates.`;
+                    
+                    console.log("❌ Skipped Contacts:", skippedContacts);
+
+                    message += `\n\nSkipped Contacts:\n${skippedContacts
+                        .map(c => `- ${c.name} (${c.email || c.phoneNumber}): ${c.reason}`)
+                        .join("\n")}`;
+                }
+
+                alert(message);
+                fetchContacts(); 
             } catch (error) {
-                alert("Failed to import contacts.");
+                alert("❌ Failed to import contacts.");
+                console.error("Import Error:", error.response?.data || error.message);
             }
         },
-        header: true, // Treat the first row as headers
+        header: true,
+        skipEmptyLines: true, 
     });
 };
 
@@ -241,6 +266,29 @@ const ContactManagement = () => {
                       <td className="px-6 py-4 text-sm text-gray-700">{contact.name}</td>
                       <td className="px-6 py-4 text-sm text-gray-700">{contact.email}</td>
                       <td className="px-6 py-4 text-sm text-gray-700">{contact.phoneNumber}</td>
+                      <td className="border border-gray-200 px-4 py-2">
+                        {contact.tags.length > 0 ? (
+                          <div className="relative group inline-block">
+                            <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs cursor-pointer transition duration-300 ease-in-out hover:bg-blue-600">
+                              {contact.tags.length} {contact.tags.length > 1 ? "Tags" : "Tag"}
+                            </span>
+                            
+                            {/* Tooltip Content */}
+                            <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-40 bg-gray-800 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-2 z-10">
+                              <div className="flex flex-col space-y-1">
+                                {contact.tags.map((tag) => (
+                                  <span key={tag._id} className="bg-gray-700 px-3 py-1 rounded-md text-center hover:bg-gray-600 transition">
+                                    {tag.name}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-gray-500">No Tags</span>
+                        )}
+                      </td>
+
                       <td className="px-6 py-4 text-sm space-x-2">
                         <button
                           className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-700"
