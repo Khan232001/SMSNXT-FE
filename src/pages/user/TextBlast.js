@@ -405,6 +405,7 @@ const TextBlast = ({
     dailyLimit: 500,
   };
 
+
   const handleSendMessage = async () => {
     console.log('selectedCampaign');
     const data = {
@@ -429,9 +430,10 @@ const TextBlast = ({
     // setIsActive((prev) => !prev);
 
     const updatedCampaignData = {
-      ...campaignData,
-      status: isActive ? "inactive" : "active",
+      ...campaignData, 
+      status: newStatus ? 'active' : 'inactive', 
     };
+
 
     try {
       let response;
@@ -451,6 +453,7 @@ const TextBlast = ({
         );
       }
 
+
       console.log(response.data);
       if(response?.data?.message === 'Campaign created successfully'){
         handleCloseConfirmModal()
@@ -459,18 +462,16 @@ const TextBlast = ({
       if (isActive) {
         console.log("campaign inactive");
       } else {
-        await api.post(
-          `/campaign/send-campaign/${selectedCampaign._id}`,
-          {},
-          authHeaders
-        );
+        console.log("Sending campaign messages...");
+        await api.post(`/campaign/send-campaign/${selectedCampaign._id}`, {}, authHeaders);
         console.log("Campaign messages are being sent.");
       }
     } catch (error) {
       console.error("Error updating campaign:", error);
     }
-  };
+};
 
+  
   const handleSaveCampaign = async () => {
     const updatedCampaignData = {
       ...campaignData,

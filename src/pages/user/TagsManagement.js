@@ -30,7 +30,7 @@ const TagsManagement = () => {
 
   useEffect(() => {
     fetchTags();
-  }, [tags]);
+  }, []);
 
   const token = localStorage.getItem("token");
 
