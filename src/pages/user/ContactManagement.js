@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import UserNavbar from '../../components/UserNavbar';
+import Select from 'react-select';
 import UserSidebar from '../../components/UserSidebar';
 import Tooltip from '../../components/Tooltip';
 import api from '../../utils/api';
@@ -36,10 +37,11 @@ const ContactManagement = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [availableTags, setAvailableTags] = useState([]); 
   const [selectedTags, setSelectedTags] = useState([]); 
-  const [parsedContacts, setParsedContacts] = useState([]);
+  const [importMode, setImportMode] = useState('importNew');
 
   useEffect(() => {
     fetchContacts();
+    fetchTags();
   }, []);
 
     const token = localStorage.getItem('token');
@@ -127,73 +129,82 @@ const ContactManagement = () => {
     }
   };
 
-  const handleImportCSV = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
 
-    Papa.parse(file, {
-        complete: async (result) => {
-            const parsedData = result.data;
+  const fetchTags = async () => {
+    try {
+      const response = await api.get('/tags', authHeaders);
+      setAvailableTags(response.data.data || []);
+    } catch (error) {
+      console.error('Failed to fetch tags', error);
+    }
+  };
 
-            if (!Array.isArray(parsedData) || parsedData.length === 0) {
-                alert("Empty or invalid CSV file.");
-                return;
-            }
+  const handleImportModeChange = (mode) => {
+    setImportMode(mode);
+  };
 
-            const rawHeaders = Object.keys(parsedData[0]);
-            const headers = rawHeaders.map(header => header.trim().toLowerCase());
+  const handleImportCSV = async () => {
+    if (!selectedFile) {
+      alert('Please select a CSV file.');
+      return;
+    }
 
-            console.log("CSV Headers:", headers);
+    Papa.parse(selectedFile, {
+      complete: async (result) => {
+        const parsedData = result.data;
 
-            const nameKey = rawHeaders.find(h => h.trim().toLowerCase() === "name");
-            const emailKey = rawHeaders.find(h => h.trim().toLowerCase() === "email");
-            const phoneKey = rawHeaders.find(h => h.trim().toLowerCase() === "phone");
+        if (!Array.isArray(parsedData) || parsedData.length === 0) {
+          alert('Invalid or empty CSV file.');
+          return;
+        }
 
-            if (!nameKey || !emailKey || !phoneKey) {
-                alert("Invalid CSV format. Ensure columns: 'Name', 'Email', 'Phone'.");
-                return;
-            }
+        const nameKey = Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "name");
+        const emailKey = Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "email");
+        const phoneKey = Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "phone");
 
-            const contacts = parsedData
-                .map(row => ({
-                    name: row[nameKey]?.trim(),
-                    email: row[emailKey]?.trim(),
-                    phoneNumber: row[phoneKey]?.trim(),
-                }))
-                .filter(contact => contact.name && contact.email && contact.phoneNumber);
+        if (!nameKey || !emailKey || !phoneKey) {
+          alert('Invalid CSV format. Ensure columns: Name, Email, Phone.');
+          return;
+        }
 
-            if (contacts.length === 0) {
-                alert("No valid contacts found in the CSV file.");
-                return;
-            }
+        const tags = selectedTags.map(tag => tag.value); // Get selected tag IDs
 
-            try {
-                const response = await api.post("/contacts/import", { contacts });
+        const contacts = parsedData
+          .map(row => ({
+            name: row[nameKey]?.trim(),
+            email: row[emailKey]?.trim(),
+            phoneNumber: row[phoneKey]?.trim(),
+            tags: tags, // Attach selected tags to each contact
+          }))
+          .filter(contact => contact.name && contact.email && contact.phoneNumber);
 
-                const { totalImported, totalSkipped, skippedContacts } = response.data;
+        if (contacts.length === 0) {
+          alert('No valid contacts found in the CSV file.');
+          return;
+        }
 
-                let message = `✅ Imported: ${totalImported} contacts.\n`;
-                if (totalSkipped > 0) {
-                    message += `⚠️ Skipped: ${totalSkipped} due to duplicates.`;
-                    
-                    console.log("❌ Skipped Contacts:", skippedContacts);
+        // Send to backend with import mode
+        try {
+          const response = await api.post('/contacts/import', { contacts, importMode }, authHeaders);
+          const { totalImported, totalSkipped, skippedContacts } = response.data;
 
-                    message += `\n\nSkipped Contacts:\n${skippedContacts
-                        .map(c => `- ${c.name} (${c.email || c.phoneNumber}): ${c.reason}`)
-                        .join("\n")}`;
-                }
+          let message = `✅ Imported: ${totalImported} contacts.\n`;
+          if (totalSkipped > 0) {
+            message += `⚠️ Skipped: ${totalSkipped} due to duplicates.\n`;
+          }
 
-                alert(message);
-                fetchContacts(); 
-            } catch (error) {
-                alert("❌ Failed to import contacts.");
-                console.error("Import Error:", error.response?.data || error.message);
-            }
-        },
-        header: true,
-        skipEmptyLines: true, 
+          alert(message);
+          fetchContacts();
+          setIsImportModalOpen(false);
+        } catch (error) {
+          alert('❌ Failed to import contacts.');
+          console.error('Import Error:', error.response?.data || error.message);
+        }
+      },
+      header: true,
+      skipEmptyLines: true,
     });
-};
+  };
 
 
   const handleCreateGroup = () => {
@@ -235,10 +246,97 @@ const ContactManagement = () => {
               >
                 Add New Contact
               </button>
-              <label className="cursor-pointer px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-600">
+              <button
+                onClick={() => setIsImportModalOpen(true)}
+                className="px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-600"
+              >
                 Import CSV
-                <input type="file" accept=".csv" className="hidden" onChange={handleImportCSV} />
-              </label>
+              </button>
+        
+
+              {isImportModalOpen && (
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
+                  <div className="bg-white p-6 rounded-lg shadow-md w-96">
+                    <h3 className="text-xl font-semibold text-blue-700 mb-4">Import Contacts</h3>
+
+                    {/* Import Mode Selection */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700">Import Mode</label>
+                      <div className="mt-2 space-y-2">
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={importMode === 'importNew'}
+                            onChange={() => handleImportModeChange('importNew')}
+                            className="form-checkbox h-5 w-5 text-blue-600"
+                          />
+                          <span className="text-gray-700">Import new contacts only</span>
+                        </label>
+
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={importMode === 'updateOnly'}
+                            onChange={() => handleImportModeChange('updateOnly')}
+                            className="form-checkbox h-5 w-5 text-blue-600"
+                          />
+                          <span className="text-gray-700">Update contacts only</span>
+                        </label>
+
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={importMode === 'importAndUpdate'}
+                            onChange={() => handleImportModeChange('importAndUpdate')}
+                            className="form-checkbox h-5 w-5 text-blue-600"
+                          />
+                          <span className="text-gray-700">Import and update contacts</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* CSV File Input */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700">CSV File</label>
+                      <input
+                        type="file"
+                        accept=".csv"
+                        onChange={(e) => setSelectedFile(e.target.files[0])}
+                        className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    {/* Multi-select Tags Input */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700">Select Tags</label>
+                      <Select
+                        isMulti
+                        options={availableTags.map(tag => ({ value: tag._id, label: tag.name }))}
+                        value={selectedTags}
+                        onChange={setSelectedTags}
+                        className="mt-2"
+                      />
+                    </div>
+
+                    {/* Buttons */}
+                    <div className="flex justify-between">
+                      <button
+                        onClick={() => setIsImportModalOpen(false)}
+                        className="px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleImportCSV}
+                        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-800"
+                      >
+                        Import
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+      
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-800"
