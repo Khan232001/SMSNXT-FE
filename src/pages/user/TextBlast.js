@@ -455,7 +455,7 @@ const TextBlast = ({
 
 
       console.log(response.data);
-      if(response?.data?.message === 'Campaign created successfully'){
+      if(response?.data?.message === 'Campaign created successfully' || response?.data?.message === 'Campaign updated successfully'){
         handleCloseConfirmModal()
         setIsActive(response?.data?.status)
       }
