@@ -441,8 +441,11 @@ const TextBlast = ({
 
     const updatedCampaignData = {
       ...campaignData,
+
       status: isActive ? "active" : "inactive",
+
     };
+    
 
     try {
       let response;

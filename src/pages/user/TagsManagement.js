@@ -9,8 +9,8 @@ import { RiContactsLine } from "react-icons/ri";
 const TagsManagement = () => {
   const [tags, setTags] = useState([]);
   const [contacts, setContacts] = useState([]);
-  const [allContacts, setAllContacts] = useState([]); // All fetched contacts for selection
-  const [selectedContacts, setSelectedContacts] = useState([]); // Contacts selected from Select Contacts Modal
+  const [allContacts, setAllContacts] = useState([]); 
+  const [selectedContacts, setSelectedContacts] = useState([]); 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddContactsModalOpen, setIsAddContactsModalOpen] = useState(false);
@@ -62,7 +62,6 @@ const TagsManagement = () => {
   const fetchAllContacts = async () => {
     try {
       const response = await api.get("/contacts", authHeaders); 
-      // Exclude already added contacts
       const availableContacts = response.data.data.filter(
         (contact) =>
           !contacts.some((addedContact) => addedContact._id === contact._id)
@@ -512,7 +511,7 @@ const TagsManagement = () => {
                     </button>
                     <button
                       className="bg-blue-600 text-white rounded-md px-4 py-2"
-                      onClick={handleSaveContactsToTag} // Save contacts to tag
+                      onClick={handleSaveContactsToTag}
                     >
                       Save
                     </button>
