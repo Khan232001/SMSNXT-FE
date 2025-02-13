@@ -12,7 +12,7 @@ import FetchImage from "../../components/FetchImage";
 import { useNavigate } from "react-router-dom";
 import { current } from "@reduxjs/toolkit";
 import FormValidationError from "../../components/FormValidatorError";
-import {MultiSelect} from "react-multi-select-component";
+import { MultiSelect } from "react-multi-select-component";
 import Modal from "../../components/Modal";
 
 const tags = [
@@ -192,6 +192,7 @@ const TextBlast = ({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [selectedTags, setSelectedTags] = useState([]);
+  console.log(selectedTags, "selectedTags");
   const [selectedTagsError, setSelectedTagsError] = useState("");
 
   const [selectedExcludeTags, setSelectedExcludeTags] = useState([]);
@@ -214,20 +215,21 @@ const TextBlast = ({
   const handleTimeZoneChange = (e) => setTimeZone(e.target.value);
 
   const [tags, setTags] = useState([]);
-  const [isActive, setIsActive] = useState('inactive');
+  console.log(tags, "tagsss");
+  const [isActive, setIsActive] = useState("false")
 
-  const [selectedRecipients, setSelectedRecipients] = useState(['']);
+  const [selectedRecipients, setSelectedRecipients] = useState([""]);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
-  const [sendMesageOpen , setSendMessageOpen]=useState(false)
+  const [sendMesageOpen, setSendMessageOpen] = useState(false);
 
   const handleSendMessageOpen = () => {
     setSendMessageOpen((sendMesageOpen) => !sendMesageOpen);
-  }
+  };
 
   const handleSendMessageClose = () => {
     setSendMessageOpen(false);
-  }
+  };
 
   const handleRecipientsChange = (e) => {
     setSelectedRecipients(e.target.value);
@@ -235,7 +237,7 @@ const TextBlast = ({
 
   const handleConfirmModal = () => {
     setIsConfirmModalOpen((isConfirmModalOpen) => !isConfirmModalOpen);
-  };  
+  };
 
   const handleCloseConfirmModal = () => {
     setIsConfirmModalOpen(false);
@@ -318,11 +320,13 @@ const TextBlast = ({
       }
 
       const response = await api.get("/tags", authHeaders);
+      console.log(response.data, "response.data");
 
       const fetchedTags = response.data.data.map((tag) => ({
         id: tag._id,
         name: tag.name,
         value: tag._id,
+        contacts: tag.contacts,
       }));
       setTags([{ id: 1, name: "Select an option", value: "" }, ...fetchedTags]);
     } catch (error) {
@@ -349,6 +353,9 @@ const TextBlast = ({
 
   const handleProceed = (selectedImage) => {
     setSelectedImageUrl(imageUrl);
+  };
+  const handleImageRemove = () => {
+    setSelectedImageUrl("");
   };
   const splitMessage = (text) => {
     const chunkSize = 160;
@@ -405,47 +412,49 @@ const TextBlast = ({
     dailyLimit: 500,
   };
 
-
   const handleSendMessage = async () => {
-    console.log('selectedCampaign');
+    console.log("selectedCampaign");
     const data = {
       phoneNumber: selectedRecipients,
       message: message,
       image: imageUrl,
-    }
-    console.log(data,'data');
+    };
+    console.log(data, "data");
     try {
-      const response = await api.post(`/campaign/send-test-message`, data, authHeaders);
-      console.log(response.data,'dsdssds');
-      if(response?.data?.message === 'Test message sent successfully.'){
-        handleSendMessageOpen()
-        setSelectedRecipients([''])
+      const response = await api.post(
+        `/campaign/send-test-message`,
+        data,
+        authHeaders
+      );
+      console.log(response.data, "dsdssds");
+      if (response?.data?.message === "Test message sent successfully.") {
+        handleSendMessageOpen();
+        setSelectedRecipients([""]);
       }
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
     }
-  }
+  };
 
   const handleActivateCampaign = async () => {
     // setIsActive((prev) => !prev);
 
     const updatedCampaignData = {
-      ...campaignData, 
-      status: newStatus ? 'active' : 'inactive', 
+      ...campaignData,
+      status: isActive ? "active" : "inactive",
     };
-
 
     try {
       let response;
       if (selectedCampaign) {
-        console.log(updatedCampaignData,'updatedCampaignData111');
+        console.log(updatedCampaignData, "updatedCampaignData111");
         response = await api.put(
           `/campaign/${selectedCampaign._id}`,
           updatedCampaignData,
           authHeaders
         );
       } else {
-        console.log('updatedCampaignData2222');
+        console.log("updatedCampaignData2222");
         response = await api.post(
           "/campaign",
           updatedCampaignData,
@@ -453,25 +462,32 @@ const TextBlast = ({
         );
       }
 
-
       console.log(response.data);
-      if(response?.data?.message === 'Campaign created successfully' || response?.data?.message === 'Campaign updated successfully'){
-        handleCloseConfirmModal()
-        setIsActive(response?.data?.status)
+      if (
+        response?.data?.message === "Campaign created successfully" ||
+        response?.data?.message === "Campaign updated successfully"
+      ) {
+        handleCloseConfirmModal();
+        setIsActive(response?.data?.status);
+      setCreateTextBlast(false);
+
       }
       if (isActive) {
         console.log("campaign inactive");
       } else {
         console.log("Sending campaign messages...");
-        await api.post(`/campaign/send-campaign/${selectedCampaign._id}`, {}, authHeaders);
+        await api.post(
+          `/campaign/send-campaign/${selectedCampaign._id}`,
+          {},
+          authHeaders
+        );
         console.log("Campaign messages are being sent.");
       }
     } catch (error) {
       console.error("Error updating campaign:", error);
     }
-};
+  };
 
-  
   const handleSaveCampaign = async () => {
     const updatedCampaignData = {
       ...campaignData,
@@ -809,12 +825,32 @@ const TextBlast = ({
                       ))}
                       {/* Retrieve image URL from cookies */}
                       {selectedImageUrl && (
-                        <div className="mt-4 flex justify-center">
+                        <div className="mt-4 flex justify-center relative">
                           <img
                             src={selectedImageUrl}
                             alt="Selected"
                             className="max-w-full max-h-40 rounded-lg"
                           />
+                          <button
+                            onClick={handleImageRemove}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                            title="Remove image"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
                         </div>
                       )}
                     </div>
@@ -932,7 +968,7 @@ const TextBlast = ({
         return (
           <div className="space-y-2">
             <div className="flex justify-end mt-[-3rem]">
-             {/* {isActive ? (
+              {/* {isActive ? (
                 <button
                   onClick={handleActivateCampaign}
                   className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
@@ -940,171 +976,288 @@ const TextBlast = ({
                   Deactivate
                 </button>
               ) : ( */}
-                <button
-                  onClick={handleConfirmModal}
-                  className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-                >
-                {isActive === 'inactive' ? 'Schedule' : 'Scheduled'}
-                </button>
+              <button
+                onClick={handleConfirmModal}
+                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+              >
+                {sendTimeOption === "now"
+                  ? "Send Now"
+                  : isActive === "inactive"
+                  ? "Schedule"
+                  : "Scheduled"}
+              </button>
               {/* )} */}
-              </div>
-            <div className="flex gap-8 mt-8 mx-auto max-w-7xl">
-  {/* Message Preview Section */}
-  <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
-    <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 mb-6">
-        <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-        </svg>
-        <h3 className="text-xl font-bold text-gray-800">Message Preview</h3>
-      </div>
-
-      <div className="flex justify-center items-center flex-1">
-        <div className="relative w-[300px] h-[500px] bg-black rounded-3xl p-[0.4rem]">
-          <div className="bg-white h-full rounded-2xl overflow-hidden shadow-lg">
-            <div className="bg-gray-100 p-3 text-sm font-medium text-gray-600 flex justify-between items-center border-b">
-              <span className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                Blueciate Inc.
-              </span>
-              <span className="text-xs">+1 4692836689</span>
             </div>
-            <div className="flex flex-col justify-start p-4 overflow-auto h-full bg-gray-50">
-              {messageChunks.map((chunk, index) => (
-                <div
-                  key={index}
-                  className="bg-blue-500 text-white rounded-lg p-3 py-2 mb-4 text-sm leading-5 break-words whitespace-pre-line max-w-[80%] self-end shadow-sm"
-                >
-                  {chunk}
-                </div>
-              ))}
-              {selectedImageUrl && (
-                <div className="mt-4 flex justify-end">
-                  <div className="bg-blue-500 p-1 rounded-lg shadow-sm max-w-[80%]">
-                    <img
-                      src={selectedImageUrl}
-                      alt="Selected"
-                      className="max-w-full max-h-40 rounded-lg"
-                    />
+            <div className="flex gap-8 mt-8 mx-auto max-w-7xl">
+              {/* Message Preview Section */}
+              <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+                <div className="flex flex-col h-full">
+                  <div className="flex items-center gap-2 mb-6">
+                    <svg
+                      className="w-6 h-6 text-blue-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                      />
+                    </svg>
+                    <h3 className="text-xl font-bold text-gray-800">
+                      Message Preview
+                    </h3>
+                  </div>
+
+                  <div className="flex justify-center items-center flex-1">
+                    <div className="relative w-[300px] h-[500px] bg-black rounded-3xl p-[0.4rem]">
+                      <div className="bg-white h-full rounded-2xl overflow-hidden shadow-lg">
+                        <div className="bg-gray-100 p-3 text-sm font-medium text-gray-600 flex justify-between items-center border-b">
+                          <span className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                            Blueciate Inc.
+                          </span>
+                          <span className="text-xs">+1 4692836689</span>
+                        </div>
+                        <div className="flex flex-col justify-start p-4 overflow-auto h-full bg-gray-50">
+                          {messageChunks.map((chunk, index) => (
+                            <div
+                              key={index}
+                              className="bg-blue-500 text-white rounded-lg p-3 py-2 mb-4 text-sm leading-5 break-words whitespace-pre-line max-w-[80%] self-end shadow-sm"
+                            >
+                              {chunk}
+                            </div>
+                          ))}
+                          {selectedImageUrl && (
+                            <div className="mt-4 flex justify-end">
+                              <div className="bg-blue-500 p-1 rounded-lg shadow-sm max-w-[80%]">
+                                <img
+                                  src={selectedImageUrl}
+                                  alt="Selected"
+                                  className="max-w-full max-h-40 rounded-lg"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+              </div>
 
-  {/* Schedule Details Section */}
-  <div className="flex-1 flex flex-col gap-4">
-  <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
-  <div className="flex items-center gap-2 mb-6">
-  <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      strokeWidth="2" 
-      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-    />
-  </svg>
-      <h3 className="text-xl font-bold text-gray-800">Recipients Number</h3>
-    </div>
-    <input type="text" placeholder="Enter Number of Recipients" 
-    value={selectedRecipients}
-    onChange={handleRecipientsChange}
-    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-    {/* <MultiSelect
+              {/* Schedule Details Section */}
+              <div className="flex-1 flex flex-col gap-4">
+                <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+                  <div className="flex items-center gap-2 mb-6">
+                    <svg
+                      className="w-6 h-6 text-blue-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                      />
+                    </svg>
+                    <h3 className="text-xl font-bold text-gray-800">
+                      Recipients Number
+                    </h3>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Enter Number of Recipients"
+                    value={selectedRecipients}
+                    onChange={handleRecipientsChange}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  {/* <MultiSelect
     options={options}
     value={selectedRecipients}
     onChange={setSelectedRecipients}
     labelledBy="Select"
   /> */}
-  <div className="flex justify-end mt-4">
-  <button  onClick={handleSendMessage} className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
-  Send Message
-</button>
-  </div>
-  </div>
-  <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
-    <div className="flex items-center gap-2 mb-6">
-      <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
-      <h3 className="text-xl font-bold text-gray-800">Schedule Details</h3>
-    </div>
+                  <div className="flex justify-end mt-4">
+                    <button
+                      onClick={handleSendMessage}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                    >
+                      Send Message
+                    </button>
+                  </div>
+                </div>
+                <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+                  <div className="flex items-center gap-2 mb-6">
+                    <svg
+                      className="w-6 h-6 text-blue-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                      />
+                    </svg>
+                    <h3 className="text-xl font-bold text-gray-800">
+                      Contact Details
+                    </h3>
+                  </div>
 
-    {sendTimeOption === "schedule" ? (
-      <div className="space-y-4">
-        {/* Date */}
-        <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-          <div className="flex items-center gap-3 w-full">
-            <div className="min-w-[100px] font-medium text-gray-600">Date</div>
-            <div className="flex-1 text-gray-800 font-semibold">
-              {new Date(scheduleDate).toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </div>
-          </div>
-        </div>
+                  <div className="flex flex-col  w-full flex-wrap gap-2">
+                    <div className="flex flex-col justify-between gap-2">
+                      {selectedTags.map((tag, index) => (
+                        <div key={tag.id} className="flex  items-center gap-10">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold"> Tag {index + 1}:</span>
+                            <span className="font-semibold">{tag.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold ml-4">Contacts:</span>
+                            <span className="font-semibold">
+                              {tag.contacts?.length}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-5 mt-4 ">
+                      <span className="font-bold">Charges :</span>
+                      <div>
+                        <span className="font-semibold ml-4">
+                          {totalSegments} credits
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+                  <div className="flex items-center gap-2 mb-6">
+                    <svg
+                      className="w-6 h-6 text-blue-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <h3 className="text-xl font-bold text-gray-800">
+                      Schedule Details
+                    </h3>
+                  </div>
 
-        {/* Time Range */}
-        <div className="flex flex-col gap-3">
-          <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-            <div className="flex items-center gap-3">
-              <div className="min-w-[100px] font-medium text-gray-600">From</div>
-              <div className="flex-1 text-gray-800 font-semibold">
-                {fromTime
-                  ? new Date(`2000-01-01T${fromTime}`).toLocaleTimeString("en-US", {
-                      hour: "numeric",
-                      minute: "numeric",
-                      hour12: true,
-                    })
-                  : "Not set"}
+                  {sendTimeOption === "schedule" ? (
+                    <div className="space-y-4">
+                      {/* Date */}
+                      <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                        <div className="flex items-center gap-3 w-full">
+                          <div className="min-w-[100px] font-medium text-gray-600">
+                            Date
+                          </div>
+                          <div className="flex-1 text-gray-800 font-semibold">
+                            {new Date(scheduleDate).toLocaleDateString(
+                              "en-US",
+                              {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Time Range */}
+                      <div className="flex flex-col gap-3">
+                        <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                          <div className="flex items-center gap-3">
+                            <div className="min-w-[100px] font-medium text-gray-600">
+                              From
+                            </div>
+                            <div className="flex-1 text-gray-800 font-semibold">
+                              {fromTime
+                                ? new Date(
+                                    `2000-01-01T${fromTime}`
+                                  ).toLocaleTimeString("en-US", {
+                                    hour: "numeric",
+                                    minute: "numeric",
+                                    hour12: true,
+                                  })
+                                : "Not set"}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                          <div className="flex items-center gap-3">
+                            <div className="min-w-[100px] font-medium text-gray-600">
+                              To
+                            </div>
+                            <div className="flex-1 text-gray-800 font-semibold">
+                              {toTime
+                                ? new Date(
+                                    `2000-01-01T${toTime}`
+                                  ).toLocaleTimeString("en-US", {
+                                    hour: "numeric",
+                                    minute: "numeric",
+                                    hour12: true,
+                                  })
+                                : "Not set"}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Timezone */}
+                      <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                        <div className="flex items-center gap-3">
+                          <div className="min-w-[100px] font-medium text-gray-600">
+                            Time Zone
+                          </div>
+                          <div className="flex-1 text-gray-800 font-semibold">
+                            {timeZone}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-[400px] text-gray-500">
+                      <div className="text-center">
+                        <svg
+                          className="w-16 h-16 mx-auto mb-4 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <p className="text-lg font-medium">
+                          Sending immediately
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-            <div className="flex items-center gap-3">
-              <div className="min-w-[100px] font-medium text-gray-600">To</div>
-              <div className="flex-1 text-gray-800 font-semibold">
-                {toTime
-                  ? new Date(`2000-01-01T${toTime}`).toLocaleTimeString("en-US", {
-                      hour: "numeric",
-                      minute: "numeric",
-                      hour12: true,
-                    })
-                  : "Not set"}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Timezone */}
-        <div className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-          <div className="flex items-center gap-3">
-            <div className="min-w-[100px] font-medium text-gray-600">Time Zone</div>
-            <div className="flex-1 text-gray-800 font-semibold">{timeZone}</div>
-          </div>
-        </div>
-      </div>
-    ) : (
-      <div className="flex items-center justify-center h-[400px] text-gray-500">
-        <div className="text-center">
-          <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p className="text-lg font-medium">Sending immediately</p>
-        </div>
-      </div>
-    )}
-  </div>
-  </div>
-</div>
           </div>
         );
       case 4:
@@ -1120,133 +1273,144 @@ const TextBlast = ({
 
   return (
     <>
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <div
-        className={`fixed top-0 left-0 z-20 bg-white shadow-md lg:relative lg:w-64 lg:block ${
-          isSidebarOpen ? "w-64" : "hidden"
-        }`}
-      >
-        <UserSidebar />
-      </div>
-
-      <div className="flex-1 flex flex-col bg-gray-100 relative">
-        {/* Navbar */}
-        <div className="fixed top-0 left-0 right-0 z-10 h-16 bg-white shadow-md flex justify-between items-center px-4 lg:px-6">
-          <button
-            className="text-gray-600 focus:outline-none lg:hidden"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
-          <UserNavbar />
+      <div className="flex h-screen">
+        {/* Sidebar */}
+        <div
+          className={`fixed top-0 left-0 z-20 bg-white shadow-md lg:relative lg:w-64 lg:block ${
+            isSidebarOpen ? "w-64" : "hidden"
+          }`}
+        >
+          <UserSidebar />
         </div>
 
-        {/* Main Content */}
-        <div className="mt-16 flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between mb-2">
-            <h1 className="text-2xl font-bold mb-4">
-              {textBlastName || "Text Blasts"}
-            </h1>
-            <div className="flex gap-3">
-             
-              <button
-                onClick={handleSaveCampaign}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+        <div className="flex-1 flex flex-col bg-gray-100 relative">
+          {/* Navbar */}
+          <div className="fixed top-0 left-0 right-0 z-10 h-16 bg-white shadow-md flex justify-between items-center px-4 lg:px-6">
+            <button
+              className="text-gray-600 focus:outline-none lg:hidden"
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                Save Campaign
-              </button>
-              <button
-                onClick={handleCancel}
-                className="px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-            </div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+            <UserNavbar />
           </div>
 
-          {/* Stepper */}
-          <div className="flex flex-col md:flex-row p-8 bg-gray-50 font-sans">
-            <div className="w-full p-4">
-              <div className="flex items-center">
-                {steps.map((step, index) => (
-                  <React.Fragment key={step.number}>
-                    <div className="flex-1 text-center">
-                      <div
-                        // onClick={() => setActiveStep(step.number)}
-                        className={`w-10 h-10 flex items-center justify-center rounded-full mx-auto cursor-pointer ${
-                          activeStep === step.number
-                            ? "bg-gray-700 text-white"
-                            : "border border-gray-300"
-                        }`}
-                      >
-                        {step.number}
+          {/* Main Content */}
+          <div className="mt-16 flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex justify-between mb-2">
+              <h1 className="text-2xl font-bold mb-4">
+                {textBlastName || "Text Blasts"}
+              </h1>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleSaveCampaign}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                >
+                  Save Campaign
+                </button>
+                <button
+                  onClick={handleCancel}
+                  className="px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+
+            {/* Stepper */}
+            <div className="flex flex-col md:flex-row p-8 bg-gray-50 font-sans">
+              <div className="w-full p-4">
+                <div className="flex items-center">
+                  {steps.map((step, index) => (
+                    <React.Fragment key={step.number}>
+                      <div className="flex-1 text-center">
+                        <div
+                          // onClick={() => setActiveStep(step.number)}
+                          className={`w-10 h-10 flex items-center justify-center rounded-full mx-auto cursor-pointer ${
+                            activeStep === step.number
+                              ? "bg-gray-700 text-white"
+                              : "border border-gray-300"
+                          }`}
+                        >
+                          {step.number}
+                        </div>
+                        <p className="text-sm mt-2 font-medium">{step.name}</p>
                       </div>
-                      <p className="text-sm mt-2 font-medium">{step.name}</p>
-                    </div>
-                    {index < steps.length - 1 && (
-                      <div className="border-t-2 border-gray-300 flex-1 pb-5"></div>
-                    )}
-                  </React.Fragment>
-                ))}
+                      {index < steps.length - 1 && (
+                        <div className="border-t-2 border-gray-300 flex-1 pb-5"></div>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Step Content */}
+            <div className="flex flex-col  px-8 pb-8 bg-gray-50 font-sans">
+              <div className="w-full p-4">
+                <h2 className="text-2xl font-bold mb-6">
+                  {steps.find((step) => step.number === activeStep)?.name}
+                </h2>
+                {renderStepContent()}
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={handlePreviousStep}
+                  disabled={activeStep === 1}
+                  className={`px-4 py-1 rounded-md border ${
+                    activeStep === 1
+                      ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+                      : "bg-gray-200 text-black border-gray-400 hover:bg-gray-300"
+                  }`}
+                >
+                  Previous
+                </button>
+                {activeStep === steps.length ? (
+                  ""
+                ) : (
+                  <button
+                    onClick={handleNextStep}
+                    // disabled={activeStep === steps.length}
+                    className={`px-4 py-1 rounded-md ${
+                      activeStep === steps.length
+                        ? "display:none"
+                        : "bg-blue-500 hover:bg-blue-600"
+                    } text-white`}
+                  >
+                    {activeStep === steps.length ? "" : "Next"}
+                  </button>
+                )}
               </div>
             </div>
           </div>
-
-          {/* Step Content */}
-          <div className="flex flex-col  px-8 pb-8 bg-gray-50 font-sans">
-            <div className="w-full p-4">
-              <h2 className="text-2xl font-bold mb-6">
-                {steps.find((step) => step.number === activeStep)?.name}
-              </h2>
-              {renderStepContent()}
-            </div>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={handlePreviousStep}
-                disabled={activeStep === 1}
-                className={`px-4 py-1 rounded-md border ${
-                  activeStep === 1
-                    ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
-                    : "bg-gray-200 text-black border-gray-400 hover:bg-gray-300"
-                }`}
-              >
-                Previous
-              </button>
-              {activeStep === steps.length ? (
-''
-              ):(
-              <button
-                onClick={handleNextStep}
-                // disabled={activeStep === steps.length}
-                className={`px-4 py-1 rounded-md ${
-                  activeStep === steps.length
-                    ? "display:none"
-                    : "bg-blue-500 hover:bg-blue-600"
-                } text-white`}
-              >
-                {activeStep === steps.length ? "" : "Next"}
-              </button>
-              )}
-            </div>
-          </div>
         </div>
       </div>
-    </div>
-    <Modal confirm={true} handleConfirm={handleActivateCampaign}   open={isConfirmModalOpen} children={<div>Are you sure you want to Activate this campaign?</div>}  handleClose={handleCloseConfirmModal} title="Confirm Campaign"/>
-    <Modal    open={sendMesageOpen} children={<div>Test message sent successfully</div>}  handleClose={handleSendMessageClose} title=" Message Confirmation"/>
+      <Modal
+        confirm={true}
+        handleConfirm={handleActivateCampaign}
+        open={isConfirmModalOpen}
+        children={<div>Are you sure you want to Activate this campaign?</div>}
+        handleClose={handleCloseConfirmModal}
+        title="Confirm Campaign"
+      />
+      <Modal
+        open={sendMesageOpen}
+        children={<div>Test message sent successfully</div>}
+        handleClose={handleSendMessageClose}
+        title=" Message Confirmation"
+      />
     </>
   );
 };
