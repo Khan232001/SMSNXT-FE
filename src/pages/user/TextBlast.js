@@ -216,7 +216,7 @@ const TextBlast = ({
 
   const [tags, setTags] = useState([]);
   console.log(tags, "tagsss");
-  const [status, setStatus] = useState("")
+  const [status, setStatus] = useState('draft')
   const [isActive, setIsActive] = useState(false)
 
   const [selectedRecipients, setSelectedRecipients] = useState([""]);
@@ -491,12 +491,12 @@ const TextBlast = ({
 
   const handleSaveCampaign = async () => {
     
-    if (!isActive) {
-      setStatus("draft")
+    if (!isActive ) {
+      setStatus ('draft')
     }
     const updatedCampaignData = {
       ...campaignData,
-      status: status,
+      status:status,
     };
 
     try {
