@@ -216,7 +216,8 @@ const TextBlast = ({
 
   const [tags, setTags] = useState([]);
   console.log(tags, "tagsss");
-  const [isActive, setIsActive] = useState("false")
+  const [status, setStatus] = useState('draft')
+  const [isActive, setIsActive] = useState(false)
 
   const [selectedRecipients, setSelectedRecipients] = useState([""]);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -266,11 +267,7 @@ const TextBlast = ({
       setScheduleDate(formattedDate);
 
       setMessage(selectedCampaign.message.textSegments.join("\n") || "");
-      if (selectedCampaign.status === "active") {
-        setIsActive(true);
-      } else {
-        setIsActive(false);
-      }
+      setStatus(selectedCampaign.status)
       setSendTimeOption(selectedCampaign.schedule.sendTimeOption);
       setFromTime(selectedCampaign.schedule.fromTime || "");
       setToTime(selectedCampaign.schedule.toTime || "");
@@ -372,6 +369,7 @@ const TextBlast = ({
   const imageUrl = Cookies.get("selectedImage");
 
   const totalSegments = segmentCount + (selectedImageUrl ? 1 : 0);
+  const remainingSegments = 500 - totalSegments;
 
   let schedule = {};
   if (sendTimeOption === "now") {
@@ -399,7 +397,6 @@ const TextBlast = ({
 
   const campaignData = {
     name: textBlastName,
-    // status: isActive ? 'active' : 'inactive',
     tags: selectedTags.map((tag) => ({
       tagId: tag.value,
       tagName: tag.name,
@@ -438,12 +435,12 @@ const TextBlast = ({
 
   const handleActivateCampaign = async () => {
     // setIsActive((prev) => !prev);
+    
 
     const updatedCampaignData = {
       ...campaignData,
-
-      status: isActive ? "active" : "inactive",
-
+      status:sendTimeOption === "now" ? "completed" : "scheduled"
+      
     };
     
 
@@ -471,7 +468,8 @@ const TextBlast = ({
         response?.data?.message === "Campaign updated successfully"
       ) {
         handleCloseConfirmModal();
-        setIsActive(response?.data?.status);
+        setIsActive(true);
+        setStatus(response?.data?.status)
       setCreateTextBlast(false);
 
       }
@@ -492,9 +490,13 @@ const TextBlast = ({
   };
 
   const handleSaveCampaign = async () => {
+    
+    if (!isActive ) {
+      setStatus ('draft')
+    }
     const updatedCampaignData = {
       ...campaignData,
-      status: isActive ? "active" : "inactive",
+      status:status,
     };
 
     try {
@@ -961,7 +963,7 @@ const TextBlast = ({
               <div className="mt-6">
                 <p className="text-sm">
                   <span className="font-bold">Daily TextBlast Limit:</span>{" "}
-                  <span className="text-gray-600">500</span>
+                  <span className="text-[#000] px-4 font-semibold bg-gray-300 rounded-md p-1">{`500 - ${totalSegments} = ${remainingSegments}`}</span>
                 </p>
               </div>
             </div>
@@ -1132,6 +1134,14 @@ const TextBlast = ({
                       ))}
                     </div>
                     <div className="flex items-center gap-5 mt-4 ">
+                      <span className="font-bold">Total Blast Limit :</span>
+                      <div>
+                        <span className="font-semibold ml-4">
+                          500
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-5 mt-4 ">
                       <span className="font-bold">Charges :</span>
                       <div>
                         <span className="font-semibold ml-4">
@@ -1139,6 +1149,7 @@ const TextBlast = ({
                         </span>
                       </div>
                     </div>
+                    
                   </div>
                 </div>
                 <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
