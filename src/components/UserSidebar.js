@@ -30,7 +30,7 @@ const Sidebar = ({ open }) => {
         {/* Quick & Group Messaging */}
         <ListItem button component={Link} to="/quick-group-messaging" className="flex items-center hover:bg-gray-700 p-2 rounded-md mb-2">
           <FaClipboardList className="text-xl mr-4" />
-          <ListItemText primary="Quick & Group Messaging" />
+          <ListItemText primary="Quick Messaging" />
         </ListItem>
 
         {/* Sender ID Management */}
