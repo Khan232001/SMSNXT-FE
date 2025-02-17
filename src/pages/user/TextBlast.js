@@ -42,6 +42,7 @@ const CustomSelect = ({
   isMulti = false,
   error,
   onErrorChange,
+  viewCampaign
 }) => {
   const handleSelect = (option) => {
     if (isMulti) {
@@ -67,10 +68,10 @@ const CustomSelect = ({
 
   return (
     <div className="w-full relative">
-      <Listbox value={selected} onChange={handleSelect} multiple={isMulti}>
+      <Listbox value={selected} disabled={viewCampaign} onChange={handleSelect} multiple={isMulti}>
         {({ open }) => (
           <div className="relative mt-1">
-            <ListboxButton className="relative w-full cursor-default rounded-xl bg-white py-3 px-4 text-left border border-gray-300 focus:outline-none focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-300 min-h-[48px]">
+            <ListboxButton className="relative  w-full cursor-default rounded-xl bg-white py-3 px-4 text-left border border-gray-300 focus:outline-none focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-300 min-h-[48px]">
               <div className="flex flex-wrap gap-2">
                 {isMulti ? (
                   selected.length > 0 ? (
@@ -181,6 +182,7 @@ const TextBlast = ({
   createTextBlast,
   setCreateTextBlast,
   selectedCampaign,
+  viewCampaign
 }) => {
   const [activeStep, setActiveStep] = useState(1);
   const [textBlastName, setTextBlastName] = useState("");
@@ -439,7 +441,7 @@ const TextBlast = ({
 
     const updatedCampaignData = {
       ...campaignData,
-      status:sendTimeOption === "now" ? "completed" : "scheduled"
+      status:sendTimeOption === "now" ? "sending" : "scheduled"
       
     };
     
@@ -618,6 +620,7 @@ const TextBlast = ({
                     required
                     value={textBlastName}
                     onChange={handleTextBlastNameChange}
+                    disabled={viewCampaign}
                   />
                   {textBlastNameError && (
                     <FormValidationError errors={textBlastNameError} />
@@ -641,6 +644,7 @@ const TextBlast = ({
                     isMulti={true}
                     error={selectedTagsError}
                     onErrorChange={setSelectedTagsError}
+                    viewCampaign={viewCampaign}
                   />
                   {selectedTagsError && (
                     <FormValidationError errors={selectedTagsError} />
@@ -707,6 +711,7 @@ const TextBlast = ({
                             label="Exclude Tags"
                             openUpward={true}
                             isMulti={true}
+                            viewCampaign={viewCampaign}
                           />
                         </div>
 
@@ -721,7 +726,8 @@ const TextBlast = ({
                             onChange={setSelectedBlasts}
                             label="Text Blasts"
                             openUpward={true}
-                            isMulti={true}
+                              isMulti={true}
+                            viewCampaign={viewCampaign}
                           />
                         </div>
                       </div>
@@ -744,6 +750,7 @@ const TextBlast = ({
                     id="messageInput"
                     rows="6"
                     value={message}
+                    disabled={viewCampaign}
                     onChange={(e) => setMessage(e.target.value)}
                     className="w-full p-4 border rounded-[1.375rem] focus:outline-none focus:ring-2 focus:ring-blue-500"
                   ></textarea>
@@ -764,6 +771,7 @@ const TextBlast = ({
                   </p>
                 </div>
                 {/* Add Media and Select Media Buttons */}
+                {!viewCampaign && (
                 <div className="flex flex-col gap-4 mt-4">
                   <button
                     onClick={handleUploadModal}
@@ -800,7 +808,9 @@ const TextBlast = ({
                     onProceed={handleProceed}
                   />
                 </div>
+                )}
                 <div>
+
                   <input
                     type="file"
                     id="mediaInput"
@@ -809,6 +819,7 @@ const TextBlast = ({
                     // onChange={handleMediaChange}
                   />
                 </div>
+                
               </div>
 
               {/* Mobile Preview */}
@@ -884,6 +895,7 @@ const TextBlast = ({
                     type="radio"
                     name="sendTime"
                     value="now"
+                    disabled={viewCampaign}
                     checked={sendTimeOption === "now"}
                     onChange={handleSendTimeChange}
                     className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
@@ -895,6 +907,7 @@ const TextBlast = ({
                     type="radio"
                     name="sendTime"
                     value="schedule"
+                    disabled={viewCampaign}
                     checked={sendTimeOption === "schedule"}
                     onChange={handleSendTimeChange}
                     className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
@@ -910,6 +923,7 @@ const TextBlast = ({
                       Date
                     </label>
                     <input
+                      disabled={viewCampaign}
                       type="date"
                       value={scheduleDate}
                       onChange={handleScheduleDateChange}
@@ -923,6 +937,7 @@ const TextBlast = ({
                         From
                       </label>
                       <input
+                        disabled={viewCampaign}
                         type="time"
                         value={fromTime}
                         onChange={handleFromTimeChange}
@@ -934,6 +949,7 @@ const TextBlast = ({
                         To
                       </label>
                       <input
+                        disabled={viewCampaign}
                         type="time"
                         value={toTime}
                         onChange={handleToTimeChange}
@@ -947,6 +963,7 @@ const TextBlast = ({
                       Time Zone
                     </label>
                     <select
+                      disabled={viewCampaign}
                       value={timeZone}
                       onChange={handleTimeZoneChange}
                       className="w-full bg-white rounded-xl px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors duration-200"
@@ -981,6 +998,7 @@ const TextBlast = ({
                   Deactivate
                 </button>
               ) : ( */}
+              {!viewCampaign && (
               <button
                 onClick={handleConfirmModal}
                 className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
@@ -991,6 +1009,7 @@ const TextBlast = ({
                   ? "Schedule"
                   : "Scheduled"}
               </button>
+              )}
               {/* )} */}
             </div>
             <div className="flex gap-8 mt-8 mx-auto max-w-7xl">
@@ -1011,7 +1030,7 @@ const TextBlast = ({
                         d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                       />
                     </svg>
-                    <h3 className="text-xl font-bold text-gray-800">
+                    <h3 className={`text-xl font-bold text-gray-800 `}>
                       Message Preview
                     </h3>
                   </div>
@@ -1054,7 +1073,8 @@ const TextBlast = ({
               </div>
 
               {/* Schedule Details Section */}
-              <div className="flex-1 flex flex-col gap-4">
+              <div className={`flex-1 flex flex-col gap-4 `}>
+                {!viewCampaign && (
                 <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
                   <div className="flex items-center gap-2 mb-6">
                     <svg
@@ -1096,6 +1116,7 @@ const TextBlast = ({
                     </button>
                   </div>
                 </div>
+                )}
                 <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
                   <div className="flex items-center gap-2 mb-6">
                     <svg
@@ -1328,12 +1349,14 @@ const TextBlast = ({
                 {textBlastName || "Text Blasts"}
               </h1>
               <div className="flex gap-3">
+                {!viewCampaign && (
                 <button
                   onClick={handleSaveCampaign}
                   className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                 >
                   Save Campaign
                 </button>
+                 )}
                 <button
                   onClick={handleCancel}
                   className="px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400"
@@ -1360,7 +1383,7 @@ const TextBlast = ({
                         >
                           {step.number}
                         </div>
-                        <p className="text-sm mt-2 font-medium">{step.name}</p>
+                        <p className="text-sm mt-2 font-medium ">{step.name}</p>
                       </div>
                       {index < steps.length - 1 && (
                         <div className="border-t-2 border-gray-300 flex-1 pb-5"></div>
@@ -1374,7 +1397,7 @@ const TextBlast = ({
             {/* Step Content */}
             <div className="flex flex-col  px-8 pb-8 bg-gray-50 font-sans">
               <div className="w-full p-4">
-                <h2 className="text-2xl font-bold mb-6">
+                <h2 className={`text-2xl font-bold ${viewCampaign ? "mb-12" : "mb-6"}`}>
                   {steps.find((step) => step.number === activeStep)?.name}
                 </h2>
                 {renderStepContent()}
