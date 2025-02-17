@@ -1,19 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import UserNavbar from '../../components/UserNavbar';
-import UserSidebar from '../../components/UserSidebar';
-import TextBlast from './TextBlast';
-import Papa from 'papaparse';
-import api from "../../utils/api"; 
+import React, { useState, useEffect } from "react";
+import UserNavbar from "../../components/UserNavbar";
+import UserSidebar from "../../components/UserSidebar";
+import TextBlast from "./TextBlast";
+import Papa from "papaparse";
+import api from "../../utils/api";
 
 const CampaignManagement = () => {
   const [campaigns, setCampaigns] = useState([]);
+  console.log("campaigns", campaigns);
   const [uploadedRecipients, setUploadedRecipients] = useState([]);
   const [filteredRecipients, setFilteredRecipients] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [createTextBlast, setCreateTextBlast] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
+  const [viewCampaign, setViewCampaign] = useState(false);
 
-  const token = localStorage.getItem('token');
+  const handleViewCampaign = (campaign) => {
+    setSelectedCampaign(campaign);
+    setViewCampaign(true);
+    setCreateTextBlast(true)
+  };
+
+  const token = localStorage.getItem("token");
   const authHeaders = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -26,16 +34,16 @@ const CampaignManagement = () => {
 
   const fetchCampaigns = async () => {
     try {
-      const response = await api.get('/campaign', authHeaders);
+      const response = await api.get("/campaign", authHeaders);
       setCampaigns(response.data.data);
     } catch (error) {
-      console.error('Failed to fetch campaigns:', error);
+      console.error("Failed to fetch campaigns:", error);
     }
   };
 
   const handleCreateCampaign = () => {
-    setCreateTextBlast(true); 
-    setSelectedCampaign(null); 
+    setCreateTextBlast(true);
+    setSelectedCampaign(null);
   };
 
   const handleFileUpload = (event) => {
@@ -49,7 +57,7 @@ const CampaignManagement = () => {
           alert(`Successfully imported ${results.data.length} recipients!`);
         },
         error: (error) => {
-          alert('Error parsing CSV: ' + error.message);
+          alert("Error parsing CSV: " + error.message);
         },
       });
     }
@@ -75,8 +83,35 @@ const CampaignManagement = () => {
   };
 
   const handleEditCampaign = (campaign) => {
-    setSelectedCampaign(campaign); 
-    setCreateTextBlast(true); 
+    setSelectedCampaign(campaign);
+    setCreateTextBlast(true);
+  };
+
+  const handleDuplicateCampaign = async (campaign) => {
+
+      const campaignData = {
+        name: campaign?.name,
+        tags: campaign?.tags,
+        message:campaign?.message,
+        schedule:campaign?.schedule,
+        dailyLimit: campaign?.dailyLimit,
+        status:campaign?.status,
+        campaignid:campaign?._id,
+        duplicate:true
+      };
+  
+      try {
+        let response;
+          response = await api.post(
+            "/campaign",
+            campaignData,
+            authHeaders
+          );
+          console.log(response.data)
+      } catch (error) {
+        console.error("Error saving campaign:", error);
+      }
+   
   };
 
   return (
@@ -86,7 +121,7 @@ const CampaignManagement = () => {
           {/* Sidebar */}
           <div
             className={`fixed top-0 left-0 z-20 bg-white shadow-md lg:relative lg:w-64 lg:block ${
-              isSidebarOpen ? 'w-64' : 'hidden'
+              isSidebarOpen ? "w-64" : "hidden"
             }`}
           >
             <UserSidebar />
@@ -99,8 +134,18 @@ const CampaignManagement = () => {
                 className="text-gray-600 focus:outline-none lg:hidden"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 </svg>
               </button>
               <UserNavbar />
@@ -153,38 +198,81 @@ const CampaignManagement = () => {
                       <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
                         Campaign Name
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Status</th>
-                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Date</th>
-                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Start Time</th>
-                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">End Time</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                        Date
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                        Start Time
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                        End Time
+                      </th>
                       <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
                         Target Audience
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {campaigns.map((campaign) => (
-                      <tr key={campaign._id} className="border-t border-gray-200">
-                        <td className="px-6 py-4 text-sm text-gray-700">{campaign.name}</td>
-                        <td className="px-6 py-4 text-sm text-gray-700">{campaign.status}</td>
+                      <tr
+                        key={campaign._id}
+                        className="border-t border-gray-200"
+                      >
                         <td className="px-6 py-4 text-sm text-gray-700">
-                          {new Date(campaign.schedule.date).toLocaleDateString('en-GB')}
+                          {campaign.name}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-700">
-                          {campaign.schedule.fromTime ? campaign.schedule.fromTime : "Now"}
+                          {campaign.status}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-700">{campaign.schedule.toTime}</td>
                         <td className="px-6 py-4 text-sm text-gray-700">
-                          {campaign.tags.map((tag) => tag.tagName).join(', ')}
+                          {new Date(campaign.schedule.date).toLocaleDateString(
+                            "en-GB"
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          {campaign.schedule.fromTime
+                            ? campaign.schedule.fromTime
+                            : "Now"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          {campaign.schedule.toTime}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          {campaign.tags.map((tag) => tag.tagName).join(", ")}
                         </td>
                         <td className="px-6 py-4 text-sm space-x-2">
-                          <button
-                            onClick={() => handleEditCampaign(campaign)}
-                            className="px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
-                          >
-                            Edit
-                          </button>
+                          {campaign?.status === "completed" ||
+                          campaign?.status === "sending" ||
+                          campaign?.status === "scheduled" ? (
+                            <>
+                              <button
+                                onClick={() => handleViewCampaign(campaign)}
+                                className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-yellow-600"
+                              >
+                                View
+                              </button>
+
+                              <button
+                                onClick={() => handleDuplicateCampaign(campaign)}
+                                className="px-3 py-1 bg-lime-800 text-white rounded-md hover:bg-yellow-600"
+                              >
+                                Duplicate
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => handleEditCampaign(campaign)}
+                              className="px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
+                            >
+                              Edit
+                            </button>
+                          )}
                           <button
                             onClick={() => handleDeleteCampaign(campaign._id)}
                             className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
@@ -205,8 +293,10 @@ const CampaignManagement = () => {
       {createTextBlast && (
         <TextBlast
           createTextBlast={createTextBlast}
+          viewCampaign={viewCampaign}
           setCreateTextBlast={setCreateTextBlast}
-          selectedCampaign={selectedCampaign} 
+          selectedCampaign={selectedCampaign}
+          handleDuplicateCampaign={handleDuplicateCampaign}
         />
       )}
     </>
