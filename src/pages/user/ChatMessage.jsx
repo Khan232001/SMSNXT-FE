@@ -10,6 +10,7 @@ const ChatMessage = () => {
   };
   const [chats, setChats] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
+  const [message, setMessage] = useState('');
 
   const fetchChats = async () => {
     try {
@@ -23,6 +24,35 @@ const ChatMessage = () => {
   useEffect(() => {
     fetchChats();
   }, []);
+
+  const handleSendMessage = async () => {
+    if (!message.trim() || !selectedChat?.contact) {
+      return;
+    }
+
+    try {
+      const { _id } = selectedChat;
+      console.log("Fetching communication with ID:", _id);
+
+      const requestData = {
+        message: message,
+        phoneNumber: selectedChat.contact?.phoneNumber,
+        mediaUrl: null, 
+      };
+
+      await api.post('/campaign/send-test-message', requestData, authHeaders);
+
+      setMessage('');
+
+      if (_id) {
+        const updatedChat = await api.get(`/communication/${_id}`, authHeaders);
+        setSelectedChat(updatedChat.data);  // Update the selected chat with the latest data
+      }
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
 
   return (
     <div className='flex h-screen bg-gray-100'>
@@ -91,11 +121,16 @@ const ChatMessage = () => {
         <div className='p-4 border-t border-gray-200 sticky bottom-0 bg-white'>
           <div className='flex items-center gap-2'>
             <input
-              type='text'
-              placeholder='Type a message'
-              className='w-full p-2 border border-gray-300 rounded-lg'
-            />
-            <button className='p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 flex items-center justify-center'>
+                type="text"
+                placeholder="Type a message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-lg"
+              />
+              <button
+                className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 flex items-center justify-center"
+                onClick={handleSendMessage}
+              >
               <svg
                 xmlns='http://www.w3.org/2000/svg'
                 viewBox='0 0 24 24'
