@@ -108,6 +108,10 @@ const CampaignManagement = () => {
             authHeaders
           );
           console.log(response.data)
+          if(response?.data?.message === 'Campaign duplicated successfully'){
+            fetchCampaigns()
+
+          }
       } catch (error) {
         console.error("Error saving campaign:", error);
       }
@@ -296,6 +300,7 @@ const CampaignManagement = () => {
           viewCampaign={viewCampaign}
           setCreateTextBlast={setCreateTextBlast}
           selectedCampaign={selectedCampaign}
+          setViewCampaign={setViewCampaign}
           handleDuplicateCampaign={handleDuplicateCampaign}
         />
       )}
