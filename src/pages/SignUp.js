@@ -42,6 +42,7 @@ const Login3 = () => {
         email,
         phoneNumber: phone, 
         password,
+        role: 'user',
       });
 
       // Save the token and user data in localStorage
