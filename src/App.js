@@ -19,6 +19,7 @@ import Pricing from "./pages/user/Pricing";
 import Contact from "./pages/user/Contact";
 import NotFound from "./pages/NotFound";
 import SubscriptionPlans from "./pages/user/SubscriptionPlans";
+import SubscriptionPricing from "./pages/user/subscriptionPricing";
 import OrderHistory from "./pages/user/OrderHistory";
 import CampaignManagement from "./pages/user/CampaignManagement";
 import ContactManagement from "./pages/user/ContactManagement";
@@ -51,6 +52,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/subscription-plans" element={<SubscriptionPlans />} />
+          <Route path="/subscription-pricing" element={<SubscriptionPricing />} />
           <Route path="/order-recharge-history" element={<OrderHistory />} />
           <Route path="/campaign-management" element={<CampaignManagement />} />
           <Route path="/contact-management" element={<ContactManagement />} />

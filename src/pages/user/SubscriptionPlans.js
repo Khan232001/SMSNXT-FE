@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import UserNavbar from '../../components/UserNavbar';
 import UserSidebar from '../../components/UserSidebar';
+import { useNavigate } from 'react-router-dom';
 
 const SubscriptionPlans = () => {
   // Sample subscription plans data
@@ -10,8 +11,14 @@ const SubscriptionPlans = () => {
     { id: 3, name: 'Premium', price: 50, duration: '1 Month', description: 'Premium plan with all features.' },
   ]);
 
+  const navigate = useNavigate();
+
   const handleDeletePlan = (id) => {
     setPlans(plans.filter(plan => plan.id !== id));
+  };
+
+  const handlePlanClick = () => {
+    navigate('/subscription-pricing');
   };
 
   return (
@@ -43,7 +50,7 @@ const SubscriptionPlans = () => {
                 </thead>
                 <tbody>
                   {plans.map((plan) => (
-                    <tr key={plan.id} className="border-t border-gray-200">
+                    <tr onClick={() =>handlePlanClick()} key={plan.id} className="border-t border-gray-200">
                       <td className="px-6 py-4 text-sm text-gray-700">{plan.name}</td>
                       <td className="px-6 py-4 text-sm text-gray-700">${plan.price}</td>
                       <td className="px-6 py-4 text-sm text-gray-700">{plan.duration}</td>
