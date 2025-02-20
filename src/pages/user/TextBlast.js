@@ -182,7 +182,8 @@ const TextBlast = ({
   createTextBlast,
   setCreateTextBlast,
   selectedCampaign,
-  viewCampaign
+  viewCampaign,
+  setViewCampaign
 }) => {
   const [activeStep, setActiveStep] = useState(1);
   const [textBlastName, setTextBlastName] = useState("");
@@ -337,6 +338,7 @@ const TextBlast = ({
   const handleCancel = () => {
     Cookies.remove("selectedImage");
     setCreateTextBlast(false);
+    setViewCampaign(false)
   };
 
   const handleUploadModal = () => {
