@@ -43,7 +43,6 @@ const Navbar = ({ toggleDrawer }) => {
     setNotificationAnchorEl(null);
   };
 
-  // Handle profile menu
   const handleProfileClick = (event) => {
     setProfileAnchorEl(event.currentTarget);
   };
@@ -52,40 +51,34 @@ const Navbar = ({ toggleDrawer }) => {
     setProfileAnchorEl(null);
   };
 
-  // Handle search input change and filter routes
   const handleSearchChange = (event) => {
     const term = event.target.value;
     setSearchTerm(term);
 
-    // Filter routes based on the search term (case insensitive)
     const filtered = routes.filter(route =>
       route.label.toLowerCase().includes(term.toLowerCase())
     );
 
     setFilteredRoutes(filtered);
-    setOpenDropdown(filtered.length > 0); // Open dropdown only if there are filtered results
+    setOpenDropdown(filtered.length > 0);
   };
 
-  // Handle clicking on search input to toggle dropdown
   const handleSearchClick = () => {
-    setOpenDropdown(true); // Open dropdown on input click
+    setOpenDropdown(true); 
   };
 
-  // Handle route selection from the dropdown
   const handleRouteSelect = (routePath) => {
     navigate(routePath);
-    setSearchTerm(""); // Clear search after navigation
-    setFilteredRoutes([]); // Clear the filtered routes
-    setOpenDropdown(false); // Close the dropdown
+    setSearchTerm(""); 
+    setFilteredRoutes([]); 
+    setOpenDropdown(false); 
   };
 
-  // Handle Logout functionality
   const handleLogout = () => {
-    // Clear authentication data
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     
-    // Redirect to login page after logout
+    // Redirect t login page after logout
     navigate('/admin/login');
   };
 
