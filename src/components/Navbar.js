@@ -79,6 +79,16 @@ const Navbar = ({ toggleDrawer }) => {
     setOpenDropdown(false); // Close the dropdown
   };
 
+  // Handle Logout functionality
+  const handleLogout = () => {
+    // Clear authentication data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    // Redirect to login page after logout
+    navigate('/admin/login');
+  };
+
   return (
     <div className="fixed top-0 left-0 right-0 bg-white shadow-md z-50 px-6 py-4">
       <div className="flex justify-between items-center">
@@ -172,7 +182,7 @@ const Navbar = ({ toggleDrawer }) => {
       >
         <MenuItem onClick={handleProfileClose}>Profile</MenuItem>
         <MenuItem onClick={handleProfileClose}>Settings</MenuItem>
-        <MenuItem onClick={handleProfileClose}>Log Out</MenuItem>
+        <MenuItem onClick={handleLogout}>Log Out</MenuItem> {/* Log out button */}
       </Menu>
     </div>
   );
