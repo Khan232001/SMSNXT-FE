@@ -1,19 +1,40 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../../utils/api'; 
 import '../Login.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(null); 
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (email && password) {
-      navigate('/admin/dashboard');
-    } else {
-      alert('Please enter valid credentials!');
+    if (!email || !password) {
+      setError('Please enter valid credentials!');
+      return;
+    }
+
+    try {
+      setIsLoading(true); 
+      const response = await api.post('/user/login', {
+        email,
+        password,
+        loginType: 'admin',  
+      });
+
+      localStorage.setItem('token', response.data.data.token); 
+      localStorage.setItem('user', JSON.stringify(response.data.data.user));
+
+      navigate('/admin/dashboard');  
+
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false); 
     }
   };
 
@@ -61,6 +82,12 @@ const Login = () => {
             />
           </div>
 
+          {error && (
+            <div className="mb-4 text-red-500 text-sm text-center">
+              {error}
+            </div>
+          )}
+
           <div className="flex items-center justify-between mb-4">
             <label className="inline-flex items-center">
               <input type="checkbox" className="form-checkbox" />
@@ -77,8 +104,9 @@ const Login = () => {
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
+            disabled={isLoading}  
           >
-            Log In
+            {isLoading ? 'Logging in...' : 'Log In'}
           </button>
 
           <div className="mt-4 text-center">

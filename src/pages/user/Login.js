@@ -15,14 +15,17 @@ const Login = () => {
     setError(null);
   
     try {
-      const response = await api.post('/user/login', { email, password });
-      // console.log("API Response:", response.data);
+      const response = await api.post('/user/login', {
+        email,
+        password,
+        loginType: 'user',  
+      });
   
       localStorage.setItem('token', response.data.data.token); 
       localStorage.setItem('user', JSON.stringify(response.data.data.user));
   
-      // Redirect to dashboard
-      navigate('/dashboard');
+      navigate('/dashboard');  
+  
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {
