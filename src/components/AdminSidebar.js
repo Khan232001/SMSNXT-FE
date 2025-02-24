@@ -90,6 +90,17 @@ const Sidebar = ({ open }) => {
           <ListItemText primary="Detailed Reporting" />
         </ListItem>
 
+        {/* Campaign Management */}
+        <ListItem
+          button
+          component={Link}
+          to="/admin/campaign-management"
+          className="flex items-center hover:bg-gray-700 hover:scale-[1.05] transition-transform duration-200 ease-in-out p-2 rounded-lg"
+        >
+           <FaFlag className="text-xl mr-4" />
+          <ListItemText primary="Campaign Management" />
+        </ListItem>
+
         {/* Staff Management */}
         <ListItem
           button
