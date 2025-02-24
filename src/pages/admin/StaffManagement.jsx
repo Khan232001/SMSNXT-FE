@@ -1,48 +1,38 @@
-import React, { useState } from 'react';
-import Navbar from '../../components/Navbar'; // Assuming Navbar is in components folder
+import React, { useState, useEffect } from 'react';
+import Navbar from '../../components/Navbar'; 
 import Sidebar from '../../components/AdminSidebar';
 import api from '../../utils/api';
 
 const StaffManagement = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [users, setUsers] = useState([
-    {
-      name: 'John Doe',
-      email: 'johndoe@example.com',
-      phonenumber: '+1234567890',
-      role: 'user',
-    },
-    {
-      name: 'Jane Smith',
-      email: 'janesmith@example.com',
-      phonenumber: '+1987654321',
-      role: 'admin',
-    },
-    {
-      name: 'Alice Johnson',
-      email: 'alicejohnson@example.com',
-      phonenumber: '+1122334455',
-      role: 'user',
-    },
-    {
-      name: 'Bob Williams',
-      email: 'bobwilliams@example.com',
-      phonenumber: '+1567890123',
-      role: 'admin',
-    },
-    {
-      name: 'Charlie Brown',
-      email: 'charliebrown@example.com',
-      phonenumber: '+1654321987',
-      role: 'user',
-    },
-    {
-      name: 'Diana Prince',
-      email: 'dianaprince@example.com',
-      phonenumber: '+1765432109',
-      role: 'admin',
-    },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    try {
+      const response = await api.get('/user/all');
+      const formattedUsers = response.data.data.map((user) => ({
+        name: user.fullName,
+        email: user.email,
+        phonenumber: user.phoneNumber,
+        role: user.role,
+        id: user._id,
+      }));
+      console.log('Formatted users:', formattedUsers);
+      setUsers(formattedUsers);
+    } catch (err) {
+      setError('Failed to fetch users');
+      console.error('Error fetching users:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newUser, setNewUser] = useState({
@@ -53,8 +43,6 @@ const StaffManagement = () => {
     phoneNumber: '',
     role: 'user',
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const handleCreateUser = () => {
     setIsModalOpen(true);
@@ -78,7 +66,7 @@ const StaffManagement = () => {
     setError(null);
 
     try {
-      const response = await api.post('/user/signup', {
+      await api.post('/user/signup', {
         firstName: newUser.firstName,
         lastName: newUser.lastName,
         email: newUser.email,
@@ -86,17 +74,6 @@ const StaffManagement = () => {
         phoneNumber: newUser.phoneNumber,
         role: newUser.role,
       });
-
-      // Add new user to the list
-      setUsers([
-        ...users,
-        {
-          name: `${newUser.firstName} ${newUser.lastName}`,
-          email: newUser.email,
-          phonenumber: newUser.phoneNumber,
-          role: newUser.role,
-        },
-      ]);
 
       setIsModalOpen(false);
       setNewUser({
@@ -108,6 +85,7 @@ const StaffManagement = () => {
         role: 'user',
       });
       alert('User created successfully!');
+      await fetchUsers();
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -118,18 +96,36 @@ const StaffManagement = () => {
     }
   };
 
-  const handleRoleToggle = (email) => {
-    setUsers(
-      users.map((user) => {
-        if (user.email === email) {
-          return {
-            ...user,
-            role: user.role === 'user' ? 'admin' : 'user',
-          };
-        }
-        return user;
-      })
-    );
+  const handleRoleToggle = async (userId) => {
+    console.log('Attempting to toggle role for user ID:', userId);
+
+    const user = users.find((u) => u.id === userId);
+    console.log('All users:', users);
+    console.log('Found user:', user);
+
+    if (!user) {
+      console.error('User not found for ID:', userId);
+      return;
+    }
+
+    try {
+      const newRole = user.role === 'user' ? 'admin' : 'user';
+      console.log(`Updating user ${userId} to role: ${newRole}`);
+
+      await api.patch(`/user/${userId}`, {
+        role: newRole,
+      });
+
+      // Update the local state to reflect the role change
+      setUsers((prevUsers) =>
+        prevUsers.map((u) =>
+          u.id === userId ? { ...u, role: newRole } : u
+        )
+      );
+    } catch (err) {
+      console.error('Error updating user role:', err);
+      alert('Failed to update user role. Please try again.');
+    }
   };
 
   return (
@@ -182,58 +178,74 @@ const StaffManagement = () => {
             </button>
           </div>
 
+          {/* Add loading and error states */}
+          {isLoading && (
+            <div className='text-center py-4'>Loading users...</div>
+          )}
+
+          {error && (
+            <div className='text-red-500 text-center py-4'>{error}</div>
+          )}
+
           {/* Users Table */}
-          <div className='overflow-x-auto bg-white shadow-lg rounded-lg mb-6'>
-            <table className='min-w-full table-auto'>
-              <thead>
-                <tr className='bg-gray-100'>
-                  <th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>
-                    Name
-                  </th>
-                  <th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>
-                    Email
-                  </th>
-                  <th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>
-                    Phone Number
-                  </th>
-                  <th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>
-                    Role
-                  </th>
-                  <th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.email} className='border-t border-gray-200'>
-                    <td className='px-6 py-4 text-sm text-gray-700'>
-                      {user.name}
-                    </td>
-                    <td className='px-6 py-4 text-sm text-gray-700'>
-                      {user.email}
-                    </td>
-                    <td className='px-6 py-4 text-sm text-gray-700'>
-                      {user.phonenumber}
-                    </td>
-                    <td className='px-6 py-4 text-sm text-gray-700'>
-                      {user.role}
-                    </td>
-                    <td className='px-6 py-4 text-sm space-x-2'>
-                      <button
-                        onClick={() => handleRoleToggle(user.email)}
-                        className={`px-3 py-1 ${
-                          user.role === 'user' ? 'bg-blue-500' : 'bg-green-500'
-                        } text-white rounded-md hover:opacity-80`}
-                      >
-                        Switch to {user.role === 'user' ? 'Admin' : 'User'}
-                      </button>
-                    </td>
+          {!isLoading && !error && (
+            <div className='overflow-x-auto bg-white shadow-lg rounded-lg mb-6'>
+              <table className='min-w-full table-auto'>
+                <thead>
+                  <tr className='bg-gray-100'>
+                    <th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>
+                      Name
+                    </th>
+                    <th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>
+                      Email
+                    </th>
+                    <th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>
+                      Phone Number
+                    </th>
+                    <th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>
+                      Role
+                    </th>
+                    <th className='px-6 py-3 text-left text-sm font-medium text-gray-600'>
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.id} className='border-t border-gray-200'>
+                      <td className='px-6 py-4 text-sm text-gray-700'>
+                        {user.name}
+                      </td>
+                      <td className='px-6 py-4 text-sm text-gray-700'>
+                        {user.email}
+                      </td>
+                      <td className='px-6 py-4 text-sm text-gray-700'>
+                        {user.phonenumber}
+                      </td>
+                      <td className='px-6 py-4 text-sm text-gray-700'>
+                        {user.role}
+                      </td>
+                      <td className='px-6 py-4 text-sm space-x-2'>
+                        <button
+                          onClick={() => {
+                            console.log('Clicked user:', user);
+                            handleRoleToggle(user.id);
+                          }}
+                          className={`px-3 py-1 ${
+                            user.role === 'user'
+                              ? 'bg-blue-500'
+                              : 'bg-green-500'
+                          } text-white rounded-md hover:opacity-80`}
+                        >
+                          Switch to {user.role === 'user' ? 'Admin' : 'User'}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
 
