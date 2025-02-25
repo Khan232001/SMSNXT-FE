@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '../../components/Navbar'; 
+import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/AdminSidebar';
 import api from '../../utils/api';
 
@@ -8,6 +8,7 @@ const StaffManagement = () => {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [activeDropdown, setActiveDropdown] = useState(null);
 
   const fetchUsers = async () => {
     setIsLoading(true);
@@ -118,13 +119,75 @@ const StaffManagement = () => {
 
       // Update the local state to reflect the role change
       setUsers((prevUsers) =>
-        prevUsers.map((u) =>
-          u.id === userId ? { ...u, role: newRole } : u
-        )
+        prevUsers.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
       );
     } catch (err) {
       console.error('Error updating user role:', err);
       alert('Failed to update user role. Please try again.');
+    }
+  };
+
+  const handleDelete = async (userId) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      try {
+        await api.delete(`/user/${userId}`);
+        // Remove user from local state
+        setUsers(users.filter((user) => user.id !== userId));
+        alert('User deleted successfully');
+      } catch (err) {
+        console.error('Error deleting user:', err);
+        alert('Failed to delete user. Please try again.');
+      }
+    }
+  };
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState({
+    id: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    password: '',
+  });
+
+  const handleEdit = (user) => {
+    const [firstName, lastName] = user.name.split(' ');
+    setEditingUser({
+      id: user.id,
+      firstName,
+      lastName,
+      email: user.email,
+      phoneNumber: user.phonenumber,
+      password: '',
+    });
+    setIsEditModalOpen(true);
+    setActiveDropdown(null);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await api.put(`/user/${editingUser.id}`, {
+        fullName: `${editingUser.firstName} ${editingUser.lastName}`,
+        email: editingUser.email,
+        phoneNumber: editingUser.phoneNumber,
+        ...(editingUser.password && { password: editingUser.password }),
+      });
+
+      setIsEditModalOpen(false);
+      alert('User updated successfully!');
+      await fetchUsers();
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          'Failed to update user. Please try again.'
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -225,20 +288,64 @@ const StaffManagement = () => {
                       <td className='px-6 py-4 text-sm text-gray-700'>
                         {user.role}
                       </td>
-                      <td className='px-6 py-4 text-sm space-x-2'>
+                      <td className='px-6 py-4 text-sm flex items-center space-x-2 relative'>
                         <button
                           onClick={() => {
                             console.log('Clicked user:', user);
                             handleRoleToggle(user.id);
                           }}
-                          className={`px-3 py-1 ${
+                          className={`h-9 px-4 flex items-center justify-center ${
                             user.role === 'user'
                               ? 'bg-blue-500'
                               : 'bg-green-500'
-                          } text-white rounded-md hover:opacity-80`}
+                          } text-white rounded-md hover:opacity-80 min-w-[120px]`}
                         >
                           Switch to {user.role === 'user' ? 'Admin' : 'User'}
                         </button>
+
+                        <button
+                          onClick={() =>
+                            setActiveDropdown(
+                              activeDropdown === user.id ? null : user.id
+                            )
+                          }
+                          className='p-1 rounded-full hover:bg-gray-100 flex items-center'
+                        >
+                          <svg
+                            className='w-6 h-6'
+                            fill='currentColor'
+                            viewBox='0 0 24 24'
+                          >
+                            <circle cx='12' cy='6' r='2' />
+                            <circle cx='12' cy='12' r='2' />
+                            <circle cx='12' cy='18' r='2' />
+                          </svg>
+                        </button>
+
+                        {activeDropdown === user.id && (
+                          <div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200'>
+                            <div className='py-1'>
+                              <button
+                                className='w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+                                onClick={() => {
+                                  handleEdit(user);
+                                  setActiveDropdown(null);
+                                }}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className='w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100'
+                                onClick={() => {
+                                  handleDelete(user.id);
+                                  setActiveDropdown(null);
+                                }}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -355,6 +462,114 @@ const StaffManagement = () => {
                   className='px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50'
                 >
                   {isLoading ? 'Creating...' : 'Create User'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isEditModalOpen && (
+        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+          <div className='bg-white p-8 rounded-lg w-full max-w-md'>
+            <h2 className='text-2xl font-bold mb-6'>Edit User</h2>
+            <form onSubmit={handleEditSubmit}>
+              <div className='space-y-4'>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700'>
+                    First Name
+                  </label>
+                  <input
+                    type='text'
+                    value={editingUser.firstName}
+                    onChange={(e) =>
+                      setEditingUser({
+                        ...editingUser,
+                        firstName: e.target.value,
+                      })
+                    }
+                    className='mt-1 block w-full px-4 py-2 border-2 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700'>
+                    Last Name
+                  </label>
+                  <input
+                    type='text'
+                    value={editingUser.lastName}
+                    onChange={(e) =>
+                      setEditingUser({
+                        ...editingUser,
+                        lastName: e.target.value,
+                      })
+                    }
+                    className='mt-1 block w-full px-4 py-2 border-2 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700'>
+                    Email
+                  </label>
+                  <input
+                    type='email'
+                    value={editingUser.email}
+                    onChange={(e) =>
+                      setEditingUser({ ...editingUser, email: e.target.value })
+                    }
+                    className='mt-1 block w-full px-4 py-2 border-2 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700'>
+                    Phone Number
+                  </label>
+                  <input
+                    type='tel'
+                    value={editingUser.phoneNumber}
+                    onChange={(e) =>
+                      setEditingUser({
+                        ...editingUser,
+                        phoneNumber: e.target.value,
+                      })
+                    }
+                    className='mt-1 block w-full px-4 py-2 border-2 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700'>
+                    New Password (leave blank to keep current)
+                  </label>
+                  <input
+                    type='password'
+                    value={editingUser.password}
+                    onChange={(e) =>
+                      setEditingUser({
+                        ...editingUser,
+                        password: e.target.value,
+                      })
+                    }
+                    className='mt-1 block w-full px-4 py-2 border-2 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500'
+                  />
+                </div>
+              </div>
+
+              {error && <p className='text-red-500 mt-4'>{error}</p>}
+
+              <div className='mt-6 flex justify-end space-x-3'>
+                <button
+                  type='button'
+                  onClick={() => setIsEditModalOpen(false)}
+                  className='px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50'
+                >
+                  Cancel
+                </button>
+                <button
+                  type='submit'
+                  disabled={isLoading}
+                  className='px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50'
+                >
+                  {isLoading ? 'Updating...' : 'Update User'}
                 </button>
               </div>
             </form>
