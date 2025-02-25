@@ -34,7 +34,7 @@ const CampaignManagement = () => {
 
   const fetchCampaigns = async () => {
     try {
-      const response = await api.get('/campaign', authHeaders);
+      const response = await api.get('/campaign/all-campaigns', authHeaders);
       setCampaigns(response.data.data);
     } catch (error) {
       console.error('Failed to fetch campaigns:', error);
