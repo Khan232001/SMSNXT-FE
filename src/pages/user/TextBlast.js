@@ -1,4 +1,4 @@
-import React, { useState, Fragment, useEffect } from "react";
+import React, { useState, Fragment, useEffect, useRef } from "react";
 import UserNavbar from "../../components/UserNavbar";
 import api from "../../utils/api";
 import UserSidebar from "../../components/UserSidebar";
@@ -27,10 +27,11 @@ const textBlasts = [
   { id: 3, name: "Text Blast 2", value: "blast2" },
 ];
 
-const options = [
-  { label: "Contact 1 ", value: "Contact 1" },
-  { label: "Contact 2 ", value: "Contact 2" },
-  { label: "Contact 3 ", value: "Contact 3" },
+const option = [
+  { label: "<FIRST_NAME>", value: "<FIRST_NAME>", key: "name" },
+  { label: "<LAST_NAME>", value: "<LAST_NAME>", key: "name" },
+  { label: "<EMAIL>", value: "<EMAIL>", key: "email" },
+  { label: "<PHONE_NUMBER>", value: "<PHONE_NUMBER>", key: "phoneNumber" },
 ];
 
 const CustomSelect = ({
@@ -42,7 +43,7 @@ const CustomSelect = ({
   isMulti = false,
   error,
   onErrorChange,
-  viewCampaign
+  viewCampaign,
 }) => {
   const handleSelect = (option) => {
     if (isMulti) {
@@ -68,7 +69,12 @@ const CustomSelect = ({
 
   return (
     <div className="w-full relative">
-      <Listbox value={selected} disabled={viewCampaign} onChange={handleSelect} multiple={isMulti}>
+      <Listbox
+        value={selected}
+        disabled={viewCampaign}
+        onChange={handleSelect}
+        multiple={isMulti}
+      >
         {({ open }) => (
           <div className="relative mt-1">
             <ListboxButton className="relative  w-full cursor-default rounded-xl bg-white py-3 px-4 text-left border border-gray-300 focus:outline-none focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-300 min-h-[48px]">
@@ -183,7 +189,7 @@ const TextBlast = ({
   setCreateTextBlast,
   selectedCampaign,
   viewCampaign,
-  setViewCampaign
+  setViewCampaign,
 }) => {
   const [activeStep, setActiveStep] = useState(1);
   const [textBlastName, setTextBlastName] = useState("");
@@ -201,8 +207,12 @@ const TextBlast = ({
   const [selectedExcludeTags, setSelectedExcludeTags] = useState([]);
   const [selectedBlasts, setSelectedBlasts] = useState([]);
   const [message, setMessage] = useState(
-    "Hi <FIRST_NAME>, it's <MANAGER_FIRST_NAME> at <COMPANY_NAME>. Reply Stop to Unsubscribe"
+    "Hi <FIRST_NAME>, it's <Last_NAME> . Reply Stop to Unsubscribe"
   );
+  const textareaRef = useRef(null);
+  const [currentUserIndex, setCurrentUserIndex] = useState(0);
+  const [finalUserViews, setFinalUserViews] = useState([]);
+  console.log(finalUserViews, "finalUserViews");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isFetchModalOpen, setIsFetchModalOpen] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState("");
@@ -219,8 +229,8 @@ const TextBlast = ({
 
   const [tags, setTags] = useState([]);
   console.log(tags, "tagsss");
-  const [status, setStatus] = useState('draft')
-  const [isActive, setIsActive] = useState(false)
+  const [status, setStatus] = useState("draft");
+  const [isActive, setIsActive] = useState(false);
 
   const [selectedRecipients, setSelectedRecipients] = useState([""]);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -247,12 +257,79 @@ const TextBlast = ({
     setIsConfirmModalOpen(false);
   };
 
+  const insertFieldAtCursor = (selectedValue) => {
+    if (!selectedValue) return;
+
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const startPos = textarea.selectionStart;
+    const endPos = textarea.selectionEnd;
+
+    const beforeText = message.substring(0, startPos);
+    const afterText = message.substring(endPos);
+
+    const newMessage = beforeText + selectedValue + afterText;
+    setMessage(newMessage);
+
+    // Set cursor position after the inserted field
+    const newCursorPos = startPos + selectedValue.length;
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
+
+  const replaceDynamicFields = (message, userData) => {
+    if (!userData) return message;
+    console.log(userData, "userData");
+    let finalMessage = message;
+
+    option.forEach((field) => {
+      const regex = new RegExp(field.value, "g");
+      finalMessage = finalMessage.replace(
+        regex,
+        userData[field.key] || field.value
+      );
+    });
+
+    return finalMessage;
+  };
+
+  useEffect(() => {
+    const transformedMessages = selectedTags?.flatMap((tag) =>
+      tag?.contacts?.map((contact) => replaceDynamicFields(message, contact))
+    );
+    setFinalUserViews(transformedMessages);
+  }, [message, selectedTags]);
+
+  // Navigation functions
+  const goToNextUser = () => {
+    if (currentUserIndex < selectedTags.length - 1) {
+      setCurrentUserIndex(currentUserIndex + 1);
+    }
+  };
+
+  const goToPrevUser = () => {
+    if (currentUserIndex > 0) {
+      setCurrentUserIndex(currentUserIndex - 1);
+    }
+  };
+
   useEffect(() => {
     if (selectedCampaign) {
       const selectedTagData = selectedCampaign.tags
         .map((tagObj) => {
           const tag = tags.find((tag) => tag.id === tagObj.tagId.toString());
-          return tag ? { id: tag.id, name: tag.name, value: tag.value } : null;
+          return tag
+            ? {
+                id: tag.id,
+                name: tag.name,
+                value: tag.value,
+                contacts: tag.contacts,
+              }
+            : null;
         })
         .filter((tag) => tag !== null);
 
@@ -270,7 +347,7 @@ const TextBlast = ({
       setScheduleDate(formattedDate);
 
       setMessage(selectedCampaign.message.textSegments.join("\n") || "");
-      setStatus(selectedCampaign.status)
+      setStatus(selectedCampaign.status);
       setSendTimeOption(selectedCampaign.schedule.sendTimeOption);
       setFromTime(selectedCampaign.schedule.fromTime || "");
       setToTime(selectedCampaign.schedule.toTime || "");
@@ -338,7 +415,7 @@ const TextBlast = ({
   const handleCancel = () => {
     Cookies.remove("selectedImage");
     setCreateTextBlast(false);
-    setViewCampaign(false)
+    setViewCampaign(false);
   };
 
   const handleUploadModal = () => {
@@ -439,14 +516,11 @@ const TextBlast = ({
 
   const handleActivateCampaign = async () => {
     // setIsActive((prev) => !prev);
-    
 
     const updatedCampaignData = {
       ...campaignData,
-      status:sendTimeOption === "now" ? "sending" : "scheduled"
-      
+      status: sendTimeOption === "now" ? "sending" : "scheduled",
     };
-    
 
     try {
       let response;
@@ -473,9 +547,8 @@ const TextBlast = ({
       ) {
         handleCloseConfirmModal();
         setIsActive(true);
-        setStatus(response?.data?.status)
-      setCreateTextBlast(false);
-
+        setStatus(response?.data?.status);
+        setCreateTextBlast(false);
       }
       if (isActive) {
         console.log("campaign inactive");
@@ -494,13 +567,12 @@ const TextBlast = ({
   };
 
   const handleSaveCampaign = async () => {
-    
-    if (!isActive ) {
-      setStatus ('draft')
+    if (!isActive) {
+      setStatus("draft");
     }
     const updatedCampaignData = {
       ...campaignData,
-      status:status,
+      status: status,
     };
 
     try {
@@ -728,7 +800,7 @@ const TextBlast = ({
                             onChange={setSelectedBlasts}
                             label="Text Blasts"
                             openUpward={true}
-                              isMulti={true}
+                            isMulti={true}
                             viewCampaign={viewCampaign}
                           />
                         </div>
@@ -750,49 +822,73 @@ const TextBlast = ({
                 <div>
                   <textarea
                     id="messageInput"
+                    ref={textareaRef}
                     rows="6"
                     value={message}
                     disabled={viewCampaign}
                     onChange={(e) => setMessage(e.target.value)}
                     className="w-full p-4 border rounded-[1.375rem] focus:outline-none focus:ring-2 focus:ring-blue-500"
                   ></textarea>
-                  <p className="text-sm mt-2">
-                    <span
-                      className={`font-semibold ${
-                        message.length > 160 ? "text-red-500" : "text-gray-500"
-                      }`}
-                    >
-                      {message.length}
-                    </span>
-                    /160{" "}
-                    {totalSegments > 1 && (
-                      <span className="ml-2 text-red-500 font-medium">
-                        Segments: {totalSegments}
+                  <div className="flex item-center gap-4">
+                    <p className="text-sm mt-2">
+                      <span
+                        className={`font-semibold ${
+                          message.length > 160
+                            ? "text-red-500"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {message.length}
                       </span>
-                    )}
-                  </p>
+                      /160{" "}
+                      {totalSegments > 1 && (
+                        <span className="ml-2 text-red-500 font-medium">
+                          Segments: {totalSegments}
+                        </span>
+                      )}
+                    </p>
+                    <div className="">
+                      <select
+                        onChange={(e) => {
+                          insertFieldAtCursor(e.target.value);
+                          e.target.value = ""; // Reset select after insertion
+                        }}
+                        className="w-full px-3 py-2  border border-gray-300 rounded-md 
+                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                     text-sm"
+                        value=""
+                      >
+                        <option value="">Select a field to insert...</option>
+                        {option?.map((field) => (
+                          <option key={field.value} value={field.value}>
+                            {field.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                 </div>
                 {/* Add Media and Select Media Buttons */}
                 {!viewCampaign && (
-                <div className="flex flex-col gap-4 mt-4">
-                  <button
-                    onClick={handleUploadModal}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                  >
-                    Add Media
-                  </button>
-                  <UploadImage
-                    isOpen={isUploadModalOpen}
-                    onClose={handleUploadModal}
-                  />
-                  <button
-                    onClick={handleFetchModal}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-                  >
-                    Select Media
-                  </button>
-                  {/* Display selected image */}
-                  {/* {selectedImageUrl && (
+                  <div className="flex flex-col gap-4 mt-4">
+                    <button
+                      onClick={handleUploadModal}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                    >
+                      Add Media
+                    </button>
+                    <UploadImage
+                      isOpen={isUploadModalOpen}
+                      onClose={handleUploadModal}
+                    />
+                    <button
+                      onClick={handleFetchModal}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                    >
+                      Select Media
+                    </button>
+                    {/* Display selected image */}
+                    {/* {selectedImageUrl && (
                     <div className="mt-4">
                       <p>Selected Image:</p>
                       <img
@@ -803,16 +899,15 @@ const TextBlast = ({
                     </div>
                   )} */}
 
-                  {/* FetchImageModal */}
-                  <FetchImage
-                    isOpen={isFetchModalOpen}
-                    onClose={handleFetchModal}
-                    onProceed={handleProceed}
-                  />
-                </div>
+                    {/* FetchImageModal */}
+                    <FetchImage
+                      isOpen={isFetchModalOpen}
+                      onClose={handleFetchModal}
+                      onProceed={handleProceed}
+                    />
+                  </div>
                 )}
                 <div>
-
                   <input
                     type="file"
                     id="mediaInput"
@@ -821,7 +916,6 @@ const TextBlast = ({
                     // onChange={handleMediaChange}
                   />
                 </div>
-                
               </div>
 
               {/* Mobile Preview */}
@@ -1001,21 +1095,19 @@ const TextBlast = ({
                 </button>
               ) : ( */}
               {!viewCampaign && (
-              <button
-                onClick={handleConfirmModal}
-                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-              >
-                {sendTimeOption === "now"
-                  ? "Send Now"
-                  : isActive === "inactive"
-                  ? "Schedule"
-                  : "Scheduled"}
-              </button>
+                <button
+                  onClick={handleConfirmModal}
+                  className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+                >
+                  {sendTimeOption === "now"
+                    ? "Send Now"
+                    : isActive === "inactive"
+                    ? "Schedule"
+                    : "Scheduled"}
+                </button>
               )}
-              {/* )} */}
             </div>
             <div className="flex gap-8 mt-8 mx-auto max-w-7xl">
-              {/* Message Preview Section */}
               <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
                 <div className="flex flex-col h-full">
                   <div className="flex items-center gap-2 mb-6">
@@ -1037,7 +1129,7 @@ const TextBlast = ({
                     </h3>
                   </div>
 
-                  <div className="flex justify-center items-center flex-1">
+                  <div className="flex  justify-center items-center flex-1">
                     <div className="relative w-[300px] h-[500px] bg-black rounded-3xl p-[0.4rem]">
                       <div className="bg-white h-full rounded-2xl overflow-hidden shadow-lg">
                         <div className="bg-gray-100 p-3 text-sm font-medium text-gray-600 flex justify-between items-center border-b">
@@ -1048,14 +1140,16 @@ const TextBlast = ({
                           <span className="text-xs">+1 4692836689</span>
                         </div>
                         <div className="flex flex-col justify-start p-4 overflow-auto h-full bg-gray-50">
-                          {messageChunks.map((chunk, index) => (
+                          {/* {finalUserView.map((chunk, index) => (
                             <div
                               key={index}
                               className="bg-blue-500 text-white rounded-lg p-3 py-2 mb-4 text-sm leading-5 break-words whitespace-pre-line max-w-[80%] self-end shadow-sm"
                             >
                               {chunk}
                             </div>
-                          ))}
+                          ))} */}
+                          {finalUserViews[currentUserIndex]}
+
                           {selectedImageUrl && (
                             <div className="mt-4 flex justify-end">
                               <div className="bg-blue-500 p-1 rounded-lg shadow-sm max-w-[80%]">
@@ -1071,53 +1165,91 @@ const TextBlast = ({
                       </div>
                     </div>
                   </div>
+                  <div className="flex items-center justify-center p-4 border-t">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={goToPrevUser}
+                        disabled={currentUserIndex === 0}
+                        className={`px-3 py-1.5 rounded text-sm ${
+                          currentUserIndex === 0
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                        }`}
+                      >
+                        Previous
+                      </button>
+
+                      {/* Page Numbers */}
+                      <div className="flex gap-1">
+                        {finalUserViews?.map((_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setCurrentUserIndex(index)}
+                            className={`w-8 h-8 rounded ${
+                              currentUserIndex === index
+                                ? "bg-blue-500 text-white"
+                                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                            }`}
+                          >
+                            {index + 1}
+                          </button>
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={goToNextUser}
+                        disabled={
+                          currentUserIndex === finalUserViews?.length - 1
+                        }
+                        className={`px-3 py-1.5 rounded text-sm ${
+                          currentUserIndex === finalUserViews?.length - 1
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                        }`}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              {/* Schedule Details Section */}
               <div className={`flex-1 flex flex-col gap-4 `}>
                 {!viewCampaign && (
-                <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
-                  <div className="flex items-center gap-2 mb-6">
-                    <svg
-                      className="w-6 h-6 text-blue-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                      />
-                    </svg>
-                    <h3 className="text-xl font-bold text-gray-800">
-                      Recipients Number
-                    </h3>
+                  <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+                    <div className="flex items-center gap-2 mb-6">
+                      <svg
+                        className="w-6 h-6 text-blue-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                        />
+                      </svg>
+                      <h3 className="text-xl font-bold text-gray-800">
+                        Recipients Number
+                      </h3>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Enter Number of Recipients"
+                      value={selectedRecipients}
+                      onChange={handleRecipientsChange}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <div className="flex justify-end mt-4">
+                      <button
+                        onClick={handleSendMessage}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                      >
+                        Send Message
+                      </button>
+                    </div>
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Enter Number of Recipients"
-                    value={selectedRecipients}
-                    onChange={handleRecipientsChange}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  {/* <MultiSelect
-    options={options}
-    value={selectedRecipients}
-    onChange={setSelectedRecipients}
-    labelledBy="Select"
-  /> */}
-                  <div className="flex justify-end mt-4">
-                    <button
-                      onClick={handleSendMessage}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                    >
-                      Send Message
-                    </button>
-                  </div>
-                </div>
                 )}
                 <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
                   <div className="flex items-center gap-2 mb-6">
@@ -1159,9 +1291,7 @@ const TextBlast = ({
                     <div className="flex items-center gap-5 mt-4 ">
                       <span className="font-bold">Total Blast Limit :</span>
                       <div>
-                        <span className="font-semibold ml-4">
-                          500
-                        </span>
+                        <span className="font-semibold ml-4">500</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-5 mt-4 ">
@@ -1172,11 +1302,10 @@ const TextBlast = ({
                         </span>
                       </div>
                     </div>
-                    
                   </div>
                 </div>
                 <div className="flex-1 bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
-                  <div className="flex items-center gap-2 mb-6">
+                  <div className="flex items-center gap-2 mb-1">
                     <svg
                       className="w-6 h-6 text-blue-500"
                       fill="none"
@@ -1271,7 +1400,7 @@ const TextBlast = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-center h-[400px] text-gray-500">
+                    <div className="flex items-center justify-center h-[150px] text-gray-500">
                       <div className="text-center">
                         <svg
                           className="w-16 h-16 mx-auto mb-4 text-gray-400"
@@ -1303,6 +1432,7 @@ const TextBlast = ({
             <h3 className="text-lg font-medium">Preview your campaign</h3>
           </div>
         );
+
       default:
         return null;
     }
@@ -1352,13 +1482,13 @@ const TextBlast = ({
               </h1>
               <div className="flex gap-3">
                 {!viewCampaign && (
-                <button
-                  onClick={handleSaveCampaign}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                >
-                  Save Campaign
-                </button>
-                 )}
+                  <button
+                    onClick={handleSaveCampaign}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                  >
+                    Save Campaign
+                  </button>
+                )}
                 <button
                   onClick={handleCancel}
                   className="px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400"
@@ -1399,7 +1529,11 @@ const TextBlast = ({
             {/* Step Content */}
             <div className="flex flex-col  px-8 pb-8 bg-gray-50 font-sans">
               <div className="w-full p-4">
-                <h2 className={`text-2xl font-bold ${viewCampaign ? "mb-12" : "mb-6"}`}>
+                <h2
+                  className={`text-2xl font-bold ${
+                    viewCampaign ? "mb-12" : "mb-6"
+                  }`}
+                >
                   {steps.find((step) => step.number === activeStep)?.name}
                 </h2>
                 {renderStepContent()}
