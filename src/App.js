@@ -37,6 +37,8 @@ import PaymentForm from "./pages/user/PaymentForm";
 import ThankYou from "./pages/user/ThankYou";
 import StaffManagement from "./pages/admin/StaffManagement";
 import CampaignManagementAdmin from "./pages/admin/CampaignManagement";
+import TagsManagementAdmin from "./pages/admin/TagsManagement";
+import ContactManagementAdmin from "./pages/admin/ContactManagement";
 // Stripe Setup
 const stripePromise = loadStripe("your-publishable-key-here"); 
 
@@ -82,7 +84,8 @@ function App() {
           <Route path="/admin/campaign-management" element={<CampaignManagementAdmin />} />
           <Route path="/admin/system-settings" element={<Settings />} />
           <Route path="/admin/sms-gateway" element={<SmsGateway />} />
-
+          <Route path="/admin/tags-management" element={<TagsManagementAdmin />} />
+          <Route path="/admin/contact-management" element={<ContactManagementAdmin />} />
           {/* Catch-all Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
