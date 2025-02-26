@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import UserNavbar from '../../components/UserNavbar';
-import UserSidebar from '../../components/UserSidebar';
+import Navbar from '../../components/Navbar';
+import Sidebar from '../../components/AdminSidebar';
 import TextBlast from '../user/TextBlast';
 import Papa from 'papaparse';
 import api from '../../utils/api';
@@ -121,7 +121,7 @@ const CampaignManagement = () => {
               isSidebarOpen ? 'w-64' : 'hidden'
             }`}
           >
-            <UserSidebar />
+            <Sidebar />
           </div>
 
           <div className='flex-1 flex flex-col bg-gray-100 relative'>
@@ -145,7 +145,7 @@ const CampaignManagement = () => {
                   />
                 </svg>
               </button>
-              <UserNavbar />
+              <Navbar />
             </div>
 
             {/* Main Content */}
