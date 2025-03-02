@@ -1,10 +1,9 @@
-
 import React, { useState } from "react";
 import { Tabs, Tab, Box } from "@mui/material";
-import { Link } from "react-router-dom"; // Keep routing
-import { 
-  Home, Message, AccountCircle, History, CreditCard, 
-  Campaign, Contacts, BarChart, Tag, People 
+import { Link } from "react-router-dom";
+import {
+  Home, Message, AccountCircle, History, CreditCard,
+  Campaign, Contacts, BarChart, Tag, People
 } from "@mui/icons-material";
 
 const UserSidebar = () => {
@@ -18,12 +17,12 @@ const UserSidebar = () => {
     <Box
       sx={{
         width: "250px",
-        height: "100vh", // Ensure full height
+        height: "100vh",
         backgroundColor: "#263238",
         paddingTop: "10px",
         color: "white",
-        overflowY: "auto", // Prevents overflow & allows scrolling only inside sidebar
-        position: "fixed", // Fix sidebar on the left
+        overflowY: "auto",
+        position: "fixed",
         top: 0,
         left: 0
       }}
