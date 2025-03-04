@@ -3,6 +3,8 @@ import { Paper, Grid, Typography, Table, TableBody, TableCell, TableContainer, T
 import Sidebar from '../../components/UserSidebar';
 import Navbar from '../../components/UserNavbar';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { useNavigate } from 'react-router-dom';
+import Resources from '../../components/Resources';
 
 // Placeholder data for charts
 const data = [
@@ -29,6 +31,7 @@ const messageStats = [
 ];
 
 const Dashboard = () => {
+  const navigate = useNavigate()
   return (
     <div className="flex">
       {/* Sidebar */}
@@ -111,55 +114,7 @@ const Dashboard = () => {
               </ResponsiveContainer>
             </Paper>
           </Box>
-          <Grid className='mt-6'>
-            <Typography variant="h4" className="text-2xl font-semibold text-gray-700">
-              Resources
-            </Typography>
-            <Paper elevation={3} className="p-5 mt-6 shadow-md rounded-lg bg-white">
-              <div className='quick-links-grid' >
-                <div className='box'>
-                  <img src='./imgs/team.png' alt='' />
-                  <h2>Group Texts</h2>
-                  <p>Compose and send group texts to your subscribed contact</p>
-                  <h3>Send a Group Text</h3>
-                </div>
-                <div className='box'>
-                  <img src='./imgs/convo.png' alt='' />
-                  <h2>Conversation</h2>
-                  <p>Send and receive 1-on-1 texts with your contacts</p>
-                  <h3>Send a Group Text</h3>
-                </div>
-                <div className='box'>
-                  <img src='./imgs/email.png' alt='' />
-                  <h2>Campaign</h2>
-                  <p>Automate messages when subscribers join one of your contact groups</p>
-                  <h3>Send a Group Text</h3>
-                </div>
-                <div className='box'>
-                  <img src='./imgs/customer-service.png' alt='' />
-                  <h2>Contacts</h2>
-                  <p>View and edit your list of subscribed contacts</p>
-                  <h3>Send a Group Text</h3>
-                </div>
-                <div className='box'>
-                  <img src='./imgs/website.png' alt='' />
-                  <h2>Keywords</h2>
-                  <p>Use keywords to create auto-replies and allow people to easily subscribe to your texts
-                  </p>
-                  <h3>Send a Group Text</h3>
-                </div>
-                <div className='box'>
-                  <img src='./imgs/sign-up.png' alt='' />
-                  <h2>Sign-up forms</h2>
-                  <p>Create shareable or embedded forms for new contacts to subscribe to your messages
-
-                  </p>
-                  <h3>Send a Group Text</h3>
-                </div>
-
-              </div>
-            </Paper>
-          </Grid>
+          <Resources/>
         </div>
       </div>
     </div>
