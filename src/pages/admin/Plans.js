@@ -36,6 +36,7 @@ function Plans() {
           planName: newPlan.name,
           price: parseFloat(newPlan.price),
           tokens: parseInt(newPlan.smsLimit, 10),
+          interval: "month"
         });
         setPlans((prevPlans) => [...prevPlans, response.data]); // Add the new plan to the list
         setNewPlan({ name: '', price: '', smsLimit: '' }); // Reset the form
