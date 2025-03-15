@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import UserNavbar from '../../components/UserNavbar';
-import UserSidebar from '../../components/UserSidebar';
 import { useNavigate } from 'react-router-dom';
 
 const SubscriptionPlans = () => {

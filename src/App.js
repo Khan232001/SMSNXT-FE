@@ -60,7 +60,7 @@ function App() {
           <Route path="/contact-management" element={<ContactManagement />} />
           <Route path="/tags-management" element={<TagsManagement />} />
           <Route path="/reporting" element={<Reporting />} />
-          <Route path="/quick-group-messaging" element={<Messaging />} />
+          <Route path="/messaging" element={<Messaging />} />
           <Route path="/sender-id-management" element={<SenderIDManagement />} />
           <Route path="/payment" element={<PaymentForm />} />
           <Route path="/thank-you" element={<ThankYou />} />

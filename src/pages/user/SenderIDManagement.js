@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import UserNavbar from '../../components/UserNavbar'; 
-import UserSidebar from '../../components/UserSidebar'; 
+import Navbar from "../../layout/Navbar";
+import Sidebar from "../../layout/Sidebar";
 
 const SenderIDManagement = () => {
   const [senderIDs, setSenderIDs] = useState([
@@ -38,11 +38,11 @@ const SenderIDManagement = () => {
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar - Hidden on small screens */}
       <div className={`lg:block ${sidebarOpen ? 'w-64' : 'w-0'} transition-all`}>
-        <UserSidebar />
+        <Sidebar />
       </div>
 
       <div className="flex-1 bg-gray-100">
-        <UserNavbar />
+        <Navbar />
         <div className="container mx-auto p-6 pt-20"> {/* Add padding-top to avoid navbar overlap */}
           <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold text-gray-700">Sender ID Management</h2>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Paper, Grid, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, Button } from '@mui/material';
-import Sidebar from '../../components/UserSidebar';
-import Navbar from '../../components/UserNavbar';
+import Sidebar from '../../layout/Sidebar';
+import Navbar from '../../layout/Navbar';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import Resources from '../../components/Resources';
@@ -34,11 +34,11 @@ const Dashboard = () => {
   const navigate = useNavigate()
   return (
     <div className="flex">
-      {/* Sidebar */}
+  
       <Sidebar />
 
-      <div className="flex-1 mt-12 ml-60">
-        {/* Navbar */}
+      <div className="flex-1  ml-60">
+
         <Navbar className="mb-5" />
 
         <div className="p-8 mt-6">
