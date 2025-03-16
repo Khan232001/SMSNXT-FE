@@ -260,12 +260,12 @@ const SubscriptionPlans = () => {
     <div className="max-w-7xl px-4 py-8" style={{ marginLeft: '20rem', marginTop: '5rem' }}>
       {/* Sidebar */}
       <div className="w-64 bg-blue-700 text-white">
-        <UserSidebar />
+        <Sidebar />
       </div>
 
       {/* Navbar */}
       <div className="fixed top-0 left-0 w-full bg-blue-700 text-white z-50 shadow-md">
-        <UserNavbar />
+        <Navbar />
       </div>
 
       {/* Header */}
