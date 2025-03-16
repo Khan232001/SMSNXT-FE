@@ -205,8 +205,8 @@
 // export default SubscriptionPlans;
 
 import React, { useState, useEffect } from 'react';
-import UserNavbar from '../../components/UserNavbar';
-import UserSidebar from '../../components/UserSidebar';
+import Navbar from "../../layout/Navbar";
+import Sidebar from "../../layout/Sidebar";
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api'; // Import your axios utility
 
