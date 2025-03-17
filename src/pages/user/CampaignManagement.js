@@ -170,7 +170,7 @@ const CampaignManagement = () => {
                     Create New Campaign
                   </button>
 
-                  <label className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 cursor-pointer w-full lg:w-auto">
+                  <label className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 cursor-pointer w-full lg:w-auto">
                     <input
                       type="file"
                       accept=".csv"

@@ -32,10 +32,12 @@ const messageStats = [
 
 const Dashboard = () => {
   const navigate = useNavigate()
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+
   return (
     <div className="flex">
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar isSidebarOpen={isSidebarOpen} />
 
       <div className="flex-1 mt-12 ml-60">
         {/* Navbar */}
