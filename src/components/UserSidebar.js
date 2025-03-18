@@ -7,7 +7,7 @@ import {
   Campaign, Contacts, BarChart, Tag, People 
 } from "@mui/icons-material";
 
-const UserSidebar = () => {
+const UserSidebar = ({ isSidebarOpen }) => {
   const [selectedTab, setSelectedTab] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -15,18 +15,19 @@ const UserSidebar = () => {
   };
 
   return (
-    <Box
-      sx={{
-        width: "250px",
-        height: "100vh", // Ensure full height
-        backgroundColor: "#263238",
-        paddingTop: "10px",
-        color: "white",
-        overflowY: "auto", // Prevents overflow & allows scrolling only inside sidebar
-        position: "fixed", // Fix sidebar on the left
-        top: 0,
-        left: 0
-      }}
+    <Box  
+    sx={{  
+    width: isSidebarOpen ? "250px" : "0",  // Sidebar will close when false
+    height: "100vh",
+    backgroundColor: "#263238",
+    paddingTop: "10px",
+    color: "white",
+    overflowY: "auto",
+    position: "fixed",
+    top: 0,
+    left: 0,
+    transition: "width 0.3s ease-in-out", // Smooth sliding effect
+  }}
     >
       <Tabs
         orientation="vertical"

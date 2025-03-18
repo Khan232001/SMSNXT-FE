@@ -23,6 +23,8 @@ const Navbar = ({ toggleDrawer }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredRoutes, setFilteredRoutes] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
 
   const routes = [
     { path: "/", label: "Home" },

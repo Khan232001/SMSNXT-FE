@@ -32,7 +32,10 @@ const messageStats = [
 
 const Dashboard = () => {
   const navigate = useNavigate()
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const toggleDrawer = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
 
   return (
     <div className="flex">
@@ -41,7 +44,7 @@ const Dashboard = () => {
 
       <div className="flex-1 mt-12 ml-60">
         {/* Navbar */}
-        <Navbar className="mb-5" />
+        <Navbar toggleDrawer={toggleDrawer} className="mb-5" />
 
         <div className="p-8 mt-6">
           <Grid container spacing={3} alignItems="center">
