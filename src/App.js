@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { AuthProvider } from './context/AuthContext';
 
 // Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -56,7 +57,7 @@ function App() {
       <Router>
         <Routes>
           {/* User Routes */}
-          <Route path="/" element={<UserLayout />}>
+          <Route path="/" element={<AuthProvider><UserLayout /></AuthProvider>}>
             <Route index element={<Home />} />
             <Route path="dashboard" element={<UserDashboard />} />
             <Route path="login" element={<Login />} />
