@@ -57,7 +57,6 @@ const Sidebar = () => {
       icon: <Message />,
       label: "Quick Messaging",
       children: [
-        { to: "/messaging/new", label: "New Message" },
         { to: "/messaging/templates", label: "Templates" },
         { to: "/messaging/scheduled", label: "Scheduled Messages" },
       ],

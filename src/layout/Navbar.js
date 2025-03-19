@@ -30,6 +30,10 @@ const Navbar = ({ toggleDrawer }) => {
   const routes = [
     { path: "/", label: "Home" },
     { path: "/dashboard", label: "Dashboard" },
+    { path: "/messaging", label: "Quick Messaging" },
+    { path: "/messaging/new", label: "New Message" },
+    { path: "/messaging/templates", label: "Message Template" },
+    { path: "/messaging/scheduled", label: "Scheduled Messages" },
     { path: "/contact", label: "Contact" },
     { path: "/pricing", label: "Pricing" },
     { path: "/subscription-plans", label: "Subscription Plans" },
@@ -38,7 +42,6 @@ const Navbar = ({ toggleDrawer }) => {
     { path: "/contact-management", label: "Contact Management" },
     { path: "/tags-management", label: "Tags Management" },
     { path: "/reporting", label: "Reporting" },
-    { path: "/messaging", label: "Quick Group Messaging" },
     { path: "/sender-id-management", label: "Sender ID Management" },
   ];
 

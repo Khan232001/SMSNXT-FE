@@ -8,7 +8,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserDashboard from "./pages/user/Dashboard";
 import Campaigns from "./pages/admin/Campaigns";
 import Customers from "./pages/admin/Customers";
-import Order from "./pages/admin/Orders";
+import Orders from "./pages/admin/Orders";
 import Payments from "./pages/admin/Payments";
 import Plans from "./pages/admin/Plans";
 import Reports from "./pages/admin/Reports";
@@ -25,7 +25,6 @@ import CampaignManagement from "./pages/user/CampaignManagement";
 import ContactManagement from "./pages/user/ContactManagement";
 import TagsManagement from "./pages/user/TagsManagement";
 import Reporting from "./pages/user/Reporting";
-import Messaging from "./pages/user/Messaging";
 import SenderIDManagement from "./pages/user/SenderIDManagement";
 import AdminLogin from "./pages/admin/AdminLogin";
 import Settings from "./pages/admin/Settings";
@@ -39,8 +38,17 @@ import StaffManagement from "./pages/admin/StaffManagement";
 import CampaignManagementAdmin from "./pages/admin/CampaignManagement";
 import TagsManagementAdmin from "./pages/admin/TagsManagement";
 import ContactManagementAdmin from "./pages/admin/ContactManagement";
+
+// Components
+
+import Templates from "./components/Templates";
+import UserLayout from "./layout/UserLayout";
+import ChatMessage from "./pages/user/ChatMessage";
+import { Schedule } from "@mui/icons-material";
+import ScheduledMessages from "./components/ScheduledMessages";
+
 // Stripe Setup
-const stripePromise = loadStripe("your-publishable-key-here"); 
+const stripePromise = loadStripe("your-publishable-key-here");
 
 function App() {
   return (
@@ -48,44 +56,55 @@ function App() {
       <Router>
         <Routes>
           {/* User Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<UserDashboard />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/subscription-plans" element={<SubscriptionPlans />} />
-          <Route path="/subscription-pricing" element={<SubscriptionPricing />} />
-          <Route path="/order-recharge-history" element={<OrderHistory />} />
-          <Route path="/campaign-management" element={<CampaignManagement />} />
-          <Route path="/contact-management" element={<ContactManagement />} />
-          <Route path="/tags-management" element={<TagsManagement />} />
-          <Route path="/reporting" element={<Reporting />} />
-          <Route path="/messaging" element={<Messaging />} />
-          <Route path="/sender-id-management" element={<SenderIDManagement />} />
-          <Route path="/payment" element={<PaymentForm />} />
-          <Route path="/thank-you" element={<ThankYou />} />
+          <Route path="/" element={<UserLayout />}>
+            <Route index element={<Home />} />
+            <Route path="dashboard" element={<UserDashboard />} />
+            <Route path="login" element={<Login />} />
+            <Route path="contact" element={<Contact />} />
+            <Route path="pricing" element={<Pricing />} />
+            <Route path="subscription-plans" element={<SubscriptionPlans />} />
+            <Route path="subscription-pricing" element={<SubscriptionPricing />} />
+            <Route path="order-recharge-history" element={<OrderHistory />} />
+            <Route path="campaign-management" element={<CampaignManagement />} />
+            <Route path="contact-management" element={<ContactManagement />} />
+            <Route path="tags-management" element={<TagsManagement />} />
+            <Route path="reporting" element={<Reporting />} />
+            <Route path="sender-id-management" element={<SenderIDManagement />} />
+            <Route path="payment" element={<PaymentForm />} />
+            <Route path="thank-you" element={<ThankYou />} />
+            <Route path="terms" element={<Terms />} />
+            <Route path="policy" element={<Policy />} />
+            <Route path="signup" element={<SignUp />} />
 
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/policy" element={<Policy />} />
-          <Route path="/user/signup" element={<SignUp />} />
-          <Route path="/sign" element={<SignUp />} />
+            {/* Messaging Nested Routes */}
+           
+            <Route path="messaging" >
+              <Route index element={<ChatMessage />} />
+         
+              <Route path="templates" element={<Templates />} />
+              <Route path="scheduled" element={<ScheduledMessages/>}/>
+            </Route>
+          </Route>
 
           {/* Admin Routes */}
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/senderids" element={<SenderIDs />} />
-          <Route path="/admin/reports" element={<Reports />} />
-          <Route path="/admin/plans" element={<Plans />} />
-          <Route path="/admin/payments" element={<Payments />} />
-          <Route path="/admin/campaigns" element={<Campaigns />} />
-          <Route path="/admin/customers" element={<Customers />} />
-          <Route path="/admin/orders" element={<Order />} />
-          <Route path="/admin/staff-management" element={<StaffManagement />} />
-          <Route path="/admin/campaign-management" element={<CampaignManagementAdmin />} />
-          <Route path="/admin/system-settings" element={<Settings />} />
-          <Route path="/admin/sms-gateway" element={<SmsGateway />} />
-          <Route path="/admin/tags-management" element={<TagsManagementAdmin />} />
-          <Route path="/admin/contact-management" element={<ContactManagementAdmin />} />
+          <Route path="/admin">
+            <Route path="login" element={<AdminLogin />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="senderids" element={<SenderIDs />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="plans" element={<Plans />} />
+            <Route path="payments" element={<Payments />} />
+            <Route path="campaigns" element={<Campaigns />} />
+            <Route path="customers" element={<Customers />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="staff-management" element={<StaffManagement />} />
+            <Route path="campaign-management" element={<CampaignManagementAdmin />} />
+            <Route path="system-settings" element={<Settings />} />
+            <Route path="sms-gateway" element={<SmsGateway />} />
+            <Route path="tags-management" element={<TagsManagementAdmin />} />
+            <Route path="contact-management" element={<ContactManagementAdmin />} />
+          </Route>
+
           {/* Catch-all Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
