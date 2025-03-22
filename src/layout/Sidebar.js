@@ -1,193 +1,156 @@
-import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
+  Drawer,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Collapse,
+  IconButton,
+  Divider,
   Box,
+  Typography,
 } from "@mui/material";
 import {
-  ExpandLess,
-  ExpandMore,
-  Dashboard,
+  CalendarMonth,
+  ChevronLeft,
+  Mail,
   Message,
-  AccountCircle,
-  History,
-  CreditCard,
-  Campaign,
-  Contacts,
-  BarChart,
-  Tag,
   People,
+  History,
+  Folder,
+  PieChart,
+  Settings,
+  PauseCircleOutline,
+  HighlightOff,
+  Archive,
+  ChatBubbleOutline,
+  FolderOpen,
+  AssignmentTurnedIn,
+  VisibilityOff,
+  CheckCircleOutline,
+  Dashboard,
+  Campaign,
 } from "@mui/icons-material";
 
-const Sidebar = () => {
+const sidebarItems = [
+  { label: "Getting Started", icon: <Dashboard />, href: "/dashboard" },
+  { label: "Compose", icon: <Mail />, href: "/compose" },
+  { label: "Messages", icon: <Message />, href: "/messaging" },
+  { label: "Campaign", icon: <Campaign />, href: "/campaign" },
+  { label: "Contacts", icon: <People />, href: "/contacts" },
+  { label: "History", icon: <History />, href: "/history" },
+  { label: "Templates", icon: <Folder />, href: "/templates" },
+  { label: "Reports", icon: <PieChart />, href: "/reports" },
+  { label: "Admin", icon: <Settings />, href: "/admin" },
+];
+
+const tabItemsMap = [
+  {
+    path: "/campaign",
+    items: [
+      { label: "Upcoming", icon: <Dashboard />, count: 1 },
+      { label: "Paused", icon: <PauseCircleOutline />, count: 0 },
+      { label: "Not Sent", icon: <HighlightOff />, count: 0 },
+      { label: "Completed", icon: <Archive />, count: 1 },
+      { label: "Calendar", icon: <CalendarMonth /> },
+    ],
+  },
+  {
+    path: "/messaging",
+    items: [
+      { label: "Open", icon: <ChatBubbleOutline />, count: 1 },
+      { label: "Unread", icon: <VisibilityOff />, count: 0 },
+      { label: "Assigned to me", icon: <AssignmentTurnedIn />, count: 0 },
+      { label: "Unassigned", icon: <FolderOpen />, count: 1 },
+      { label: "Solved", icon: <CheckCircleOutline />, count: 0 },
+      { label: "All chats", icon: <Folder />, count: 1 },
+    ],
+  },
+];
+
+export default function Sidebar({ collapsed, toggleCollapse, hiddenRoutes = ["/login", "/sign", "/forgot-password"] }) {
   const location = useLocation();
-  const [openMenus, setOpenMenus] = useState({});
+  const activePath = location.pathname;
 
-  // Function to handle parent menu click and toggle the submenu
-  const handleParentClick = (item) => {
-    if (item.children) {
-      setOpenMenus((prev) => ({
-        ...prev,
-        [item.to]: !prev[item.to], // Toggle the menu visibility
-      }));
-    }
-  };
+  // Ensure hiddenRoutes is always an array
+  if (!Array.isArray(hiddenRoutes)) {
+    console.error("hiddenRoutes should be an array");
+    return null;
+  }
 
-  // useEffect to check when the path changes and open the corresponding submenu
-  useEffect(() => {
-    const openSubmenu = menuItems.find((item) => location.pathname.includes(item.to));
-    if (openSubmenu && openSubmenu.children) {
-      setOpenMenus((prev) => ({
-        ...prev,
-        [openSubmenu.to]: true, // Open the submenu of the current route
-      }));
-    } else {
-      setOpenMenus({}); // Close all submenus if no match
-    }
-  }, [location.pathname]); // Run when pathname changes
+  // Hide sidebar on specified routes
+  if (hiddenRoutes.includes(activePath)) return null;
 
-  const menuItems = [
-    { to: "/dashboard", icon: <Dashboard />, label: "Dashboard" },
-    {
-      to: "/messaging",
-      icon: <Message />,
-      label: "Quick Messaging",
-      children: [
-        { to: "/messaging/templates", label: "Templates" },
-        { to: "/messaging/scheduled", label: "Scheduled Messages" },
-      ],
-    },
-    {
-      to: "/sender-id-management",
-      icon: <AccountCircle />,
-      label: "Sender ID",
-      children: [
-        { to: "/sender/list", label: "My Senders" },
-        { to: "/sender/register", label: "Register New" },
-      ],
-    },
-    {
-      to: "/subscription-plans",
-      icon: <CreditCard />,
-      label: "Subscription Plans",
-      children: [
-        { to: "/subscription", label: "Active Plans" },
-        { to: "/subscription/upgrade", label: "Upgrade Plan" },
-        { to: "/subscription/billing", label: "Billing" },
-      ],
-    },
-    {
-      to: "/order-recharge-history",
-      icon: <History />,
-      label: "Order & Recharge",
-      children: [
-        { to: "/order/credits", label: "Purchase Credits" },
-        { to: "/order/history", label: "Order History" },
-      ],
-    },
-    {
-      to: "/campaign-management",
-      icon: <Campaign />,
-      label: "Campaign",
-      children: [
-        { to: "/campaign", label: "Active Campaigns" },
-        { to: "/campaign/new", label: "Create New" },
-        { to: "/campaign/schedule", label: "Schedule" },
-      ],
-    },
-    {
-      to: "/contact-management",
-      icon: <Contacts />,
-      label: "Contact Management",
-      children: [
-        { to: "/contact-management", label: "Overview" },
-        { to: "/contact-management/import", label: "Import/Export" },
-      ],
-    },
-    {
-      to: "/tags-management",
-      icon: <Tag />,
-      label: "Manage Tags",
-      children: [
-        { to: "/tags", label: "All Tags" },
-        { to: "/tags/create", label: "Create Tag" },
-      ],
-    },
-    {
-      to: "/reporting",
-      icon: <BarChart />,
-      label: "Reporting",
-      children: [
-        { to: "/reporting", label: "Dashboard" },
-        { to: "/reporting/delivery", label: "Delivery Reports" },
-        { to: "/reporting/analytics", label: "Analytics" },
-      ],
-    },
-  ];
+  // Find active tab items for the current path
+  const activeTab = tabItemsMap.find((tab) => activePath.includes(tab.path));
+  const activeTabItems = activeTab ? activeTab.items : null;
 
   return (
-    <Box
+    <Drawer
+      variant="permanent"
       sx={{
-        width: "250px",
-        height: "100vh",
-        backgroundColor: "#263238",
-        paddingTop: "10px",
-        color: "white",
-        overflowY: "auto",
-        position: "fixed",
-        top: 0,
-        left: 0,
+        width: collapsed ? 64 : 240,
+        flexShrink: 0,
+        "& .MuiDrawer-paper": {
+          width: collapsed ? 64 : 240,
+          boxSizing: "border-box",
+          bgcolor: "#012341",
+          color: "white",
+          transition: "width 0.3s ease",
+        },
       }}
     >
-      <List>
-        {menuItems.map((item) => (
-          <React.Fragment key={item.to}>
-            <ListItemButton
-              component={Link}
-              to={item.to} // Navigate to the parent route
-              onClick={() => handleParentClick(item)} // Handle parent click and toggle submenu
-              selected={location.pathname === item.to}
-              sx={{
-                color: "white",
-                "&.Mui-selected": { backgroundColor: "#455A64" },
-              }}
-            >
-              <ListItemIcon sx={{ color: "white" }}>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.label} />
-              {item.children ? openMenus[item.to] ? <ExpandLess /> : <ExpandMore /> : null}
-            </ListItemButton>
+      <Box display="flex" alignItems="center" justifyContent="space-between" p={2}>
+        {!collapsed && <Typography variant="h6">smsNxt</Typography>}
+        <IconButton onClick={toggleCollapse} color="inherit">
+          <ChevronLeft sx={{ transform: collapsed ? "rotate(180deg)" : "none" }} />
+        </IconButton>
+      </Box>
 
-            {/* Submenu Links */}
-            {item.children && (
-              <Collapse in={openMenus[item.to]} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  {item.children.map((subItem) => (
-                    <ListItemButton
-                      key={subItem.to}
-                      component={Link}
-                      to={subItem.to}
-                      selected={location.pathname === subItem.to}
-                      sx={{
-                        pl: 4,
-                        color: "white",
-                        "&.Mui-selected": { backgroundColor: "#37474F" },
-                      }}
-                    >
-                      <ListItemText primary={subItem.label} />
-                    </ListItemButton>
-                  ))}
-                </List>
-              </Collapse>
-            )}
-          </React.Fragment>
+      <Divider sx={{ bgcolor: "gray" }} />
+
+      {/* Sidebar Main Items */}
+      <List>
+        {sidebarItems.map(({ label, icon, href }) => (
+          <ListItemButton
+            key={label}
+            component={Link}
+            to={href}
+            selected={activePath === href}
+            sx={{
+              "&.Mui-selected": { bgcolor: "rgba(255, 255, 255, 0.2)" },
+              "&:hover": { bgcolor: "rgba(255, 255, 255, 0.1)" },
+            }}
+          >
+            <ListItemIcon sx={{ color: "white" }}>{icon}</ListItemIcon>
+            {!collapsed && <ListItemText primary={label} />}
+          </ListItemButton>
         ))}
       </List>
-    </Box>
-  );
-};
 
-export default Sidebar;
+      <Divider sx={{ bgcolor: "gray" }} />
+
+      {/* Active Tab Items (Dynamic based on route) */}
+      {!collapsed && activeTabItems && (
+        <Box p={2}>
+          <Typography variant="caption" color="gray">
+            {activeTab.path === "/campaign" ? "CAMPAIGN" : "MESSENGER"}
+          </Typography>
+          <List>
+            {activeTabItems.map(({ label, icon, count }) => (
+              <ListItemButton key={label} sx={{ "&:hover": { bgcolor: "rgba(255, 255, 255, 0.1)" } }}>
+                <ListItemIcon sx={{ color: "white" }}>{icon}</ListItemIcon>
+                <ListItemText primary={label} />
+                {count !== undefined && count > 0 && (
+                  <Typography variant="body2" sx={{ color: "#FFA726", ml: 1 }}>
+                    {count}
+                  </Typography>
+                )}
+              </ListItemButton>
+            ))}
+          </List>
+        </Box>
+      )}
+    </Drawer>
+  );
+}

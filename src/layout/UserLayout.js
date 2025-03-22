@@ -5,72 +5,64 @@ import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 
 const UserLayout = () => {
-
-
-
- const location = useLocation();
-    const [pageTitle, setPageTitle] = useState('Dashboard');
+    const location = useLocation();
+    const [pageTitle, setPageTitle] = useState("Dashboard");
     const [isLoading, setIsLoading] = useState(true);
-    console.log(pageTitle)
-    // Set page title based on route
+
+    // Define page titles for different routes
+    const pageTitles = {
+        "/dashboard": "Dashboard",
+        "/campaign": "Campaign Management",
+        "/messaging": "Quick Messaging",
+        "/sender": "Sender ID",
+        "/subscription": "Subscription Plans",
+        "/order": "Order & Recharge",
+        "/contact-management": "Contact Management",
+        "/tags": "Manage Tags",
+        "/contacts": "Manage Contacts",
+        "/reporting": "Reporting",
+    };
+
+    const hiddenRoutes = ["/login", "/sign", "/forgot-password"];
+
+    // Check if the current route is in the hiddenRoutes array
+    const hideLayout = hiddenRoutes.includes(location.pathname);
+
     useEffect(() => {
-        const path = location.pathname;
+        // Find the title based on the current route
+        const foundTitle = Object.keys(pageTitles).find((path) =>
+            location.pathname.includes(path)
+        );
+        setPageTitle(foundTitle ? pageTitles[foundTitle] : "Dashboard");
 
-        if (path.includes('/dashboard')) {
-            setPageTitle('Dashboard');
-        } else if (path.includes('/campaign')) {
-            setPageTitle('Campaign Management');
-        } else if (path.includes('/messaging')) {
-            setPageTitle('Quick Messaging');
-        } else if (path.includes('/sender')) {
-            setPageTitle('Sender ID');
-        } else if (path.includes('/subscription')) {
-            setPageTitle('Subscription Plans');
-        } else if (path.includes('/order')) {
-            setPageTitle('Order & Recharge');
-        } else if (path.includes('/contact-management')) {
-            setPageTitle('Contact Management');
-        } else if (path.includes('/tags')) {
-            setPageTitle('Manage Tags');
-        } else if (path.includes('/contacts')) {
-            setPageTitle('Manage Contacts');
-        } else if (path.includes('/reporting')) {
-            setPageTitle('Reporting');
-        } else {
-            setPageTitle('Dashboard');
-        }
-
-     
+        // Simulate loading effect
         setIsLoading(true);
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 300);
-
+        const timer = setTimeout(() => setIsLoading(false), 300);
         return () => clearTimeout(timer);
     }, [location]);
-    return (
-        <Box sx={{ display: "flex", height: "100vh", bgcolor: "#F8F9FB" }}>
-       
-            <Box
-                sx={{
-                    display: { xs: "none", sm: "block" },
-                    width: { sm: "240px" },
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    height: "100vh",
-                    bgcolor: "#263238",
-                    color: "#FFF",
-                }}
-            >
-                <Sidebar />
-            </Box>
 
-            {/* Main Content */}
+    return (
+        <Box sx={{ display: "flex", bgcolor: "#F8F9FB", minHeight: "100vh" }}>
+            {!hideLayout && (
+                <Box
+                    sx={{
+                        display: { xs: "none", sm: "block" },
+                        width: { sm: "240px" },
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        bgcolor: "#263238",
+                        color: "#FFF",
+                    }}
+                >
+                    <Sidebar hiddenRoutes={hiddenRoutes} />
+                </Box>
+            )}
+
             <Box
                 sx={{
                     flex: 1,
-                    marginLeft: { xs: 0, sm: "240px" },
+                    marginLeft: hideLayout ? 0 : { xs: 0, sm: "240px" },
                     padding: "16px",
                     paddingTop: "0px",
                     display: "flex",
