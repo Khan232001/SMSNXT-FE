@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import UserNavbar from "../../components/UserNavbar";
-import UserSidebar from "../../components/UserSidebar";
+import Navbar from "../../layout/Navbar";
+import Sidebar from "../../layout/Sidebar";
 import api from "../../utils/api";
 import { FaTrashCan } from "react-icons/fa6";
 import { FaEdit } from "react-icons/fa";
@@ -218,18 +218,18 @@ const TagsManagement = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
-      {/* Sidebar */}
-      <div className="md:w-64 bg-blue-700 text-white">
-        <UserSidebar />
+
+      <div className="md:w-64 text-white">
+        <Sidebar />
       </div>
 
       <div className="flex-1 bg-blue-50">
         {/* Navbar */}
-        <div className="fixed top-0 left-0 w-full bg-blue-700 text-white z-50 shadow-md">
-          <UserNavbar />
+        <div className=" text-white z-50 shadow-md">
+          <Navbar />
         </div>
 
-        <div className="bg-white shadow-md rounded-lg p-6 mt-16">
+        <div className="bg-white shadow-md rounded-lg p-6 mt-4">
           <h1 className="text-xl font-semibold mb-4">Tags</h1>
 
           {/* Search Input */}

@@ -205,8 +205,8 @@
 // export default SubscriptionPlans;
 
 import React, { useState, useEffect } from 'react';
-import UserNavbar from '../../components/UserNavbar';
-import UserSidebar from '../../components/UserSidebar';
+import Navbar from "../../layout/Navbar";
+import Sidebar from "../../layout/Sidebar";
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api'; // Import your axios utility
 
@@ -260,12 +260,12 @@ const SubscriptionPlans = () => {
     <div className="max-w-7xl px-4 py-8" style={{ marginLeft: '20rem', marginTop: '5rem' }}>
       {/* Sidebar */}
       <div className="w-64 bg-blue-700 text-white">
-        <UserSidebar />
+        <Sidebar />
       </div>
 
       {/* Navbar */}
       <div className="fixed top-0 left-0 w-full bg-blue-700 text-white z-50 shadow-md">
-        <UserNavbar />
+        <Navbar />
       </div>
 
       {/* Header */}

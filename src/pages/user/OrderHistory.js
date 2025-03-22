@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import UserNavbar from '../../components/UserNavbar'; // Importing Navbar
-import UserSidebar from '../../components/UserSidebar'; // Importing Sidebar
+import Navbar from "../../layout/Navbar";
+import Sidebar from "../../layout/Sidebar";
 
 const OrderHistory = () => {
   // Sample order data
@@ -20,12 +20,12 @@ const OrderHistory = () => {
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
       {/* Sidebar */}
-      <UserSidebar />
+      <Sidebar />
 
       {/* Main Content Area */}
       <div style={{ flex: 1, marginLeft: '250px', display: 'flex', flexDirection: 'column' }}>
         {/* Navbar */}
-        <UserNavbar /> <br/> <br/> <br/>
+        <Navbar /> <br/> <br/> <br/>
 
         {/* Order History Content */}
         <div className="container mx-auto p-6 flex-1">

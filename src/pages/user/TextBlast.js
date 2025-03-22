@@ -1,7 +1,7 @@
 import React, { useState, Fragment, useEffect, useRef } from "react";
-import UserNavbar from "../../components/UserNavbar";
+import Navbar from "../../layout/Navbar";
+import Sidebar from "../../layout/Sidebar";
 import api from "../../utils/api";
-import UserSidebar from "../../components/UserSidebar";
 import Papa from "papaparse";
 import { Listbox, ListboxButton, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
@@ -1447,12 +1447,12 @@ const TextBlast = ({
             isSidebarOpen ? "w-64" : "hidden"
           }`}
         >
-          <UserSidebar />
+          <Sidebar />
         </div>
 
         <div className="flex-1 flex flex-col bg-gray-100 relative">
           {/* Navbar */}
-          <div className="fixed top-0 left-0 right-0 z-10 h-16 bg-white shadow-md flex justify-between items-center px-4 lg:px-6">
+          <div className="">
             <button
               className="text-gray-600 focus:outline-none lg:hidden"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -1471,7 +1471,7 @@ const TextBlast = ({
                 />
               </svg>
             </button>
-            <UserNavbar />
+            <Navbar />
           </div>
 
           {/* Main Content */}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import UserNavbar from '../../components/UserNavbar';
+import Navbar from "../../layout/Navbar";
+import Sidebar from "../../layout/Sidebar";
 import Select from 'react-select';
-import UserSidebar from '../../components/UserSidebar';
 import Tooltip from '../../components/Tooltip';
 import api from '../../utils/api';
 import Papa from 'papaparse';
@@ -224,15 +224,15 @@ const ContactManagement = () => {
   return (
     <div className="flex flex-col md:flex-row h-screen">
       {/* Sidebar */}
-      <div className="w-64 bg-blue-700 text-white">
-        <UserSidebar />
+      <div className="w-64  text-white">
+        <Sidebar />
       </div>
 
       <div className="flex-1 bg-blue-50">
         {/* Navbar */}
-        <div className="fixed top-0 left-0 w-full bg-blue-700 text-white z-50 shadow-md">
-          <UserNavbar />
-        </div>
+     
+          <Navbar />
+    
 
         {/* Main Content */}
         <div className="container mx-auto px-4 py-6 mt-16 max-w-7xl">

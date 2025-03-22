@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import UserNavbar from "../../components/UserNavbar";
-import UserSidebar from "../../components/UserSidebar";
+import Navbar from "../../layout/Navbar";
+import Sidebar from "../../layout/Sidebar";
 import TextBlast from "./TextBlast";
 import Papa from "papaparse";
 import api from "../../utils/api";
@@ -128,33 +128,13 @@ const CampaignManagement = () => {
               isSidebarOpen ? "w-64" : "hidden"
             }`}
           >
-            <UserSidebar />
+            <Sidebar />
           </div>
 
           <div className="flex-1 flex flex-col bg-gray-100 relative">
-            {/* Navbar */}
-            <div className="fixed top-0 left-0 right-0 z-10 h-16 bg-white shadow-md flex justify-between items-center px-4 lg:px-6">
-              <button
-                className="text-gray-600 focus:outline-none lg:hidden"
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              </button>
-              <UserNavbar />
-            </div>
 
+     
+            <Navbar />
             {/* Main Content */}
             <div className="mt-16 flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-6">
               <div className="flex flex-col lg:flex-row justify-between items-center mb-6 space-y-4 lg:space-y-0">
@@ -198,7 +178,7 @@ const CampaignManagement = () => {
               <div className="overflow-x-auto bg-white shadow-lg rounded-lg mb-6">
                 <table className="min-w-full table-auto">
                   <thead>
-                    <tr className="bg-gray-100">
+                    <tr className="">
                       <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
                         Campaign Name
                       </th>

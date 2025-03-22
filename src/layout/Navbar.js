@@ -15,7 +15,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Navbar = ({ toggleDrawer }) => {
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
@@ -26,9 +26,16 @@ const Navbar = ({ toggleDrawer }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
 
+
+
+
   const routes = [
     { path: "/", label: "Home" },
     { path: "/dashboard", label: "Dashboard" },
+    { path: "/messaging", label: "Quick Messaging" },
+    { path: "/messaging/new", label: "New Message" },
+    { path: "/messaging/templates", label: "Message Template" },
+    { path: "/messaging/scheduled", label: "Scheduled Messages" },
     { path: "/contact", label: "Contact" },
     { path: "/pricing", label: "Pricing" },
     { path: "/subscription-plans", label: "Subscription Plans" },
@@ -37,11 +44,18 @@ const Navbar = ({ toggleDrawer }) => {
     { path: "/contact-management", label: "Contact Management" },
     { path: "/tags-management", label: "Tags Management" },
     { path: "/reporting", label: "Reporting" },
-    { path: "/quick-group-messaging", label: "Quick Group Messaging" },
     { path: "/sender-id-management", label: "Sender ID Management" },
   ];
 
+  const location = useLocation();
   const navigate = useNavigate();
+
+  // Find the matching route
+  const currentRoute = routes.find(route => route.path === location.pathname);
+
+  // Set default label if not found
+  const currentPage = currentRoute ? currentRoute.label : "Dashboard";
+
 
   const handleNotificationClick = (event) => {
     setNotificationAnchorEl(event.currentTarget);
@@ -91,14 +105,14 @@ const Navbar = ({ toggleDrawer }) => {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 bg-white shadow-md z-50 px-4 md:px-6 py-2 md:py-4">
+    <div className=" bg-white shadow-md z-50 px-4 md:px-6 py-2 md:py-4">
       <div className="flex items-center justify-between">
         {/* Left - Title */}
         <div className="flex items-center space-x-4">
           <button onClick={toggleDrawer} className="sm:hidden">
             <MenuIcon className="text-gray-600" />
           </button>
-          <h6 className="font-bold text-lg md:text-xl text-gray-800">Dashboard</h6>
+          <h6 className="font-bold text-lg md:text-xl text-gray-800">{currentPage}</h6>
         </div>
 
         {/* Center - Search Input */}

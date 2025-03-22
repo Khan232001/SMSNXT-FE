@@ -1,24 +1,24 @@
 import React from "react";
-import UserNavbar from "../../components/UserNavbar";
-import UserSidebar from "../../components/UserSidebar";
+import Navbar from "../../layout/Navbar";
+import Sidebar from "../../layout/Sidebar";
 
 const Reporting = () => {
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <div className="fixed top-0 left-0 w-64 h-full bg-gray-800">
-        <UserSidebar />
+
+      <div className="fixed top-0 left-0 w-64 h-full">
+        <Sidebar />
       </div>
 
       {/* Main Content */}
       <div className="flex-1 ml-64 bg-gray-100">
         {/* Navbar */}
-        <div className="fixed top-0 left-64 w-full z-10">
-          <UserNavbar />
-        </div>
+    
+          <Navbar />
+    
 
         {/* Content */}
-        <div className="p-6 mt-16">
+        <div className="p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Reporting</h2>
 
           {/* Overview Card Section */}

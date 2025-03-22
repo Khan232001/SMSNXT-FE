@@ -222,13 +222,13 @@ const TagsManagement = () => {
   return (
     <div className='flex flex-col md:flex-row h-screen'>
       {/* Sidebar */}
-      <div className='md:w-64 bg-blue-700 text-white'>
+      <div className='md:w-64  text-white'>
         <Sidebar />
       </div>
 
       <div className='flex-1 bg-blue-50'>
         {/* Navbar */}
-        <div className='fixed top-0 left-0 w-full bg-blue-700 text-white z-50 shadow-md'>
+        <div className='fixed top-0 left-0 w-full text-white z-50 shadow-md'>
           <Navbar />
         </div>
 
