@@ -4,7 +4,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 
-const UserLayout = () => {
+const UserLayout = ({collapsed, activeTab, setActiveTab, toggleCollapse}) => {
     const location = useLocation();
     const [pageTitle, setPageTitle] = useState("Dashboard");
     const [isLoading, setIsLoading] = useState(true);
@@ -46,23 +46,24 @@ const UserLayout = () => {
             {!hideLayout && (
                 <Box
                     sx={{
-                        display: { xs: "none", sm: "block" },
-                        width: { sm: "240px" },
-                        position: "fixed",
-                        top: 0,
-                        left: 0,
-                        bgcolor: "#263238",
-                        color: "#FFF",
+                        display: { xs: collapsed ? 'none' : 'block', sm: 'block' },
+                        width: { sm: collapsed ? 64 : 240 },
+                        position: 'relative',
+                        transition: 'width 0.3s ease'
                     }}
                 >
-                    <Sidebar hiddenRoutes={hiddenRoutes} />
+                    <Sidebar collapsed={collapsed} toggleCollapse={toggleCollapse} hiddenRoutes={hiddenRoutes} />
+
                 </Box>
             )}
 
             <Box
                 sx={{
                     flex: 1,
-                    marginLeft: hideLayout ? 0 : { xs: 0, sm: "240px" },
+                    marginLeft: hideLayout ? 0 : {
+                        xs: 0,
+                      
+                    },
                     padding: "16px",
                     paddingTop: "0px",
                     display: "flex",

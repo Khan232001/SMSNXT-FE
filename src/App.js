@@ -45,7 +45,6 @@ import Templates from "./components/Templates";
 import UserLayout from "./layout/UserLayout";
 import ChatMessage from "./pages/user/ChatMessage";
 import ScheduledMessages from "./components/ScheduledMessages";
-import Sidebar from "./layout/Sidebar"; // Import Sidebar
 import Conversations from "./components/Conversations";
 import ChatWindow from "./components/ChatWindow";
 
@@ -54,33 +53,34 @@ const stripePromise = loadStripe("your-publishable-key-here");
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
-  const [activeTab, setActiveTab] = useState("Getting Started");
+
+function handleCollapse() {
+  setCollapsed(!collapsed);
+}
 
   return (
     <Elements stripe={stripePromise}>
       <Router>
         <AuthProvider>
-          <Sidebar
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            collapsed={collapsed}
-            toggleCollapse={() => setCollapsed((prev) => !prev)}
-          />
           <Routes>
-            {/* User Routes */}
-              <Route path="sign" element={<SignUp />} />
-              <Route path="login" element={<Login />} />
-            <Route path="/" element={<UserLayout />}>
-              <Route index element={<Home />} />
-              <Route path="dashboard" element={<UserDashboard />} />
-              <Route path="compose" element={<ChatMessage/>}/>
-            
+            {/* Auth Routes */}
+            <Route path="signup" element={<SignUp />} />
+            <Route path="login" element={<Login />} />
+
+      
+            <Route index element={<Home />} />
+            <Route
+              path="/"
+              element={<UserLayout collapsed={collapsed} toggleCollapse={handleCollapse} />}
+            >
+              <Route index path="dashboard" element={<UserDashboard />} />
+              <Route path="compose" element={<ChatMessage />} />
               <Route path="contact" element={<Contact />} />
               <Route path="pricing" element={<Pricing />} />
               <Route path="subscription-plans" element={<SubscriptionPlans />} />
               <Route path="subscription-pricing" element={<SubscriptionPricing />} />
               <Route path="order-recharge-history" element={<OrderHistory />} />
-              <Route path="campaign-management" element={<CampaignManagement />} />
+              <Route path="campaign" element={<CampaignManagement />} />
               <Route path="contact-management" element={<ContactManagement />} />
               <Route path="tags-management" element={<TagsManagement />} />
               <Route path="reporting" element={<Reporting />} />
@@ -94,7 +94,7 @@ function App() {
               <Route path="messaging">
                 <Route index element={<Conversations />} />
                 <Route path="open" element={<ChatWindow />} />
-                <Route path="scheduled" element={<ScheduledMessages />} />
+                {/* <Route path="scheduled" element={<ScheduledMessages />} /> */}
               </Route>
             </Route>
 

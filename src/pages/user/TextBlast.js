@@ -1441,15 +1441,8 @@ const TextBlast = ({
   return (
     <>
       <div className="flex h-screen">
-        {/* Sidebar */}
-        <div
-          className={`fixed top-0 left-0 z-20 bg-white shadow-md lg:relative lg:w-64 lg:block ${
-            isSidebarOpen ? "w-64" : "hidden"
-          }`}
-        >
-          <Sidebar />
-        </div>
-
+    
+   
         <div className="flex-1 flex flex-col bg-gray-100 relative">
           {/* Navbar */}
           <div className="">
@@ -1471,7 +1464,7 @@ const TextBlast = ({
                 />
               </svg>
             </button>
-            <Navbar />
+           
           </div>
 
           {/* Main Content */}

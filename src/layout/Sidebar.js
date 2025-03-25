@@ -31,16 +31,18 @@ import {
   Dashboard,
   Campaign,
 } from "@mui/icons-material";
+import { useState } from "react";
 
 const sidebarItems = [
   { label: "Getting Started", icon: <Dashboard />, href: "/dashboard" },
   { label: "Compose", icon: <Mail />, href: "/compose" },
   { label: "Messages", icon: <Message />, href: "/messaging" },
   { label: "Campaign", icon: <Campaign />, href: "/campaign" },
-  { label: "Contacts", icon: <People />, href: "/contacts" },
+  { label: "Subscriptions", icon: <People />, href: "/subscription-plans" },
+  { label: "Contacts", icon: <People />, href: "/contact-management" },
   { label: "History", icon: <History />, href: "/history" },
   { label: "Templates", icon: <Folder />, href: "/templates" },
-  { label: "Reports", icon: <PieChart />, href: "/reports" },
+  { label: "Reports", icon: <PieChart />, href: "/reporting" },
   { label: "Admin", icon: <Settings />, href: "/admin" },
 ];
 
@@ -54,6 +56,7 @@ const tabItemsMap = [
       { label: "Completed", icon: <Archive />, count: 1 },
       { label: "Calendar", icon: <CalendarMonth /> },
     ],
+    bgColor: "hsl(11deg 69.89% 59.73%)"
   },
   {
     path: "/messaging",
@@ -65,13 +68,16 @@ const tabItemsMap = [
       { label: "Solved", icon: <CheckCircleOutline />, count: 0 },
       { label: "All chats", icon: <Folder />, count: 1 },
     ],
+    bgColor: "hsl(206deg 66.55% 44.44%)"
   },
 ];
 
 export default function Sidebar({ collapsed, toggleCollapse, hiddenRoutes = ["/login", "/sign", "/forgot-password"] }) {
+
+
   const location = useLocation();
   const activePath = location.pathname;
-
+  
   // Ensure hiddenRoutes is always an array
   if (!Array.isArray(hiddenRoutes)) {
     console.error("hiddenRoutes should be an array");
@@ -84,17 +90,19 @@ export default function Sidebar({ collapsed, toggleCollapse, hiddenRoutes = ["/l
   // Find active tab items for the current path
   const activeTab = tabItemsMap.find((tab) => activePath.includes(tab.path));
   const activeTabItems = activeTab ? activeTab.items : null;
-
+  
   return (
     <Drawer
       variant="permanent"
       sx={{
         width: collapsed ? 64 : 240,
+        overflow: "hidden",
         flexShrink: 0,
         "& .MuiDrawer-paper": {
           width: collapsed ? 64 : 240,
           boxSizing: "border-box",
           bgcolor: "#012341",
+          overflow: "hidden",
           color: "white",
           transition: "width 0.3s ease",
         },
@@ -102,7 +110,11 @@ export default function Sidebar({ collapsed, toggleCollapse, hiddenRoutes = ["/l
     >
       <Box display="flex" alignItems="center" justifyContent="space-between" p={2}>
         {!collapsed && <Typography variant="h6">smsNxt</Typography>}
-        <IconButton onClick={toggleCollapse} color="inherit">
+        <IconButton
+          onClick={toggleCollapse}
+          color="inherit"
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
           <ChevronLeft sx={{ transform: collapsed ? "rotate(180deg)" : "none" }} />
         </IconButton>
       </Box>
@@ -132,9 +144,11 @@ export default function Sidebar({ collapsed, toggleCollapse, hiddenRoutes = ["/l
 
       {/* Active Tab Items (Dynamic based on route) */}
       {!collapsed && activeTabItems && (
-        <Box p={2}>
-          <Typography variant="caption" color="gray">
-            {activeTab.path === "/campaign" ? "CAMPAIGN" : "MESSENGER"}
+        <Box p={2} style={{
+          backgroundColor: activeTab.bgColor
+        }}>
+          <Typography variant="caption" color="white">
+            {activeTab.path === "/campaign" ? "CAMPAIGN" : "MESSAGES"}
           </Typography>
           <List>
             {activeTabItems.map(({ label, icon, count }) => (
@@ -142,7 +156,7 @@ export default function Sidebar({ collapsed, toggleCollapse, hiddenRoutes = ["/l
                 <ListItemIcon sx={{ color: "white" }}>{icon}</ListItemIcon>
                 <ListItemText primary={label} />
                 {count !== undefined && count > 0 && (
-                  <Typography variant="body2" sx={{ color: "#FFA726", ml: 1 }}>
+                  <Typography variant="body2" sx={{ color: "white", ml: 1 }}>
                     {count}
                   </Typography>
                 )}
