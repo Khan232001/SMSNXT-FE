@@ -223,18 +223,7 @@ const ContactManagement = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
-      {/* Sidebar */}
-      <div className="w-64  text-white">
-        <Sidebar />
-      </div>
-
-      <div className="flex-1 bg-blue-50">
-        {/* Navbar */}
-     
-          <Navbar />
-    
-
-        {/* Main Content */}
+{/* Main Content */}
         <div className="container mx-auto px-4 py-6 mt-16 max-w-7xl">
           <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold text-blue-700">Contact Management</h2>
@@ -447,7 +436,7 @@ const ContactManagement = () => {
             </div>
 
           </div>
-        </div>
+    
       </div>
       {/* Add Contact Modal */}
       {isAddContactModalOpen && (

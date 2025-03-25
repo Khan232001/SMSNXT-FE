@@ -1,64 +1,178 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, IconButton, List, ListItem, Avatar } from "@mui/material";
-import { FilterList } from "@mui/icons-material";
+import PropTypes from 'prop-types';
+import {
+    Box,
+    Typography,
+    TextField,
+    IconButton,
+    List,
+    ListItem,
+    Avatar,
+    useTheme,
+    InputAdornment,
+    CircularProgress
+} from "@mui/material";
+import { FilterList, Search } from "@mui/icons-material";
 import ChatWindow from "./ChatWindow";
 
 const Conversations = () => {
+    const theme = useTheme();
     const [selectedChat, setSelectedChat] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
     const [chats, setChats] = useState([
-        { name: "Muhammad Ahmad", messages: ["Hi, how are you ahmad"], lastMessageDate: "21 Feb" },
+        {
+            id: 1,
+            name: "Muhammad Ahmad",
+            messages: [
+                { text: "Hi, how are you Ahmad?", sender: "them", timestamp: "09:30 AM" }
+            ],
+            lastMessageDate: new Date().toLocaleDateString(),
+            unread: 2
+        },
     ]);
 
     const handleSelectChat = (index) => {
         setSelectedChat(index);
     };
 
-    const handleSendMessage = (message) => {
-        if (message.trim() !== "" && selectedChat !== null) {
+    const handleSendMessage = async (message) => {
+        if (message.trim() && selectedChat !== null) {
             const updatedChats = [...chats];
-            updatedChats[selectedChat].messages.push({ text: message, sender: "me" });
+            updatedChats[selectedChat].messages.push({
+                text: message,
+                sender: "me",
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+            updatedChats[selectedChat].lastMessageDate = new Date().toLocaleDateString();
             setChats(updatedChats);
         }
     };
 
+    const filteredChats = chats.filter(chat =>
+        chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
-        <Box className="flex h-screen bg-gray-100 p-2 rounded-lg shadow-lg">
-            {/* Sidebar */}
-            <Box className="w-1/4 bg-white p-4 rounded-lg shadow-md">
-                <Typography variant="h6" className="mb-2">Open</Typography>
-                <Box className="flex items-center gap-2 mb-4">
-                    <TextField variant="outlined" size="small" placeholder="Search chats..." className="flex-1" />
-                    <IconButton>
+        <Box sx={{
+            display: 'flex',
+            height: '100vh',
+            bgcolor: 'background.default',
+            p: 2,
+            gap: 2,
+            flexDirection: { xs: 'column', md: 'row' }
+        }}>
+            {/* Conversations Sidebar */}
+            <Box sx={{
+                width: { xs: '100%', md: '30%' },
+                bgcolor: 'background.paper',
+                borderRadius: 2,
+                boxShadow: 1,
+                display: 'flex',
+                flexDirection: 'column'
+            }}>
+                <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>{}</Typography>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        placeholder="Search chats..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Search color="action" />
+                                </InputAdornment>
+                            ),
+                            sx: { borderRadius: 4 }
+                        }}
+                    />
+                    <IconButton sx={{ ml: 1 }}>
                         <FilterList />
                     </IconButton>
                 </Box>
-                <List>
-                    {chats.map((chat, index) => (
+
+                <List sx={{ flex: 1, overflowY: 'auto' }}>
+                    {filteredChats.map((chat, index) => (
                         <ListItem
-                            key={index}
+                            key={chat.id}
                             button
                             onClick={() => handleSelectChat(index)}
-                            className={`flex items-center gap-2 p-2 rounded-lg ${selectedChat === index ? "bg-blue-100" : ""}`}
+                            selected={selectedChat === index}
+                            sx={{
+                                gap: 2,
+                                py: 1.5,
+                                borderBottom: '1px solid',
+                                borderColor: 'divider',
+                                bgcolor: selectedChat === index ? 'primary.light' : 'inherit',
+                                '&:hover': { bgcolor: 'action.hover' }
+                            }}
                         >
-                            <Avatar>{chat.name.charAt(0)}</Avatar>
-                            <Box>
-                                <Typography>{chat.name}</Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    {chat.messages.length > 0 ? chat.messages[chat.messages.length - 1].text : "No recent messages"}
-                                </Typography>
+                            <Avatar sx={{ bgcolor: theme.palette.secondary.main }}>
+                                {chat.name.charAt(0)}
+                            </Avatar>
+                            <Box sx={{ flex: 1 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <Typography fontWeight={600}>{chat.name}</Typography>
+                                    <Typography variant="caption" color="textSecondary">
+                                        {chat.lastMessageDate}
+                                    </Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <Typography
+                                        variant="body2"
+                                        color="textSecondary"
+                                        sx={{
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            maxWidth: '70%'
+                                        }}
+                                    >
+                                        {chat.messages.length > 0
+                                            ? chat.messages[chat.messages.length - 1].text
+                                            : 'No messages yet'}
+                                    </Typography>
+                                    {chat.unread > 0 && (
+                                        <Box sx={{
+                                            bgcolor: 'primary.main',
+                                            color: 'white',
+                                            borderRadius: '50%',
+                                            width: 24,
+                                            height: 24,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}>
+                                            <Typography variant="caption">{chat.unread}</Typography>
+                                        </Box>
+                                    )}
+                                </Box>
                             </Box>
-                            <Typography variant="caption" className="ml-auto text-gray-500">
-                                {chat.lastMessageDate}
-                            </Typography>
                         </ListItem>
                     ))}
                 </List>
             </Box>
 
             {/* Chat Window */}
-            <ChatWindow selectedChat={selectedChat} chats={chats} onSendMessage={handleSendMessage} />
+            <Box sx={{
+                flex: 1,
+                display: 'flex',
+                height: '100%',
+                borderRadius: 2,
+                boxShadow: 1
+            }}>
+                <ChatWindow
+                    selectedChat={selectedChat}
+                    chats={chats}
+                    onSendMessage={handleSendMessage}
+                />
+            </Box>
         </Box>
     );
 };
+
+
 
 export default Conversations;
