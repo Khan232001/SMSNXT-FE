@@ -30,20 +30,21 @@ import {
   CheckCircleOutline,
   Dashboard,
   Campaign,
+  RocketLaunch, // Added RocketLaunch icon
 } from "@mui/icons-material";
 import { useState } from "react";
 
 const sidebarItems = [
-  { label: "Getting Started", icon: <Dashboard />, href: "/dashboard" },
+  { label: "Getting Started", icon: <RocketLaunch />, href: "/getting-started" }, // Updated with RocketLaunch icon
+  { label: "Dashboard", icon: <Dashboard />, href: "/dashboard" },
   { label: "Compose", icon: <Mail />, href: "/compose" },
   { label: "Messages", icon: <Message />, href: "/messaging" },
   { label: "Campaign", icon: <Campaign />, href: "/campaign" },
   { label: "Subscriptions", icon: <People />, href: "/subscription-plans" },
   { label: "Contacts", icon: <People />, href: "/contact-management" },
-  { label: "History", icon: <History />, href: "/history" },
   { label: "Templates", icon: <Folder />, href: "/templates" },
   { label: "Reports", icon: <PieChart />, href: "/reporting" },
-  { label: "Admin", icon: <Settings />, href: "/admin" },
+  { label: "Admin", icon: <Settings />, href: "/admin/dashboard" },
 ];
 
 const tabItemsMap = [

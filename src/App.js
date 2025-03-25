@@ -47,6 +47,8 @@ import ChatMessage from "./pages/user/ChatMessage";
 import ScheduledMessages from "./components/ScheduledMessages";
 import Conversations from "./components/Conversations";
 import ChatWindow from "./components/ChatWindow";
+import WelcomePage from "./components/Welcome";
+import Welcome from "./components/Welcome";
 
 // Stripe Setup
 const stripePromise = loadStripe("your-publishable-key-here");
@@ -73,8 +75,10 @@ function handleCollapse() {
               path="/"
               element={<UserLayout collapsed={collapsed} toggleCollapse={handleCollapse} />}
             >
-              <Route index path="dashboard" element={<UserDashboard />} />
+              <Route index path="getting-started" element={<Welcome />} />
+              <Route  path="dashboard" element={<UserDashboard />} />
               <Route path="compose" element={<ChatMessage />} />
+              <Route path="templates" element={<Templates />} />
               <Route path="contact" element={<Contact />} />
               <Route path="pricing" element={<Pricing />} />
               <Route path="subscription-plans" element={<SubscriptionPlans />} />

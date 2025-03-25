@@ -11,6 +11,7 @@ const UserLayout = ({collapsed, activeTab, setActiveTab, toggleCollapse}) => {
 
     // Define page titles for different routes
     const pageTitles = {
+        "/getting-started": "Getting Started",
         "/dashboard": "Dashboard",
         "/campaign": "Campaign Management",
         "/messaging": "Quick Messaging",

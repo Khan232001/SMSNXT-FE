@@ -1,6 +1,4 @@
 import React from "react";
-import Navbar from "../../layout/Navbar";
-import Sidebar from "../../layout/Sidebar";
 
 const Reporting = () => {
   return (
