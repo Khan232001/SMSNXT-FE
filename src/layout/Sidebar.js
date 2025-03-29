@@ -38,7 +38,7 @@ const sidebarItems = [
   { label: "Getting Started", icon: <RocketLaunch />, href: "/getting-started" }, // Updated with RocketLaunch icon
   { label: "Dashboard", icon: <Dashboard />, href: "/dashboard" },
   { label: "Compose", icon: <Mail />, href: "/compose" },
-  { label: "Messages", icon: <Message />, href: "/messaging" },
+  { label: "Two way Messaging", icon: <Message />, href: "/messaging" },
   { label: "Campaign", icon: <Campaign />, href: "/campaign" },
   { label: "Subscriptions", icon: <People />, href: "/subscription-plans" },
   { label: "Contacts", icon: <People />, href: "/contact-management" },

@@ -29,8 +29,9 @@ const Navbar = ({ toggleDrawer }) => {
 
   const routes = [
     { path: "/", label: "Home" },
+    { path: "/getting-started", label: "Getting Started" },
     { path: "/dashboard", label: "Dashboard" },
-    { path: "/messaging", label: "Quick Messaging" },
+    { path: "/messaging", label: "Two way messaging" },
     { path: "/messaging/new", label: "New Message" },
     { path: "/messaging/templates", label: "Message Template" },
     { path: "/messaging/scheduled", label: "Scheduled Messages" },
