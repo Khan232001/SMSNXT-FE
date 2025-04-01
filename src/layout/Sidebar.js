@@ -44,7 +44,8 @@ const sidebarItems = [
   { label: "Contacts", icon: <People />, href: "/contact-management" },
   { label: "Templates", icon: <Folder />, href: "/templates" },
   { label: "Reports", icon: <PieChart />, href: "/reporting" },
-  { label: "Admin", icon: <Settings />, href: "/admin/dashboard" },
+  { label: 'Tags', icon: <Settings />, href: '/tags-management' },
+  // { label: "Admin", icon: <Settings />, href: "/admin/dashboard" },
 ];
 
 const tabItemsMap = [
@@ -73,7 +74,7 @@ const tabItemsMap = [
   },
 ];
 
-export default function Sidebar({ collapsed, toggleCollapse, hiddenRoutes = ["/login", "/sign", "/forgot-password"] }) {
+export default function Sidebar({ collapsed, toggleCollapse, hiddenRoutes = []}) {
 
 
   const location = useLocation();

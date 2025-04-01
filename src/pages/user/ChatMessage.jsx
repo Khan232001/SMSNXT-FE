@@ -45,6 +45,10 @@ const TextMessageForm = () => {
         borderRadius: 2,
         boxShadow: 3,
       }}
+      md={{
+        maxWidth: 1200,
+        minWidth: 1000,
+      }}
     >
       <Typography
         variant="h6"

@@ -6,8 +6,9 @@ import { FaTrashCan } from "react-icons/fa6";
 import { FaEdit } from "react-icons/fa";
 import { RiContactsLine } from "react-icons/ri";
 
+const temp_tags = ["Khan", "Ahmad"]
 const TagsManagement = () => {
-  const [tags, setTags] = useState([]);
+  const [tags, setTags] = useState(temp_tags);
   const [contacts, setContacts] = useState([]);
   const [allContacts, setAllContacts] = useState([]); 
   const [selectedContacts, setSelectedContacts] = useState([]); 
@@ -219,16 +220,8 @@ const TagsManagement = () => {
   return (
     <div className="flex flex-col md:flex-row h-screen">
 
-      <div className="md:w-64 text-white">
-        <Sidebar />
-      </div>
 
       <div className="flex-1 bg-blue-50">
-        {/* Navbar */}
-        <div className=" text-white z-50 shadow-md">
-          <Navbar />
-        </div>
-
         <div className="bg-white shadow-md rounded-lg p-6 mt-4">
           <h1 className="text-xl font-semibold mb-4">Tags</h1>
 
