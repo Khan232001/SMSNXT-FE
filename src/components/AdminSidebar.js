@@ -1,185 +1,100 @@
-import React, { useState } from 'react';
-import { List, ListItem, ListItemText, Divider, Collapse } from '@mui/material';
+import { Link, useLocation } from "react-router-dom";
 import {
-  FaHome,
-  FaUsers,
-  FaRegMoneyBillAlt,
-  FaFlag,
-  FaClipboardList,
-  FaCogs,
-  FaChartLine,
-  FaCaretDown,
-  FaCaretUp,
-} from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
+  Divider,
+  Box,
+  Typography,
+} from "@mui/material";
+import {
+  CalendarMonth,
+  ChevronLeft,
+  Mail,
+  Message,
+  People,
+  History,
+  Folder,
+  PieChart,
+  Settings,
+  PauseCircleOutline,
+  HighlightOff,
+  Archive,
+  ChatBubbleOutline,
+  FolderOpen,
+  AssignmentTurnedIn,
+  VisibilityOff,
+  CheckCircleOutline,
+  Dashboard,
+  Campaign,
+  RocketLaunch,
+} from "@mui/icons-material";
+import { useState } from "react";
 
-const Sidebar = ({ open }) => {
-  const [contactMenuOpen, setContactMenuOpen] = useState(false);
+const sidebarItems = [
+  { label: "Dashboard", icon: <Dashboard />, href: "/admin/dashboard" },
+  { label: "Plan & Customers", icon: <People />, href: "/admin/plans" },
+  { label: "Orders", icon: <Folder />, href: "/admin/orders" },
+  { label: "Payments", icon: <PieChart />, href: "/admin/payments" },
+  { label: "Sender IDs", icon: <People />, href: "/admin/senderids" },
+  { label: "Campaigns", icon: <Campaign />, href: "/admin/campaigns" },
+  { label: "Reports", icon: <PieChart />, href: "/admin/reports" },
+  { label: "Campaign Management", icon: <Folder />, href: "/admin/campaign-management" },
+  { label: "Staff", icon: <People />, href: "/admin/staff-management" },
+  { label: "SMS Gateway", icon: <Settings />, href: "/admin/sms-gateway" },
+  { label: "System Settings", icon: <Settings />, href: "/admin/system-settings" },
+  { label: "Manage Contacts", icon: <People />, href: "/admin/contact-management" },
+  { label: "Manage Tags", icon: <Folder />, href: "/admin/tags-management" },
+];
+
+export default function AdminSidebar({ collapsed, toggleCollapse }) {
+  const location = useLocation();
+  const activePath = location.pathname;
 
   return (
-    <div
-      className={`bg-gray-800 text-white w-64 h-screen fixed top-0 left-0 py-4 px-4 transition-transform duration-300 shadow-xl rounded-r-lg overflow-y-auto hide-scrollbar ${
-        open ? 'translate-x-0' : '-translate-x-full'
-      } md:translate-x-0`}
+    <Drawer
+      variant="permanent"
+      sx={{
+        width: collapsed ? 64 : 240,
+        flexShrink: 0,
+        "& .MuiDrawer-paper": {
+          width: collapsed ? 64 : 240,
+          boxSizing: "border-box",
+          bgcolor: "#012341",
+          color: "white",
+          transition: "width 0.3s ease",
+        },
+      }}
     >
-      <List className='space-y-0'>
-        {/* Dashboard */}
-        <ListItem
-          button
-          component={Link}
-          to='/admin/dashboard'
-          className='flex items-center hover:bg-gray-700 hover:scale-[1.05] transition-transform duration-200 ease-in-out p-2 rounded-lg'
-        >
-          <FaHome className='text-xl mr-4' />
-          <ListItemText primary='Dashboard Overview' />
-        </ListItem>
+      <Box display="flex" alignItems="center" justifyContent="space-between" p={2}>
+        {!collapsed && <Typography variant="h6">Admin</Typography>}
+        <IconButton onClick={toggleCollapse} color="inherit">
+          <ChevronLeft sx={{ transform: collapsed ? "rotate(180deg)" : "none" }} />
+        </IconButton>
+      </Box>
 
-        <Divider className='border-gray-600' />
+      <Divider sx={{ bgcolor: "gray" }} />
 
-        {/* Plan & Customer Management */}
-        <ListItem
-          button
-          component={Link}
-          to='/admin/plans'
-          className='flex items-center hover:bg-gray-700 hover:scale-[1.05] transition-transform duration-200 ease-in-out p-2 rounded-lg'
-        >
-          <FaClipboardList className='text-xl mr-4' />
-          <ListItemText primary='Plan & Customer Management' />
-        </ListItem>
-
-        {/* Subscription Order Handling */}
-        <ListItem
-          button
-          component={Link}
-          to='/admin/orders'
-          className='flex items-center hover:bg-gray-700 hover:scale-[1.05] transition-transform duration-200 ease-in-out p-2 rounded-lg'
-        >
-          <FaClipboardList className='text-xl mr-4' />
-          <ListItemText primary='Subscription Order Handling' />
-        </ListItem>
-
-        {/* Payment Processing */}
-        <ListItem
-          button
-          component={Link}
-          to='/admin/payments'
-          className='flex items-center hover:bg-gray-700 hover:scale-[1.05] transition-transform duration-200 ease-in-out p-2 rounded-lg'
-        >
-          <FaRegMoneyBillAlt className='text-xl mr-4' />
-          <ListItemText primary='Payment Processing' />
-        </ListItem>
-
-        {/* Sender ID Management */}
-        <ListItem
-          button
-          component={Link}
-          to='/admin/senderids'
-          className='flex items-center hover:bg-gray-700 hover:scale-[1.05] transition-transform duration-200 ease-in-out p-2 rounded-lg'
-        >
-          <FaUsers className='text-xl mr-4' />
-          <ListItemText primary='Sender ID Management' />
-        </ListItem>
-
-        {/* Campaign and Marketing Tools */}
-        <ListItem
-          button
-          component={Link}
-          to='/admin/campaigns'
-          className='flex items-center hover:bg-gray-700 hover:scale-[1.05] transition-transform duration-200 ease-in-out p-2 rounded-lg'
-        >
-          <FaFlag className='text-xl mr-4' />
-          <ListItemText primary='Campaign and Marketing Tools' />
-        </ListItem>
-
-        {/* Detailed Reporting */}
-        <ListItem
-          button
-          component={Link}
-          to='/admin/reports'
-          className='flex items-center hover:bg-gray-700 hover:scale-[1.05] transition-transform duration-200 ease-in-out p-2 rounded-lg'
-        >
-          <FaChartLine className='text-xl mr-4' />
-          <ListItemText primary='Detailed Reporting' />
-        </ListItem>
-
-        {/* Campaign Management */}
-        <ListItem
-          button
-          component={Link}
-          to='/admin/campaign-management'
-          className='flex items-center hover:bg-gray-700 hover:scale-[1.05] transition-transform duration-200 ease-in-out p-2 rounded-lg'
-        >
-          <FaFlag className='text-xl mr-4' />
-          <ListItemText primary='Campaign Management' />
-        </ListItem>
-
-        {/* Staff Management */}
-        <ListItem
-          button
-          component={Link}
-          to='/admin/staff-management'
-          className='flex items-center hover:bg-gray-700 hover:scale-[1.05] transition-transform duration-200 ease-in-out p-2 rounded-lg'
-        >
-          <FaUsers className='text-xl mr-4' />
-          <ListItemText primary='Staff Management' />
-        </ListItem>
-
-        {/* SMS Gateway Configuration */}
-        <ListItem
-          button
-          component={Link}
-          to='/admin/sms-gateway'
-          className='flex items-center hover:bg-gray-700 hover:scale-[1.05] transition-transform duration-200 ease-in-out p-2 rounded-lg'
-        >
-          <FaCogs className='text-xl mr-4' />
-          <ListItemText primary='SMS Gateway Configuration' />
-        </ListItem>
-
-        {/* Website Management */}
-        <ListItem
-          button
-          component={Link}
-          to='/admin/system-settings'
-          className='flex items-center hover:bg-gray-700 hover:scale-[1.05] transition-transform duration-200 ease-in-out p-2 rounded-lg'
-        >
-          <FaCogs className='text-xl mr-4' />
-          <ListItemText primary='Website Management & System Settings' />
-        </ListItem>
-
-        {/* Contact Management */}
-        <ListItem
-          button
-          onClick={() => setContactMenuOpen(!contactMenuOpen)}
-          className='flex items-center hover:bg-gray-700 hover:scale-[1.05] transition-transform duration-200 ease-in-out p-2 rounded-lg'
-        >
-          <FaUsers className='text-xl mr-4' />
-          <ListItemText primary='Contact Management' />
-          {contactMenuOpen ? <FaCaretUp /> : <FaCaretDown />}
-        </ListItem>
-
-        <Collapse in={contactMenuOpen} timeout='auto' unmountOnExit>
-          <List component='div' disablePadding className='pl-8'>
-            <ListItem
-              button
-              component={Link}
-              to='/admin/contact-management'
-              className='flex items-center hover:bg-gray-700 p-2 rounded-md mb-2'
-            >
-              <ListItemText primary='Manage Contacts' />
-            </ListItem>
-            <ListItem
-              button
-              component={Link}
-              to='/admin/tags-management'
-              className='flex items-center hover:bg-gray-700 p-2 rounded-md mb-2'
-            >
-              <ListItemText primary='Manage Tags' />
-            </ListItem>
-          </List>
-        </Collapse>
+      <List>
+        {sidebarItems.map(({ label, icon, href }) => (
+          <ListItemButton
+            key={label}
+            component={Link}
+            to={href}
+            selected={activePath === href}
+            sx={{
+              "&.Mui-selected": { bgcolor: "rgba(255, 255, 255, 0.2)" },
+              "&:hover": { bgcolor: "rgba(255, 255, 255, 0.1)" },
+            }}
+          >
+            <ListItemIcon sx={{ color: "white" }}>{icon}</ListItemIcon>
+            {!collapsed && <ListItemText primary={label} />}
+          </ListItemButton>
+        ))}
       </List>
-    </div>
+    </Drawer>
   );
-};
-
-export default Sidebar;
+}

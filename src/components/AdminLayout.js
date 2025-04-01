@@ -2,15 +2,17 @@
 
 import React from 'react';
 import Navbar from './Navbar';
-import Sidebar from './AdminSidebar';
+import AdminSidebar from "../components/AdminSidebar";
 import './AdminLayout.css';  // Layout-specific styles
 
 const AdminLayout = ({ children }) => {
+  const [collapsed, setCollapsed] = useState(false);
+  const toggleCollapse = () => setCollapsed(!collapsed);
   return (
     <div className="admin-layout">
       <Navbar />
       <div className="admin-content">
-        <Sidebar />
+      <AdminSidebar collapsed={collapsed} toggleCollapse={toggleCollapse} />
         <main className="main-content">
           {children}  {/* This will render page-specific content */}
         </main>
