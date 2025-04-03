@@ -45,6 +45,7 @@ const sidebarItems = [
   { label: "Templates", icon: <Folder />, href: "/templates" },
   { label: "Reports", icon: <PieChart />, href: "/reporting" },
   { label: 'Tags', icon: <Settings />, href: '/tags-management' },
+  { label: 'Guides', icon: <Dashboard />, href: '' },
   // { label: "Admin", icon: <Settings />, href: "/admin/dashboard" },
 ];
 

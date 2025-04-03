@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from "../../layout/Navbar";
-import Sidebar from "../../layout/Sidebar";
 import Select from 'react-select';
 import Tooltip from '../../components/Tooltip';
 import api from '../../utils/api';
@@ -15,11 +13,13 @@ const ContactManagement = () => {
   const [newContactName, setNewContactName] = useState('');
   const [newContactEmail, setNewContactEmail] = useState('');
   const [newContactPhone, setNewContactPhone] = useState('');
+  const [newContactTag, setNewContactTag] = useState('');
 
   // States for editing a contact
   const [editContactName, setEditContactName] = useState('');
   const [editContactEmail, setEditContactEmail] = useState('');
   const [editContactPhone, setEditContactPhone] = useState('');
+  const [editContactTag, setEditContactTag] = useState('');
   const [currentContact, setCurrentContact] = useState(null);
 
   // States for import contact
@@ -54,12 +54,22 @@ const ContactManagement = () => {
       console.error('Failed to fetch contacts:', error);
     }
   };
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '-'; // Handle invalid dates
+
+    const options = { day: 'numeric', month: 'short', hour: 'numeric', minute: 'numeric', hour12: true };
+    return date.toLocaleString('en-US', options);
+  };
 
   const handleAddContact = async () => {
     const newContact = {
       name: newContactName,
       email: newContactEmail,
       phoneNumber: newContactPhone,
+      tags: newContactTag ? [{ name: newContactTag }] : []
     };
 
     try {
@@ -77,6 +87,7 @@ const ContactManagement = () => {
     setNewContactName('');
     setNewContactEmail('');
     setNewContactPhone('');
+    setNewContactTag('');
     setIsAddContactModalOpen(false);
   };
 
@@ -85,6 +96,7 @@ const ContactManagement = () => {
     setEditContactName(contact.name);
     setEditContactEmail(contact.email);
     setEditContactPhone(contact.phoneNumber);
+    setEditContactTag(contact.tags?.[0]?.name || '');
     setIsEditContactModalOpen(true);
   };
 
@@ -93,6 +105,7 @@ const ContactManagement = () => {
       name: editContactName,
       email: editContactEmail,
       phoneNumber: editContactPhone,
+      tags: editContactTag ? [{ name: editContactTag }] : []
     };
 
     try {
@@ -112,6 +125,7 @@ const ContactManagement = () => {
     setEditContactName('');
     setEditContactEmail('');
     setEditContactPhone('');
+    setEditContactTag('');
     setCurrentContact(null);
     setIsEditContactModalOpen(false);
   };
@@ -156,22 +170,21 @@ const ContactManagement = () => {
         const nameKey = Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "name");
         const emailKey = Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "email");
         const phoneKey = Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "phone");
+        const tagKey = Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "tag");
 
         if (!nameKey || !emailKey || !phoneKey) {
           alert('Invalid CSV format. Ensure columns: Name, Email, Phone.');
           return;
         }
 
-        const tags = selectedTags.map(tag => tag.value);
-
         const contacts = parsedData
           .map(row => ({
             name: row[nameKey]?.trim(),
             email: row[emailKey]?.trim(),
             phoneNumber: row[phoneKey]?.trim(),
-            tags: tags,
+            tags: row[tagKey]?.trim() ? [{ name: row[tagKey].trim() }] : []
           }))
-          .filter(contact => contact.name  && contact.email && contact.phoneNumber);
+          .filter(contact => contact.name && contact.email && contact.phoneNumber);
 
         if (contacts.length === 0) {
           alert('No valid contacts found in the CSV file.');
@@ -229,7 +242,6 @@ const ContactManagement = () => {
         {/* Contacts Table */}
         <div className="overflow-x-auto bg-white shadow-sm rounded-lg border border-gray-200">
           <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-           
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-500">Show on page:</span>
               <select className="border border-gray-300 rounded-md px-2 py-1 text-sm">
@@ -269,8 +281,12 @@ const ContactManagement = () => {
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">7 Feb, 1:44 am</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">7 Feb, 1:44 am</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatDate(contact.createdAt)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatDate(contact.updatedAt)}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Sameer Dagga</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex space-x-2">
@@ -330,14 +346,6 @@ const ContactManagement = () => {
             </div>
           </div>
         </div>
-
-        {/* Filters and Columns */}
-        {/* <div className="mt-4 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <span className="text-sm font-medium text-gray-700">Filters</span>
-            <span className="text-sm font-medium text-gray-700">Columns</span>
-          </div>
-        </div> */}
       </div>
 
       {/* Add Contact Modal */}
@@ -375,6 +383,16 @@ const ContactManagement = () => {
                 required
               />
             </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Tag</label>
+              <input
+                type="text"
+                value={newContactTag}
+                onChange={(e) => setNewContactTag(e.target.value)}
+                className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                // placeholder="Enter a tag name"
+              />
+            </div>
             <div className="flex justify-between">
               <button
                 onClick={handleAddContactCancel}
@@ -398,18 +416,15 @@ const ContactManagement = () => {
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-md w-96">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">Edit Contact</h3>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Name</label>
-                <input
-                  type="text"
-                  value={editContactName}
-                  onChange={(e) => setEditContactName(e.target.value)}
-                  className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-             
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Name</label>
+              <input
+                type="text"
+                value={editContactName}
+                onChange={(e) => setEditContactName(e.target.value)}
+                className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
             </div>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700">Email</label>
@@ -429,6 +444,16 @@ const ContactManagement = () => {
                 onChange={(e) => setEditContactPhone(e.target.value)}
                 className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Tag</label>
+              <input
+                type="text"
+                value={editContactTag}
+                onChange={(e) => setEditContactTag(e.target.value)}
+                className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter a tag name"
               />
             </div>
             <div className="flex justify-between">
