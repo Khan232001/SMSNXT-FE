@@ -56,9 +56,9 @@ const stripePromise = loadStripe("your-publishable-key-here");
 function App() {
   const [collapsed, setCollapsed] = useState(false);
 
-function handleCollapse() {
-  setCollapsed(!collapsed);
-}
+  function handleCollapse() {
+    setCollapsed(!collapsed);
+  }
 
   return (
     <Elements stripe={stripePromise}>
@@ -68,19 +68,22 @@ function handleCollapse() {
             {/* Auth Routes */}
             <Route path="sign" element={<SignUp />} />
             <Route path="login" element={<Login />} />
+            <Route path="contact" element={<Contact />} />
 
-      
+
             <Route index element={<Home />} />
+            <Route path="thank-you" element={<ThankYou />} />
+            <Route path="terms" element={<Terms />} />
+            <Route path="policy" element={<Policy />} />
+            <Route path="pricing" element={<Pricing />} />
             <Route
               path="/"
               element={<UserLayout collapsed={collapsed} toggleCollapse={handleCollapse} />}
             >
               <Route index path="getting-started" element={<Welcome />} />
-              <Route  path="dashboard" element={<UserDashboard />} />
+              <Route path="dashboard" element={<UserDashboard />} />
               <Route path="compose" element={<ChatMessage />} />
               <Route path="templates" element={<Templates />} />
-              <Route path="contact" element={<Contact />} />
-              <Route path="pricing" element={<Pricing />} />
               <Route path="subscription-plans" element={<SubscriptionPlans />} />
               <Route path="subscription-pricing" element={<SubscriptionPricing />} />
               <Route path="order-recharge-history" element={<OrderHistory />} />
@@ -90,9 +93,6 @@ function handleCollapse() {
               <Route path="reporting" element={<Reporting />} />
               <Route path="sender-id-management" element={<SenderIDManagement />} />
               <Route path="payment" element={<PaymentForm />} />
-              <Route path="thank-you" element={<ThankYou />} />
-              <Route path="terms" element={<Terms />} />
-              <Route path="policy" element={<Policy />} />
 
               {/* Messaging Nested Routes */}
               <Route path="messaging">

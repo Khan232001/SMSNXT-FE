@@ -1468,7 +1468,7 @@ const TextBlast = ({
           </div>
 
           {/* Main Content */}
-          <div className="mt-16 flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="mt-16 flex-1 container mx-auto px-4 overflow-y-auto sm:px-6 lg:px-8 py-6">
             <div className="flex justify-between mb-2">
               <h1 className="text-2xl font-bold mb-4">
                 {textBlastName || "Text Blasts"}
