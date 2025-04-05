@@ -1,129 +1,144 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Check, CheckCheck } from "lucide-react";
 
-const Hero = () => {
+export default function ChatApp() {
   const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [showChat, setShowChat] = useState(false);
+  const [chatCycle, setChatCycle] = useState(0);
+  const chatContainerRef = useRef(null); // Ref for auto-scrolling
+ 
+  const qaSets = [
+    [
+      { question: "What are your pricing plans?", answer: "Our pricing varies based on volume. Visit our pricing page for more details." },
+      { question: "Do you have any offers?", answer: { type: "image", url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuFTfCtFJirlKnnZ1NjUjxQ3l_KB3INPckHw&s" } },
+    ],
+    [
+      { question: "Can I see a product demo?", answer: { type: "image", url: "https://www.yotpo.com/wp-content/uploads/2020/06/RECOMMENDED-FOR-YOU.png" } },
+      { question: "How do I integrate with your API?", answer: "Our API documentation has all the details. Visit our dev page!" },
+    ]
+  ];
 
-  // Simulate loading and then show real messages after a delay
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setMessages([
-        {
-          id: 1,
-          user: "Dental Center",
-          text: "Hi Chris! Thanks for coming in for your semi-annual teeth cleaning program, we loved seeing you. We'd really appreciate it if you left us a review on Google. Click on our profile below.",
-        },
-        {
-          id: 2,
-          user: "You",
-          text: "Yes, for sure. I will do this right away. You all do great work.",
-        },
-        {
-          id: 3,
-          user: "You",
-          text: "...just left you 5 stars!",
-        },
-      ]);
-      setLoading(false);
-    }, 1000); // Simulate a 3-second loading delay
+    function cycleChat() {
+      setMessages([]); // Clear messages before starting next chat cycle
+      setChatCycle((prev) => (prev + 1) % qaSets.length);
+      setTimeout(() => {
+        startChatFlow();
+      }, 500);
+    }
 
-    return () => clearTimeout(timer);
+    setShowChat(true);
+    startChatFlow();
+
+    const interval = setInterval(cycleChat, 10000);
+    return () => clearInterval(interval);
   }, []);
 
+  // Auto-scroll when messages update
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const startChatFlow = () => {
+    addMessage("Hello! How can I assist you today?", "text", false, () => {
+      displayQAPairs(0);
+    });
+  };
+
+  const addMessage = (content, type, isUser, callback = null) => {
+    setMessages((prev) => {
+      if (prev.some((msg) => msg.content === content && msg.isUser === isUser)) {
+        return prev; // Prevent duplicate messages
+      }
+      return [...prev, { id: prev.length + 1, content, type, isUser, read: isUser ? false : true }];
+    });
+
+    setTimeout(() => {
+      if (callback) callback();
+    }, 1000);
+  };
+
+  const displayQAPairs = (index) => {
+    if (index < qaSets[chatCycle].length) {
+      setTimeout(() => {
+        addMessage(qaSets[chatCycle][index].question, "text", true, () => {
+          setTimeout(() => {
+            const answer = qaSets[chatCycle][index].answer;
+            addMessage(answer.type === "image" ? answer.url : answer, answer.type || "text", false, () => {
+              setMessages((prev) => prev.map((msg) => (msg.isUser ? { ...msg, read: true } : msg)));
+              displayQAPairs(index + 1);
+            });
+          }, 1500);
+        });
+      }, 2000);
+    }
+  };
+
   return (
-    <section className="relative bg-navy text-white py-32">
-      <div className="absolute inset-0 bg-navy-900"></div>
-
-      <div className="absolute bottom-0 left-0 right-0">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1440 320"
-          className="w-full h-auto"
-        >
-          <path
-            fill="#172554"
-            fillOpacity="1"
-            d="M0,192L480,288C960,384,1440,288,1440,288L1440,320L0,320Z"
-          ></path>
-        </svg>
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-start justify-between max-w-7xl mx-auto px-20 gap-8">
-        {/* Left Content */}
-        <div className="text-center lg:text-left max-w-lg">
-          <h1 className="text-5xl font-bold leading-tight mb-6 text-black">
-            SMS Marketing Made Easy
+    <section className="relative bg-white text-black py-24 overflow-hidden">
+      <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-start justify-center lg:justify-between max-w-7xl mx-auto px-6 md:px-16 gap-12 text-center lg:text-left">
+        
+        <div className="max-w-lg">
+          <h1 className="text-3xl md:text-5xl lg:text-8xl font-extrabold leading-tight mb-8 md:mb-12 mt-6">
+          <span className="text-blue-600 font-poppins mb-8">SMS Marketing</span> Made Easy with  
+<span className="text-9xl">NXT</span>
           </h1>
-          <p className="text-lg mb-8 text-black">
-            Get started today with a FREE 14-day trial and see why Textedly is
-            the easiest way to instantly send 10 or 100,000 bulk SMS and MMS
-            mobile text messages on the #1 rated texting platform.
+          <p className="text-lg md:text-xl mb-6 text-gray-700 font-poppins">
+            Get started today with a FREE 14-day trial and see why we are the easiest way to send bulk SMS messages in seconds.
           </p>
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="flex justify-center lg:justify-start items-center"
-          >
-            <div className="relative w-full max-w-lg">
-              <input
-                type="email"
-                className="py-3 px-6 w-full rounded-full shadow-lg text-black focus:outline-none"
-                placeholder="Enter your email address"
-                required
-              />
-              <button
-                type="button"
-                className="absolute right-0 top-0 bottom-0 bg-blue-400 text-black py-2 px-6 rounded-full shadow-lg hover:bg-blue-300 font-semibold"
-                style={{ margin: "4px" }}
+        </div>
+
+        <AnimatePresence>
+          {showChat && (
+            <motion.div
+              key={chatCycle}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 1 }}
+              className="shadow-lg rounded-2xl w-[320px] h-[550px] flex flex-col p-4 relative bg-cover bg-center"
+              style={{ backgroundImage: `url('/imgs/chat-bg.png')` }}
+            >
+              {/* ✅ Chat Container with Auto-Scroll, Fixed Positioning */}
+              <div
+                ref={chatContainerRef}
+                className="flex flex-col gap-4 p-2 justify-end mt-auto overflow-y-auto h-[450px]"
               >
-                Start Your Free Trial
-              </button>
-            </div>
-          </form>
-          <p className="text-sm text-gray-400 mt-2">No credit card required</p> {/* Added line */}
-        </div>
-
-        {/* Right Phone UI */}
-        <div className="relative w-64 h-[500px] bg-gray-900 rounded-3xl shadow-2xl overflow-hidden">
-          {/* Phone Header */}
-          <div className="bg-black-500 text-white px-4 py-2 text-lg font-semibold">
-            Chat with Chris
-          </div>
-
-          {/* Chat Screen */}
-          <div className="absolute inset-0 top-10 p-4 bg-gray-100 overflow-y-auto">
-            <div className="space-y-4">
-              {loading
-                ? // Skeleton Loader (while loading messages)
-                  Array.from({ length: 3 }).map((_, idx) => (
-                    <div
-                      key={idx}
-                      className="flex flex-col items-start animate-pulse"
-                    >
-                      <div className="bg-gray-300 py-2 px-4 rounded-lg shadow w-[70%] h-10"></div>
-                    </div>
-                  ))
-                : // Actual Messages
-                  messages.map((msg) => (
-                    <div
+                <AnimatePresence>
+                  {messages.map((msg) => (
+                    <motion.div
                       key={msg.id}
-                      className={`flex flex-col items-${msg.user === "You" ? "end" : "start"}`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3 }}
+                      className={`p-3 text-sm rounded-lg max-w-[75%] break-words flex items-center justify-between mt-2 ${
+                        msg.isUser 
+                          ? "bg-green-200 text-black font-medium self-end mr-10" 
+                          : "bg-white text-gray-900 self-start font-medium ml-10"
+                      }`}
                     >
-                      <div
-                        className={`py-2 px-4 rounded-lg shadow text-black max-w-[70%] ${
-                          msg.user === "You" ? "bg-black-500 text-black bg-blue-100" : "bg-white"
-                        }`}
-                      >
-                        {msg.text}
-                      </div>
-                    </div>
+                      {msg.type === "image" ? (
+                        <img src={msg.content} alt="Image" className="max-w-[150px] rounded-lg" />
+                      ) : (
+                        msg.content
+                      )}
+                      {msg.isUser && (
+                        <span className="ml-2 text-xs text-gray-600 flex items-center">
+                          {msg.read ? <CheckCheck className="w-4 h-4 text-blue-500" /> : <Check className="w-4 h-4 text-gray-500" />}
+                        </span>
+                      )}
+                    </motion.div>
                   ))}
-            </div>
-          </div>
-        </div>
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </section>
   );
-};
-
-export default Hero;
+}

@@ -1,107 +1,70 @@
-import React from 'react';
-import { FaDollarSign, FaChurch, FaCar, FaUtensils, FaStore, FaCut, FaBus, FaRing, FaBeer, FaBuilding, FaTruck } from 'react-icons/fa';
+import React from "react";
+import {
+  FaDollarSign,
+  FaChurch,
+  FaCar,
+  FaUtensils,
+  FaStore,
+  FaCut,
+  FaBus,
+  FaRing,
+  FaBeer,
+  FaBuilding,
+  FaTruck,
+} from "react-icons/fa";
+import { motion } from "framer-motion";
+
+const industries = [
+  { icon: <FaDollarSign />, label: "Finance" },
+  { icon: <FaChurch />, label: "Religious Organizations" },
+  { icon: <FaCar />, label: "Rental Services" },
+  { icon: <FaUtensils />, label: "Restaurants" },
+  { icon: <FaStore />, label: "Retail & Ecommerce" },
+  { icon: <FaCut />, label: "Salons & Spas" },
+  { icon: <FaBus />, label: "Transportation" },
+  { icon: <FaRing />, label: "Wedding Services" },
+  { icon: <FaBeer />, label: "Bars & Nightclubs" },
+  { icon: <FaBuilding />, label: "Construction & Home Services" },
+  { icon: <FaTruck />, label: "Delivery Services" },
+];
 
 const IndustrySolutions = () => {
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header Section */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-blue-600">
-            Solutions for <span className="text-blue-700">Your Industry</span>
-          </h2>
-        </div>
-
-        {/* Icons Section */}
-        <div className="flex flex-wrap justify-center gap-6">
-          {/* Horizontal Scroll container */}
-          <div className="overflow-hidden">
-            <div className="flex scroll-icons gap-6">
-              {/* Icon 1 - Finance */}
-              <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg max-w-[160px]">
-                <FaDollarSign className="text-4xl text-blue-600 mb-4" />
-                <p className="text-center text-sm font-semibold text-gray-700">Finance</p>
-              </div>
-
-              {/* Icon 2 - Religious Organizations */}
-              <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg max-w-[160px]">
-                <FaChurch className="text-4xl text-blue-600 mb-4" />
-                <p className="text-center text-sm font-semibold text-gray-700">Religious Organizations</p>
-              </div>
-
-              {/* Icon 3 - Rental Services */}
-              <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg max-w-[160px]">
-                <FaCar className="text-4xl text-blue-600 mb-4" />
-                <p className="text-center text-sm font-semibold text-gray-700">Rental Services</p>
-              </div>
-
-              {/* Icon 4 - Restaurants */}
-              <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg max-w-[160px]">
-                <FaUtensils className="text-4xl text-blue-600 mb-4" />
-                <p className="text-center text-sm font-semibold text-gray-700">Restaurants</p>
-              </div>
-
-              {/* Icon 5 - Retail and Ecommerce */}
-              <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg max-w-[160px]">
-                <FaStore className="text-4xl text-blue-600 mb-4" />
-                <p className="text-center text-sm font-semibold text-gray-700">Retail and Ecommerce</p>
-              </div>
-
-              {/* Icon 6 - Salons and Spas */}
-              <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg max-w-[160px]">
-                <FaCut className="text-4xl text-blue-600 mb-4" />
-                <p className="text-center text-sm font-semibold text-gray-700">Salons and Spas</p>
-              </div>
-
-              {/* Icon 7 - Transportation */}
-              <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg max-w-[160px]">
-                <FaBus className="text-4xl text-blue-600 mb-4" />
-                <p className="text-center text-sm font-semibold text-gray-700">Transportation</p>
-              </div>
-
-              {/* Icon 8 - Wedding Services */}
-              <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg max-w-[160px]">
-                <FaRing className="text-4xl text-blue-600 mb-4" />
-                <p className="text-center text-sm font-semibold text-gray-700">Wedding Services</p>
-              </div>
-
-              {/* Icon 9 - Bars and Nightclubs */}
-              <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg max-w-[160px]">
-                <FaBeer className="text-4xl text-blue-600 mb-4" />
-                <p className="text-center text-sm font-semibold text-gray-700">Bars and Nightclubs</p>
-              </div>
-
-              {/* Icon 10 - Construction and Home Services */}
-              <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg max-w-[160px]">
-                <FaBuilding className="text-4xl text-blue-600 mb-4" />
-                <p className="text-center text-sm font-semibold text-gray-700">Construction and Home Services</p>
-              </div>
-
-              {/* Icon 11 - Delivery Services */}
-              <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg max-w-[160px]">
-                <FaTruck className="text-4xl text-blue-600 mb-4" />
-                <p className="text-center text-sm font-semibold text-gray-700">Delivery Services</p>
-              </div>
-            </div>
-          </div>
-        </div>
+    <section className="py-16 bg-gradient-to-r from-indigo-900 via-purple-800 to-pink-700 text-white">
+      <div className="max-w-7xl mx-auto px-4 text-center">
+        <h2 className="text-4xl font-bold mb-6">
+          Powerful SMS Solutions for <span className="text-yellow-400">Every Industry</span>
+        </h2>
+        <p className="text-lg mb-8 opacity-90">
+          Reach your audience instantly with tailored messaging solutions.
+        </p>
       </div>
 
-      {/* Custom CSS */}
-      <style jsx>{`
-        .scroll-icons {
-          animation: scroll 30s linear infinite;
-        }
+      {/* Scrolling Icons */}
+      <div className="overflow-hidden relative">
+        <motion.div
+          className="flex gap-6 w-max"
+          animate={{ x: [0, -1000] }}
+          transition={{ ease: "linear", repeat: Infinity, duration: 20 }}
+        >
+          {industries.map((industry, index) => (
+            <div
+              key={index}
+              className="flex flex-col items-center bg-white p-4 rounded-xl shadow-xl text-blue-900 max-w-[160px] hover:scale-105 transition-transform duration-300"
+            >
+              <div className="text-5xl text-blue-600 mb-3">{industry.icon}</div>
+              <p className="text-center font-semibold">{industry.label}</p>
+            </div>
+          ))}
+        </motion.div>
+      </div>
 
-        @keyframes scroll {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-100%);
-          }
-        }
-      `}</style>
+      {/* CTA Button */}
+      <div className="text-center mt-10">
+        <button className="bg-yellow-400 text-blue-900 px-6 py-3 text-lg font-semibold rounded-full shadow-md hover:bg-yellow-300 transition">
+          Explore SMS Solutions
+        </button>
+      </div>
     </section>
   );
 };

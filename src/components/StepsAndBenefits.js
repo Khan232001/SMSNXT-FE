@@ -1,82 +1,98 @@
 import React from "react";
-import { PhoneIcon, UsersIcon, ChatIcon, CloudIcon, CheckCircleIcon, UserGroupIcon, CogIcon, BellIcon } from '@heroicons/react/outline';
+import {
+  PhoneIcon,
+  UsersIcon,
+  ChatIcon,
+  CloudIcon,
+  CheckCircleIcon,
+  UserGroupIcon,
+  CogIcon,
+  BellIcon,
+} from "@heroicons/react/outline";
+import { motion } from "framer-motion";
 
 const StepsAndBenefits = () => {
   return (
-    <section className="py-16 bg-gray-100">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Title */}
-        <h2 className="text-4xl font-bold text-center mb-12 text-gray-900">
-          Accelerate Your Text Message Marketing
-        </h2>
+    <section className="py-20 bg-gradient-to-r from-indigo-900 via-purple-800 to-pink-700 text-white">
+      <div className="max-w-7xl mx-auto px-6 text-center">
+        <motion.h2
+          className="text-5xl font-extrabold mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          Supercharge Your <span className="text-yellow-300">SMS Marketing</span>
+        </motion.h2>
+        <motion.p
+          className="text-lg opacity-90 mb-12 max-w-2xl mx-auto"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          Drive engagement and conversions with our AI-powered messaging solutions.
+        </motion.p>
+      </div>
 
-        {/* Steps */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
-          {/* Step 1: Secure Trusted Number */}
-          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-            <PhoneIcon className="h-12 w-12 text-blue-600 mb-4" />
-            <h3 className="text-xl font-semibold mb-4 text-blue-600">Step 1 - Secure Trusted Number</h3>
-            <p className="text-gray-700 text-center">
-              Own a textable number within 1 business day thanks to EZ Texting’s long-standing and trusted relationship with wireless carriers.
-            </p>
-          </div>
+      {/* Steps Section */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 px-6">
+        {[
+          {
+            icon: <PhoneIcon className="h-14 w-14 text-yellow-300 mb-4" />, 
+            title: "Step 1 - Secure Trusted Number",
+            text: "Get a trusted, textable number within 1 business day with our strong carrier relationships.",
+          },
+          {
+            icon: <UsersIcon className="h-14 w-14 text-yellow-300 mb-4" />, 
+            title: "Step 2 - Build Attentive Audience",
+            text: "Grow your contact list using QR codes, Keywords, and embedded sign-up forms.",
+          },
+          {
+            icon: <ChatIcon className="h-14 w-14 text-yellow-300 mb-4" />, 
+            title: "Step 3 - Craft Effective Texts",
+            text: "Create high-converting SMS & MMS messages with AI-powered tools.",
+          },
+        ].map((step, index) => (
+          <motion.div
+            key={index}
+            className="bg-white p-8 rounded-xl shadow-lg text-blue-900 flex flex-col items-center hover:shadow-2xl transition-all duration-300"
+            whileHover={{ scale: 1.05 }}
+          >
+            {step.icon}
+            <h3 className="text-xl font-bold mb-3 text-blue-800">{step.title}</h3>
+            <p className="text-gray-700 text-center">{step.text}</p>
+          </motion.div>
+        ))}
+      </div>
 
-          {/* Step 2: Build Attentive Audience */}
-          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-            <UsersIcon className="h-12 w-12 text-blue-600 mb-4" />
-            <h3 className="text-xl font-semibold mb-4 text-blue-600">Step 2 - Build Attentive Audience</h3>
-            <p className="text-gray-700 text-center">
-              Grow an engaged text marketing contact list with QR codes, embedded sign-up forms, Keywords, and Team Inbox.
-            </p>
-          </div>
+      {/* Benefits Section */}
+      <div className="mt-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 px-6">
+        {[
+          { icon: <CheckCircleIcon className="h-14 w-14 text-yellow-300 mb-4" />, title: "No Hidden Fees", text: "Transparent pricing with zero hidden charges." },
+          { icon: <CogIcon className="h-14 w-14 text-yellow-300 mb-4" />, title: "Opt-In Tools", text: "Easily grow your audience with intuitive opt-in tools." },
+          { icon: <UserGroupIcon className="h-14 w-14 text-yellow-300 mb-4" />, title: "Unlimited Contacts", text: "No limits on the number of contacts you can store." },
+          { icon: <BellIcon className="h-14 w-14 text-yellow-300 mb-4" />, title: "Contact Management", text: "Effortlessly manage and segment your contacts." },
+          { icon: <CloudIcon className="h-14 w-14 text-yellow-300 mb-4" />, title: "Message Automations", text: "Automate SMS campaigns and keep your audience engaged." },
+        ].map((benefit, index) => (
+          <motion.div
+            key={index}
+            className="bg-white p-8 rounded-xl shadow-lg text-blue-900 flex flex-col items-center hover:shadow-2xl transition-all duration-300"
+            whileHover={{ scale: 1.05 }}
+          >
+            {benefit.icon}
+            <h3 className="text-lg font-bold mb-3 text-blue-800">{benefit.title}</h3>
+            <p className="text-gray-700 text-center">{benefit.text}</p>
+          </motion.div>
+        ))}
+      </div>
 
-          {/* Step 3: Craft Effective Texts */}
-          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-            <ChatIcon className="h-12 w-12 text-blue-600 mb-4" />
-            <h3 className="text-xl font-semibold mb-4 text-blue-600">Step 3 - Craft Effective Texts</h3>
-            <p className="text-gray-700 text-center">
-              Engage contacts with SMS and MMS that delight and drive action, powered by AI Compose, smart scheduling, and a free image gallery and editor.
-            </p>
-          </div>
-        </div>
-
-        {/* Benefits */}
-        <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
-          {/* Benefit 1: No Hidden Fees */}
-          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-            <CheckCircleIcon className="h-12 w-12 text-blue-600 mb-4" />
-            <h3 className="text-lg font-semibold mb-4 text-blue-600">No Hidden Fees</h3>
-            <p className="text-gray-700 text-center">No surprise charges. Transparent pricing with no hidden fees.</p>
-          </div>
-
-          {/* Benefit 2: Opt-In Tools */}
-          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-            <CogIcon className="h-12 w-12 text-blue-600 mb-4" />
-            <h3 className="text-lg font-semibold mb-4 text-blue-600">Opt-In Tools</h3>
-            <p className="text-gray-700 text-center">Use our easy-to-use opt-in tools to grow your audience.</p>
-          </div>
-
-          {/* Benefit 3: Unlimited Contacts */}
-          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-            <UserGroupIcon className="h-12 w-12 text-blue-600 mb-4" />
-            <h3 className="text-lg font-semibold mb-4 text-blue-600">Unlimited Contacts</h3>
-            <p className="text-gray-700 text-center">No limits on the number of contacts you can add to your list.</p>
-          </div>
-
-          {/* Benefit 4: Contact Management */}
-          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-            <BellIcon className="h-12 w-12 text-blue-600 mb-4" />
-            <h3 className="text-lg font-semibold mb-4 text-blue-600">Contact Management</h3>
-            <p className="text-gray-700 text-center">Effortlessly manage your contacts with our simple dashboard.</p>
-          </div>
-
-          {/* Benefit 5: Message Automations */}
-          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-            <CloudIcon className="h-12 w-12 text-blue-600 mb-4" />
-            <h3 className="text-lg font-semibold mb-4 text-blue-600">Message Automations</h3>
-            <p className="text-gray-700 text-center">Automate your messaging to keep your audience engaged effortlessly.</p>
-          </div>
-        </div>
+      {/* CTA Button */}
+      <div className="text-center mt-16">
+        <motion.button
+          className="bg-yellow-400 text-blue-900 px-8 py-4 text-lg font-bold rounded-full shadow-lg hover:bg-yellow-300 transition-all duration-300"
+          whileHover={{ scale: 1.1 }}
+        >
+          Get Started Today
+        </motion.button>
       </div>
     </section>
   );
