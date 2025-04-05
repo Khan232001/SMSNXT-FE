@@ -1,0 +1,53 @@
+.wave-background {
+    position: relative;
+    background: linear-gradient(45deg, #22577E, #5584AC, #95D1CC, #FAFFAF);
+    background-size: 300% 300%;
+    animation: gradient-wave 10s ease infinite;
+  }
+  
+  @keyframes gradient-wave {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  /* Mobile-first responsive design */
+.flex {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.h-screen {
+  height: 100vh;
+}
+
+.login-left {
+  padding: 2rem;
+}
+
+
+.wave-background h3,
+.wave-background p {
+  text-align: center;
+}
+
+@media (min-width: 1024px) {
+  .flex {
+    flex-wrap: nowrap;
+  }
+
+  .login-left {
+    justify-content: center;
+    align-items: center;
+  }
+
+  .wave-background h3,
+  .wave-background p {
+    text-align: left;
+  }
+}
