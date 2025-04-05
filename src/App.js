@@ -55,6 +55,8 @@ import Usecase from "./components/Usecase";
 import Compaigndetails from "./components/Compaigndetails";
 import Samplemessages from "./components/Samplemessages";
 import Summary from "./components/Summary";
+import Signupquest from "./components/Signupquest";
+import Otpverify from "./components/Otpverify";
 // Stripe Setup
 const stripePromise = loadStripe("your-publishable-key-here");
 
@@ -104,7 +106,8 @@ function handleCollapse() {
           <Route path="/Compaigndetails" element={<Compaigndetails />} />
           <Route path="/samplemessages" element={<Samplemessages />} />
           <Route path="/summary" element={<Summary />} />
-
+          <Route path="/signupquest" element={<Signupquest />} />
+          <Route path="/otpverify" element={<Otpverify />} />
               {/* Messaging Nested Routes */}
               <Route path="messaging">
                 <Route index element={<Conversations />} />
