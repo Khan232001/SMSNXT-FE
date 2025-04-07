@@ -5,6 +5,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { AuthProvider } from "./context/AuthContext";
 
 // Pages
+import AddStaff from "./pages/admin/AddStaff";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserDashboard from "./pages/user/Dashboard";
 import Campaigns from "./pages/admin/Campaigns";
@@ -47,7 +48,6 @@ import ChatMessage from "./pages/user/ChatMessage";
 import ScheduledMessages from "./components/ScheduledMessages";
 import Conversations from "./components/Conversations";
 import ChatWindow from "./components/ChatWindow";
-import WelcomePage from "./components/Welcome";
 import Welcome from "./components/Welcome";
 
 // Stripe Setup
@@ -56,9 +56,9 @@ const stripePromise = loadStripe("your-publishable-key-here");
 function App() {
   const [collapsed, setCollapsed] = useState(false);
 
-function handleCollapse() {
-  setCollapsed(!collapsed);
-}
+  function handleCollapse() {
+    setCollapsed(!collapsed);
+  }
 
   return (
     <Elements stripe={stripePromise}>
@@ -69,14 +69,14 @@ function handleCollapse() {
             <Route path="sign" element={<SignUp />} />
             <Route path="login" element={<Login />} />
 
-      
+            {/* Public Routes */}
             <Route index element={<Home />} />
             <Route
               path="/"
               element={<UserLayout collapsed={collapsed} toggleCollapse={handleCollapse} />}
             >
               <Route index path="getting-started" element={<Welcome />} />
-              <Route  path="dashboard" element={<UserDashboard />} />
+              <Route path="dashboard" element={<UserDashboard />} />
               <Route path="compose" element={<ChatMessage />} />
               <Route path="templates" element={<Templates />} />
               <Route path="contact" element={<Contact />} />
@@ -106,19 +106,20 @@ function handleCollapse() {
             <Route path="/admin">
               <Route path="login" element={<AdminLogin />} />
               <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="senderids" element={<SenderIDs />} />
-              <Route path="reports" element={<Reports />} />
-              <Route path="plans" element={<Plans />} />
-              <Route path="payments" element={<Payments />} />
+              <Route path="staff/create" element={<AddStaff />} /> 
+              <Route path="staff-management" element={<StaffManagement />} />
               <Route path="campaigns" element={<Campaigns />} />
               <Route path="customers" element={<Customers />} />
               <Route path="orders" element={<Orders />} />
-              <Route path="staff-management" element={<StaffManagement />} />
+              <Route path="payments" element={<Payments />} />
+              <Route path="plans" element={<Plans />} />
+              <Route path="reports" element={<Reports />} />
+              <Route path="senderids" element={<SenderIDs />} />
               <Route path="campaign-management" element={<CampaignManagementAdmin />} />
-              <Route path="system-settings" element={<Settings />} />
-              <Route path="sms-gateway" element={<SmsGateway />} />
               <Route path="tags-management" element={<TagsManagementAdmin />} />
               <Route path="contact-management" element={<ContactManagementAdmin />} />
+              <Route path="system-settings" element={<Settings />} />
+              <Route path="sms-gateway" element={<SmsGateway />} />
             </Route>
 
             {/* Catch-all Route */}

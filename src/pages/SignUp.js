@@ -6,6 +6,7 @@ import "./Login.css";
 const Login3 = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -39,8 +40,9 @@ const Login3 = () => {
       const response = await api.post("/user/signup", {
         firstName,
         lastName,
+        company, // 
         email,
-        phoneNumber: phone, 
+        phoneNumber: phone,
         password,
         role: 'user',
       });
@@ -104,6 +106,22 @@ const Login3 = () => {
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+          <div className="mb-4">
+  <label
+    className="block text-gray-700 text-lg font-bold mb-2"
+    htmlFor="company"
+  >
+    Company
+  </label>
+  <input
+    id="company"
+    type="text"
+    placeholder="Company Inc."
+    value={company}
+    onChange={(e) => setCompany(e.target.value)}
+    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+</div>
 
           <div className="mb-4">
             <label
