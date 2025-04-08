@@ -32,6 +32,11 @@ const messageStats = [
 
 const Dashboard = () => {
   const navigate = useNavigate()
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const toggleDrawer = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
+
   return (
     <div className="p-8 mt-6">
       <Grid container spacing={3} alignItems="center">

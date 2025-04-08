@@ -1,3 +1,8 @@
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+
 import React, { useState } from "react";
 import {
   Box,
@@ -27,11 +32,37 @@ const TextMessageForm = () => {
   const [message, setMessage] = useState("");
   const [recipients, setRecipients] = useState("");
   const [senderId, setSenderId] = useState("");
-
+  const [scheduleTime, setScheduleTime] = useState(dayjs());
+  
   console.log(message)
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-   setMessage(e.target.value)
+  
+    const payload = {
+      recipients,
+      senderId,
+      message,
+      scheduleTime: scheduleTime.format("YYYY-MM-DD HH:mm:ss"),
+    };
+  
+    console.log("Submitting payload:", payload);
+  
+    try {
+      const res = await fetch("http://localhost:5000/api/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      const result = await res.json();
+      console.log("Response from backend:", result);
+      alert("Message sent successfully!");
+    } catch (err) {
+      console.error("Error sending message:", err);
+      alert("Failed to send message.");
+    }
   };
 
   return (
@@ -66,159 +97,116 @@ const TextMessageForm = () => {
           borderRadius: 2,
         }}
       >
-        <form onSubmit={handleSubmit}>
-          {/* Recipients Section */}
-          <Box mb={3}>
-            <Typography
-              variant="subtitle2"
-              sx={{ fontWeight: 600, mb: 1, color: "text.primary" }}
-            >
-              To
-            </Typography>
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Start typing a number or contact name"
-              value={recipients}
-              onChange={(e) => setRecipients(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <FormatListBulleted color="action" />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Box>
+      <form onSubmit={handleSubmit}>
+  <Grid container spacing={2}>
+    {/* LEFT SIDE: Form Fields */}
+    <Grid item xs={12} md={8}>
+      {/* To Field */}
+      <Box mb={3}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: "text.primary" }}>
+          To
+        </Typography>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Start typing a number or contact name"
+          value={recipients}
+          onChange={(e) => setRecipients(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <FormatListBulleted color="action" />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
 
-          {/* Sender Section */}
-          <Box mb={3}>
-            <Typography
-              variant="subtitle2"
-              sx={{ fontWeight: 600, mb: 1, color: "text.primary" }}
-            >
-              From
-            </Typography>
-            <Select
-              fullWidth
-              value={senderId}
-              onChange={(e) => setSenderId(e.target.value)}
-              displayEmpty
-              renderValue={(selected) =>
-                selected || "Default sender settings (recommended)"
-              }
-            >
-              <MenuItem value="DEFAULT">
-                Default sender settings (recommended)
-              </MenuItem>
-              <MenuItem value="CUSTOM">Custom Sender ID</MenuItem>
-            </Select>
-          </Box>
+      {/* From Field */}
+      <Box mb={3}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: "text.primary" }}>
+          From
+        </Typography>
+        <Select
+          fullWidth
+          value={senderId}
+          onChange={(e) => setSenderId(e.target.value)}
+          displayEmpty
+          renderValue={(selected) =>
+            selected || "Default sender settings (recommended)"
+          }
+        >
+          <MenuItem value="DEFAULT">Default sender settings (recommended)</MenuItem>
+          <MenuItem value="CUSTOM">Custom Sender ID</MenuItem>
+        </Select>
+      </Box>
 
-          {/* Message Section */}
-          <Box mb={3}>
-            <Typography
-              variant="subtitle2"
-              sx={{ fontWeight: 600, mb: 1, color: "text.primary" }}
-            >
-              Message
-            </Typography>
-            <TextField
-              fullWidth
-              multiline
-              minRows={4}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type your message"
-              sx={{ mb: 1 }}
-            />
+      {/* Message Field */}
+      <Box mb={3}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: "text.primary" }}>
+          Message
+        </Typography>
+        <TextField
+          fullWidth
+          multiline
+          minRows={4}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Type your message"
+          sx={{ mb: 1 }}
+        />
+        <Typography variant="caption" sx={{ color: "text.secondary" }}>
+          Characters: {message.length}/918 | Parts: {Math.ceil(message.length / 153)}/6 | Cost: ${(
+            Math.ceil(message.length / 153) * 0.01
+          ).toFixed(2)}
+        </Typography>
+      </Box>
 
-            {/* Message Controls */}
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-              <Grid item xs={6}>
-                <List
-                  dense
-                  sx={{
-                    border: "1px solid",
-                    borderColor: "divider",
-                    borderRadius: 1,
-                  }}
-                >
-                  <ListItem>
-                    <ListItemText primary="Contacts" />
-                  </ListItem>
-                  <Divider />
-                  <ListItem button>
-                    <ListItemText primary="Segments" />
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="Frequently sent" />
-                  </ListItem>
-                </List>
-              </Grid>
+      {/* Schedule Picker */}
+      <Box mb={3}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: "text.primary" }}>
+          Schedule
+        </Typography>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateTimePicker
+            label="Select date & time"
+            value={scheduleTime}
+            onChange={(newValue) => setScheduleTime(newValue)}
+            sx={{ width: "100%" }}
+          />
+        </LocalizationProvider>
+      </Box>
 
-              <Grid item xs={6}>
-                <List
-                  dense
-                  sx={{
-                    border: "1px solid",
-                    borderColor: "divider",
-                    borderRadius: 1,
-                  }}
-                >
-                  <ListItem>
-                    <ListItemText primary="Sensor settings" />
-                  </ListItem>
-                  <Divider />
-                  <ListItem button>
-                    <ListItemText primary="Insert template" />
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="Add dynamic field" />
-                  </ListItem>
-                  <ListItem button>
-                    <ListItemText primary="Attach file" />
-                  </ListItem>
-                </List>
-              </Grid>
-            </Grid>
+      {/* Action Buttons */}
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Button variant="outlined" startIcon={<Schedule />} sx={{ textTransform: "none", color: "text.primary" }}>
+          Schedule message
+        </Button>
+        <Button type="submit" variant="contained" startIcon={<Send />} sx={{ textTransform: "none" }}>
+          Send now
+        </Button>
+      </Box>
+    </Grid>
 
-            {/* Message Footer */}
-            <Typography variant="caption" sx={{ color: "text.secondary" }}>
-              Characters: {message.length}/918 | Parts:{" "}
-              {Math.ceil(message.length / 153)}/6 | Cost: $
-              {(Math.ceil(message.length / 153) * 0.01).toFixed(2)}
-            </Typography>
-          </Box>
+    {/* RIGHT SIDE: Message Controls */}
+    <Grid item xs={12} md={4}>
+      <List dense sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, mb: 2 }}>
+        <ListItem><ListItemText primary="Contacts" /></ListItem>
+        <Divider />
+        <ListItem button><ListItemText primary="Segments" /></ListItem>
+        <ListItem button><ListItemText primary="Frequently sent" /></ListItem>
+      </List>
 
-          {/* Action Buttons */}
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Button
-              variant="outlined"
-              startIcon={<Schedule />}
-              sx={{ textTransform: "none", color: "text.primary" }}
-            >
-              Schedule message
-            </Button>
-
-            <Box>
-              <Button
-                type="submit"
-                variant="contained"
-                startIcon={<Send />}
-                sx={{ textTransform: "none", ml: 1 }}
-              >
-                Send now
-              </Button>
-            </Box>
-          </Box>
-        </form>
+      <List dense sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1 }}>
+        <ListItem><ListItemText primary="Sensor settings" /></ListItem>
+        <Divider />
+        <ListItem button><ListItemText primary="Insert template" /></ListItem>
+        <ListItem button><ListItemText primary="Add dynamic field" /></ListItem>
+        <ListItem button><ListItemText primary="Attach file" /></ListItem>
+      </List>
+    </Grid>
+  </Grid>
+</form>
       </Paper>
     </Box>
   );
