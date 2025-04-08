@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Person, Email, Lock, Phone } from "@mui/icons-material";
-
+import { Link } from "react-router-dom";
 const Signup = () => {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -109,13 +109,14 @@ const Signup = () => {
             />
             <label className="text-sm">I consent to be contacted.</label>
           </div>
-
+          <Link to='/signupquest'>
           <button
             type="submit"
             className="w-full bg-yellow-400 text-black font-semibold py-2 rounded-lg hover:bg-yellow-300 transition-all duration-200 shadow-lg"
           >
             Sign Up
           </button>
+          </Link>
         </form>
 
         <p className="text-sm text-center mt-4">

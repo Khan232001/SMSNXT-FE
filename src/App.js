@@ -57,6 +57,13 @@ import Samplemessages from "./components/Samplemessages";
 import Summary from "./components/Summary";
 import Signupquest from "./components/Signupquest";
 import Otpverify from "./components/Otpverify";
+import WelcomeSMSNXT from "./components/WelcomeSMSNXT";
+import Step1 from "./components/Step1";
+import Step2 from "./components/Step2";
+import Step3 from "./components/Step3";
+import Lastthing from "./components/Lastthing";
+import Intro from "./components/Intro";
+import Lastpage from './components/Lastpage';
 // Stripe Setup
 const stripePromise = loadStripe("your-publishable-key-here");
 
@@ -108,6 +115,22 @@ function handleCollapse() {
           <Route path="/summary" element={<Summary />} />
           <Route path="/signupquest" element={<Signupquest />} />
           <Route path="/otpverify" element={<Otpverify />} />
+          <Route path="/welcomesmsnxt" element={<WelcomeSMSNXT />} />
+          <Route path="/step1" element={<Step1 />} />
+          <Route path="/step2" element={<Step2 />} />
+          <Route path="/step3" element={<Step3 />} />
+          <Route path="/lastthing" element={<Lastthing />} />
+          <Route path="/intro" element={<Intro />} />
+          <Route path="/lastpage" element={<Lastpage />} />
+
+
+
+
+
+
+
+
+
               {/* Messaging Nested Routes */}
               <Route path="messaging">
                 <Route index element={<Conversations />} />
