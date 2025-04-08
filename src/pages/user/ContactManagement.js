@@ -8,7 +8,8 @@ const ContactManagement = () => {
   const [contacts, setContacts] = useState([]);
   const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
   const [isEditContactModalOpen, setIsEditContactModalOpen] = useState(false);
-
+  const [dragActive, setDragActive] = useState(false);
+  const [importStep, setImportStep] = useState(1); // 
   // States for adding a contact
   const [newContactName, setNewContactName] = useState('');
   const [newContactEmail, setNewContactEmail] = useState('');
@@ -45,6 +46,45 @@ const ContactManagement = () => {
       Authorization: `Bearer ${token}`,
     },
   };
+
+
+
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type === 'text/csv' || file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
+        setSelectedFile(file);
+      } else {
+        alert('Please upload a CSV or Excel file');
+      }
+    }
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.type === 'text/csv' || file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
+        setSelectedFile(file);
+      } else {
+        alert('Please upload a CSV or Excel file');
+      }
+    }
+  };
+
 
   const fetchContacts = async () => {
     try {
@@ -234,7 +274,7 @@ const ContactManagement = () => {
               onClick={() => setIsImportModalOpen(true)}
               className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center"
             >
-              <span>Import & Download</span>
+              <span>Import Contacts</span>
             </button>
           </div>
         </div>
@@ -477,77 +517,284 @@ const ContactManagement = () => {
       {/* Import Modal */}
       {isImportModalOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-md w-96">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Import Contacts</h3>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Import Mode</label>
-              <div className="space-y-2">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    checked={importMode === 'importNew'}
-                    onChange={() => handleImportModeChange('importNew')}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Import new contacts only</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    checked={importMode === 'updateOnly'}
-                    onChange={() => handleImportModeChange('updateOnly')}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Update contacts only</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    checked={importMode === 'importAndUpdate'}
-                    onChange={() => handleImportModeChange('importAndUpdate')}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Import and update contacts</span>
-                </label>
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-2xl font-semibold text-gray-800">Import contacts</h3>
+                <button
+                  onClick={() => setIsImportModalOpen(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
-            </div>
 
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">CSV File</label>
-              <input
-                type="file"
-                accept=".csv"
-                onChange={(e) => setSelectedFile(e.target.files[0])}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-              />
-            </div>
+              <div className="mb-6">
+                <h4 className="text-lg font-medium text-gray-800 mb-2">Upload contact data</h4>
+                <p className="text-sm text-gray-600">Select a way how you would like to upload contacts.</p>
+              </div>
 
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
-              <Select
-                isMulti
-                options={availableTags.map(tag => ({ value: tag._id, label: tag.name }))}
-                value={selectedTags}
-                onChange={setSelectedTags}
-                className="basic-multi-select"
-                classNamePrefix="select"
-              />
-            </div>
+              {importStep === 1 && (
+                <div className="space-y-6">
+                  <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h5 className="font-medium text-gray-800 mb-3">Upload a file</h5>
+                    <p className="text-sm text-gray-600 mb-4">Upload a file with contacts phone numbers, names, organization etc.</p>
 
-            <div className="flex justify-between mt-6">
-              <button
-                onClick={() => setIsImportModalOpen(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleImportCSV}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Import
-              </button>
+                    <div
+                      className={`border-2 border-dashed rounded-lg p-8 text-center ${dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
+                      onDragEnter={handleDrag}
+                      onDragLeave={handleDrag}
+                      onDragOver={handleDrag}
+                      onDrop={handleDrop}
+                    >
+                      {selectedFile ? (
+                        <div className="flex flex-col items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-green-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <p className="font-medium text-gray-800">{selectedFile.name}</p>
+                          <p className="text-sm text-gray-500 mt-1">{(selectedFile.size / 1024).toFixed(2)} KB</p>
+                          <button
+                            onClick={() => setSelectedFile(null)}
+                            className="mt-3 text-sm text-blue-600 hover:text-blue-800"
+                          >
+                            Change file
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <p className="font-medium text-gray-800 mb-1">Drag & drop your file here</p>
+                          <p className="text-sm text-gray-500 mb-3">or</p>
+                          <label className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 inline-block">
+                            Browse files...
+                            <input
+                              type="file"
+                              className="hidden"
+                              accept=".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                              onChange={handleFileChange}
+                            />
+                          </label>
+                          <p className="text-xs text-gray-500 mt-3">Supported file types: Excel (.xls or .xlsx) and CSV (.csv)</p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <div className="flex-1 border-t border-gray-200"></div>
+                    <span className="text-sm text-gray-500">OR</span>
+                    <div className="flex-1 border-t border-gray-200"></div>
+                  </div>
+
+                  <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h5 className="font-medium text-gray-800 mb-3">Copy and paste phone numbers</h5>
+                    <p className="text-sm text-gray-600 mb-4">Simply copy and paste multiple numbers to add many contacts at once (no field matching).</p>
+                    <textarea
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder="Paste phone numbers here, one per line..."
+                    ></textarea>
+                  </div>
+
+                 
+                </div>
+              )}
+
+              {importStep === 2 && (
+                <div className="space-y-6">
+                  <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h5 className="font-medium text-gray-800 mb-4">Map your fields</h5>
+                    <p className="text-sm text-gray-600 mb-4">Match your file's columns to the correct contact fields.</p>
+
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="font-medium text-sm text-gray-700">File Column</div>
+                        <div className="font-medium text-sm text-gray-700">Contact Field</div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 items-center">
+                        <div className="text-sm text-gray-600">Name</div>
+                        <Select
+                          options={[
+                            { value: 'name', label: 'Name' },
+                            { value: 'email', label: 'Email' },
+                            { value: 'phone', label: 'Phone' },
+                            { value: 'tag', label: 'Tag' }
+                          ]}
+                          defaultValue={{ value: 'name', label: 'Name' }}
+                          className="basic-select"
+                          classNamePrefix="select"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 items-center">
+                        <div className="text-sm text-gray-600">Email Address</div>
+                        <Select
+                          options={[
+                            { value: 'name', label: 'Name' },
+                            { value: 'email', label: 'Email' },
+                            { value: 'phone', label: 'Phone' },
+                            { value: 'tag', label: 'Tag' }
+                          ]}
+                          defaultValue={{ value: 'email', label: 'Email' }}
+                          className="basic-select"
+                          classNamePrefix="select"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 items-center">
+                        <div className="text-sm text-gray-600">Phone</div>
+                        <Select
+                          options={[
+                            { value: 'name', label: 'Name' },
+                            { value: 'email', label: 'Email' },
+                            { value: 'phone', label: 'Phone' },
+                            { value: 'tag', label: 'Tag' }
+                          ]}
+                          defaultValue={{ value: 'phone', label: 'Phone' }}
+                          className="basic-select"
+                          classNamePrefix="select"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h5 className="font-medium text-gray-800 mb-3">Import Options</h5>
+                    <div className="space-y-3">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          checked={importMode === 'importNew'}
+                          onChange={() => handleImportModeChange('importNew')}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Import new contacts only (skip duplicates)</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          checked={importMode === 'updateOnly'}
+                          onChange={() => handleImportModeChange('updateOnly')}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Update existing contacts only</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          checked={importMode === 'importAndUpdate'}
+                          onChange={() => handleImportModeChange('importAndUpdate')}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Import new and update existing contacts</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h5 className="font-medium text-gray-800 mb-3">Add Tags</h5>
+                    <Select
+                      isMulti
+                      options={availableTags.map(tag => ({ value: tag._id, label: tag.name }))}
+                      value={selectedTags}
+                      onChange={setSelectedTags}
+                      className="basic-multi-select"
+                      classNamePrefix="select"
+                      placeholder="Select tags to apply to all imported contacts..."
+                    />
+                  </div>
+                </div>
+              )}
+
+              {importStep === 3 && (
+                <div className="space-y-6">
+                  <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h5 className="font-medium text-gray-800 mb-4">Review and Import</h5>
+
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-sm text-gray-600">File Name:</div>
+                        <div className="text-sm font-medium text-gray-800">{selectedFile?.name}</div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-sm text-gray-600">File Size:</div>
+                        <div className="text-sm font-medium text-gray-800">{(selectedFile?.size / 1024).toFixed(2)} KB</div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-sm text-gray-600">Import Mode:</div>
+                        <div className="text-sm font-medium text-gray-800">
+                          {importMode === 'importNew' && 'Import new contacts only'}
+                          {importMode === 'updateOnly' && 'Update existing contacts only'}
+                          {importMode === 'importAndUpdate' && 'Import new and update existing'}
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-sm text-gray-600">Tags to Apply:</div>
+                        <div className="text-sm font-medium text-gray-800">
+                          {selectedTags.length > 0
+                            ? selectedTags.map(tag => tag.label).join(', ')
+                            : 'No tags selected'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="flex items-start">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
+                      </svg>
+                      <p className="text-sm text-blue-700">
+                        <span className="font-medium">Note:</span> This action cannot be undone. We'll import {selectedFile?.name} with the selected settings.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-between mt-8">
+                {importStep > 1 ? (
+                  <button
+                    onClick={() => setImportStep(importStep - 1)}
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                  >
+                    Back
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setIsImportModalOpen(false)}
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                  >
+                    Cancel
+                  </button>
+                )}
+
+                {importStep < 3 ? (
+                  <button
+                    onClick={() => setImportStep(importStep + 1)}
+                    disabled={!selectedFile}
+                    className={`px-4 py-2 rounded-md ${selectedFile ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleImportCSV}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                    Import Contacts
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
