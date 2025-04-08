@@ -1,101 +1,102 @@
-import React from 'react';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
 
 const MarketingCards = () => {
+  const [zoomedCard, setZoomedCard] = useState(null);
+
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-semibold text-gray-900">
-            Text messaging marketing has never been easier
+    <section className="py-12 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-10">
+          <h2 className="text-4xl font-bold text-gray-900">
+            Elevate Your SMS Marketing 🚀
           </h2>
-          <p className="text-xl text-gray-600 mt-4">
-            Unlock your full potential with flexibility, control, and performance you won't find anywhere else.
+          <p className="text-lg text-gray-600 mt-2">
+            Engage customers with full-screen, high-quality visuals & animations.
           </p>
         </div>
 
-        {/* Marketing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Retail Text Marketing */}
-          <div className="bg-blue-100 p-6 rounded-lg shadow-lg flex flex-col items-start">
-            <p className="text-lg text-gray-800 mb-4">
-              Thanks for joining our mobile club. Come in today, and receive 20% off any purchase in the store. Show this text and also get a coupon for your next visit.
-            </p>
-            <div className="flex items-center space-x-2">
-              <span className="bg-blue-500 text-white rounded-full p-2">
-                <i className="fas fa-tag"></i>
-              </span>
-              <span className="text-blue-500 font-semibold">Retail Text Marketing</span>
-            </div>
-          </div>
+        {/* Marketing Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {cardsData.map((card, index) => (
+            <motion.div
+              key={index}
+              className={`relative p-6 rounded-2xl shadow-lg cursor-pointer bg-white transition-all 
+                ${zoomedCard === index ? "scale-110 z-50 shadow-2xl" : "hover:scale-105"}`}
+              onClick={() => setZoomedCard(zoomedCard === index ? null : index)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.4 }}
+            >
+              <div className="flex items-center mb-4">
+                <span className={`text-white p-3 rounded-full ${card.iconBg}`}>
+                  <i className={`${card.icon} text-2xl`}></i>
+                </span>
+                <span className="ml-4 text-2xl font-semibold text-gray-800">
+                  {card.title}
+                </span>
+              </div>
+              <p className="text-gray-700 mb-4 text-lg">{card.description}</p>
 
-          {/* School SMS Text Messaging */}
-          <div className="bg-green-100 p-6 rounded-lg shadow-lg flex flex-col items-start">
-            <p className="text-lg text-gray-800 mb-4">
-              Reminder to all parents of Mesa Elementary School. Tomorrow is minimum day. Please pick up your kid's by 12 noon. And all homework is due tomorrow as well.
-            </p>
-            <div className="flex items-center space-x-2">
-              <span className="bg-green-500 text-white rounded-full p-2">
-                <i className="fas fa-school"></i>
-              </span>
-              <span className="text-green-500 font-semibold">School SMS Text Messaging</span>
-            </div>
-          </div>
-
-          {/* Sales SMS Text Marketing */}
-          <div className="bg-purple-100 p-6 rounded-lg shadow-lg flex flex-col items-start">
-            <p className="text-lg text-gray-800 mb-4">
-              Come to our website today and get 20% off all Apple iPhone accessories and 10% off Apple Watches. Use code APW20 when checking out.
-            </p>
-            <div className="flex items-center space-x-2">
-              <span className="bg-purple-500 text-white rounded-full p-2">
-                <i className="fas fa-shopping-cart"></i>
-              </span>
-              <span className="text-purple-500 font-semibold">Sales SMS Text Marketing</span>
-            </div>
-          </div>
-
-          {/* Restaurant Text Marketing */}
-          <div className="bg-yellow-100 p-6 rounded-lg shadow-lg flex flex-col items-start">
-            <p className="text-lg text-gray-800 mb-4">
-              Text members: Republic Brewery just tapped Pliny the Younger beer! Come in before 5 PM and get $2 off any craft beer on tap. Show this text.
-            </p>
-            <div className="flex items-center space-x-2">
-              <span className="bg-yellow-500 text-white rounded-full p-2">
-                <i className="fas fa-utensils"></i>
-              </span>
-              <span className="text-yellow-500 font-semibold">Restaurant Text Marketing</span>
-            </div>
-          </div>
-
-          {/* SMS Appointment Reminders */}
-          <div className="bg-orange-100 p-6 rounded-lg shadow-lg flex flex-col items-start">
-            <p className="text-lg text-gray-800 mb-4">
-              Reminder: Jacqueline Burns. Your dentist appointment with Dr. Smith is tomorrow at 12 noon. Please don’t be late. We look forward to seeing you!
-            </p>
-            <div className="flex items-center space-x-2">
-              <span className="bg-orange-500 text-white rounded-full p-2">
-                <i className="fas fa-calendar-check"></i>
-              </span>
-              <span className="text-orange-500 font-semibold">SMS Appointment Reminders</span>
-            </div>
-          </div>
-
-          {/* Lead Generation SMS */}
-          <div className="bg-teal-100 p-6 rounded-lg shadow-lg flex flex-col items-start">
-            <p className="text-lg text-gray-800 mb-4">
-              Rates are at an all-time low. Call us today at (212) 555-5555 to see how you can qualify. Or click here to get an instant quote.
-            </p>
-            <div className="flex items-center space-x-2">
-              <span className="bg-teal-500 text-white rounded-full p-2">
-                <i className="fas fa-users"></i>
-              </span>
-              <span className="text-teal-500 font-semibold">Lead Generation SMS</span>
-            </div>
-          </div>
-        </div>
-      </div>
+              {/* Full-Width High-Resolution Image */}
+              <motion.div className="rounded-xl overflow-hidden border border-gray-300 shadow-md w-full">
+        <img
+          src={card.image}
+          alt="Marketing Preview"
+          className="w-full h-auto object-cover"
+        />
+      </motion.div>
+    </motion.div>
+  ))}  {/* <-- Correctly closed .map() function */}
+</div>
+</div>
     </section>
   );
 };
+
+const cardsData = [
+  {
+    title: "Retail SMS Marketing",
+    description: "Join our mobile club & get 20% off! Show this text for an extra coupon.",
+    icon: "fas fa-tag",
+    iconBg: "bg-blue-600",
+    image: "https://www.firetext.co.uk/blog/wp-content/uploads/2020/06/SMS-marketing-for-retailers-after-Covid-3.png",
+  },
+  {
+    title: "School SMS Alerts",
+    description: "Reminder: Tomorrow is a minimum day. Pick up kids by 12 noon!",
+    icon: "fas fa-school",
+    iconBg: "bg-green-600",
+    image: 'https://media.gatsia.com/unsafe/fit-in/437x0/filters:format(png):quality(80)/bucket-prod.jecreemavitrine.fr/uploads/sites/151/2023/11/Image-5.png',
+  },
+  {
+    title: "E-Commerce Sales SMS",
+    description: "Get 20% off Apple accessories! Use code APW20 at checkout.",
+    icon: "fas fa-shopping-cart",
+    iconBg: "bg-purple-600",
+    image: "https://blog.wishpond.com/wp-content/uploads/2020/03/image2-6.png.webp",
+  },
+  {
+    title: "Restaurant Promotions",
+    description: "Happy Hour! Show this text to get $2 off any craft beer on tap.",
+    icon: "fas fa-utensils",
+    iconBg: "bg-yellow-600",
+    image: "https://blog.wishpond.com/wp-content/uploads/2020/03/image2-6.png.webp",
+  },
+  {
+    title: "Appointment Reminders",
+    description: "Reminder: Dentist appointment at 12 PM tomorrow. Don't be late!",
+    icon: "fas fa-calendar-check",
+    iconBg: "bg-orange-600",
+    image: "https://lh7-us.googleusercontent.com/NKyIw7X5eamfIun9Lfg6-Xzdtl7zPDNSg-UYGsCHw3K-tdpzC3qt5mQ7wP_3GCHn2JVpi8xgoDHyh73CJOfthCTPBQgYtsq54Ofd1vMvF1HNVSlPEjMlHoL3-xNb5rmJp1DeMqBhhbZlyy1GZfIKgiI",
+  },
+  {
+    title: "Real Estate SMS Leads",
+    description: "Home prices are rising! Get an instant valuation of your home now.",
+    icon: "fas fa-home",
+    iconBg: "bg-teal-600",
+    image: "https://leadferno.com/wp-content/uploads/sales-follow-up-text.png",
+  },
+];
 
 export default MarketingCards;

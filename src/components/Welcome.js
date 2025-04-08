@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from 'react-router-dom';
 import {
     Button,
     Card,
@@ -185,6 +186,7 @@ const Welcome = () => {
                                 <li><Typography variant="body2">Voice/SMS capabilities</Typography></li>
                                 <li><Typography variant="body2">Call forwarding</Typography></li>
                             </ul>
+                            <Link to="/modal">
                             <Button
                                 variant="outlined"
                                 fullWidth
@@ -193,6 +195,7 @@ const Welcome = () => {
                             >
                                 Choose Local Number
                             </Button>
+                            </Link>
                         </CardContent>
                     </Card>
                 </Grid>

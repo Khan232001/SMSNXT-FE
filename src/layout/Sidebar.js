@@ -38,15 +38,13 @@ const sidebarItems = [
   { label: "Getting Started", icon: <RocketLaunch />, href: "/getting-started" }, // Updated with RocketLaunch icon
   { label: "Dashboard", icon: <Dashboard />, href: "/dashboard" },
   { label: "Compose", icon: <Mail />, href: "/compose" },
-  { label: "Two way Messaging", icon: <Message />, href: "/messaging" },
+  { label: "Messages", icon: <Message />, href: "/messaging" },
   { label: "Campaign", icon: <Campaign />, href: "/campaign" },
   { label: "Subscriptions", icon: <People />, href: "/subscription-plans" },
   { label: "Contacts", icon: <People />, href: "/contact-management" },
   { label: "Templates", icon: <Folder />, href: "/templates" },
   { label: "Reports", icon: <PieChart />, href: "/reporting" },
-  { label: 'Tags', icon: <Settings />, href: '/tags-management' },
-  { label: 'Guides', icon: <Dashboard />, href: '' },
-  // { label: "Admin", icon: <Settings />, href: "/admin/dashboard" },
+  { label: "Admin", icon: <Settings />, href: "/admin/dashboard" },
 ];
 
 const tabItemsMap = [
@@ -75,7 +73,7 @@ const tabItemsMap = [
   },
 ];
 
-export default function Sidebar({ collapsed, toggleCollapse, hiddenRoutes = []}) {
+export default function Sidebar({ collapsed, toggleCollapse, hiddenRoutes = ["/login", "/sign", "/forgot-password"] }) {
 
 
   const location = useLocation();

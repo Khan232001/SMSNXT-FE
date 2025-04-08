@@ -5,7 +5,6 @@ import { loadStripe } from "@stripe/stripe-js";
 import { AuthProvider } from "./context/AuthContext";
 
 // Pages
-import AddStaff from "./pages/admin/AddStaff";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserDashboard from "./pages/user/Dashboard";
 import Campaigns from "./pages/admin/Campaigns";
@@ -48,17 +47,25 @@ import ChatMessage from "./pages/user/ChatMessage";
 import ScheduledMessages from "./components/ScheduledMessages";
 import Conversations from "./components/Conversations";
 import ChatWindow from "./components/ChatWindow";
+import WelcomePage from "./components/Welcome";
 import Welcome from "./components/Welcome";
-
+import Modal from "./components/Modal";
+import Businesspage from "./components/Businesspage";
+import Usecase from "./components/Usecase";
+import Compaigndetails from "./components/Compaigndetails";
+import Samplemessages from "./components/Samplemessages";
+import Summary from "./components/Summary";
+import Signupquest from "./components/Signupquest";
+import Otpverify from "./components/Otpverify";
 // Stripe Setup
 const stripePromise = loadStripe("your-publishable-key-here");
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
 
-  function handleCollapse() {
-    setCollapsed(!collapsed);
-  }
+function handleCollapse() {
+  setCollapsed(!collapsed);
+}
 
   return (
     <Elements stripe={stripePromise}>
@@ -68,22 +75,19 @@ function App() {
             {/* Auth Routes */}
             <Route path="sign" element={<SignUp />} />
             <Route path="login" element={<Login />} />
-            <Route path="contact" element={<Contact />} />
 
-            {/* Public Routes */}
+      
             <Route index element={<Home />} />
-            <Route path="thank-you" element={<ThankYou />} />
-            <Route path="terms" element={<Terms />} />
-            <Route path="policy" element={<Policy />} />
-            <Route path="pricing" element={<Pricing />} />
             <Route
               path="/"
               element={<UserLayout collapsed={collapsed} toggleCollapse={handleCollapse} />}
             >
               <Route index path="getting-started" element={<Welcome />} />
-              <Route path="dashboard" element={<UserDashboard />} />
+              <Route  path="dashboard" element={<UserDashboard />} />
               <Route path="compose" element={<ChatMessage />} />
               <Route path="templates" element={<Templates />} />
+              <Route path="contact" element={<Contact />} />
+              <Route path="pricing" element={<Pricing />} />
               <Route path="subscription-plans" element={<SubscriptionPlans />} />
               <Route path="subscription-pricing" element={<SubscriptionPricing />} />
               <Route path="order-recharge-history" element={<OrderHistory />} />
@@ -93,7 +97,17 @@ function App() {
               <Route path="reporting" element={<Reporting />} />
               <Route path="sender-id-management" element={<SenderIDManagement />} />
               <Route path="payment" element={<PaymentForm />} />
-
+              <Route path="thank-you" element={<ThankYou />} />
+              <Route path="terms" element={<Terms />} />
+              <Route path="policy" element={<Policy />} />
+              <Route path="/modal" element={<Modal />} />
+          <Route path="/businesspage" element={<Businesspage />} />
+          <Route path="/usecase" element={<Usecase />} />
+          <Route path="/Compaigndetails" element={<Compaigndetails />} />
+          <Route path="/samplemessages" element={<Samplemessages />} />
+          <Route path="/summary" element={<Summary />} />
+          <Route path="/signupquest" element={<Signupquest />} />
+          <Route path="/otpverify" element={<Otpverify />} />
               {/* Messaging Nested Routes */}
               <Route path="messaging">
                 <Route index element={<Conversations />} />
@@ -106,20 +120,19 @@ function App() {
             <Route path="/admin">
               <Route path="login" element={<AdminLogin />} />
               <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="staff/create" element={<AddStaff />} /> 
-              <Route path="staff-management" element={<StaffManagement />} />
+              <Route path="senderids" element={<SenderIDs />} />
+              <Route path="reports" element={<Reports />} />
+              <Route path="plans" element={<Plans />} />
+              <Route path="payments" element={<Payments />} />
               <Route path="campaigns" element={<Campaigns />} />
               <Route path="customers" element={<Customers />} />
               <Route path="orders" element={<Orders />} />
-              <Route path="payments" element={<Payments />} />
-              <Route path="plans" element={<Plans />} />
-              <Route path="reports" element={<Reports />} />
-              <Route path="senderids" element={<SenderIDs />} />
+              <Route path="staff-management" element={<StaffManagement />} />
               <Route path="campaign-management" element={<CampaignManagementAdmin />} />
-              <Route path="tags-management" element={<TagsManagementAdmin />} />
-              <Route path="contact-management" element={<ContactManagementAdmin />} />
               <Route path="system-settings" element={<Settings />} />
               <Route path="sms-gateway" element={<SmsGateway />} />
+              <Route path="tags-management" element={<TagsManagementAdmin />} />
+              <Route path="contact-management" element={<ContactManagementAdmin />} />
             </Route>
 
             {/* Catch-all Route */}
