@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Mail, Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 export default function EmailVerification() {
   const [timer, setTimer] = useState(120); // 2 minutes
   const [email, setEmail] = useState("");
@@ -80,12 +80,14 @@ export default function EmailVerification() {
 
         {/* NEXT Button */}
         <div className="mt-6">
+        <Link to='/welcomesmsnxt'>
           <button
             onClick={handleNext}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md font-semibold transition"
           >
             Next
           </button>
+          </Link>
         </div>
       </div>
     </div>
