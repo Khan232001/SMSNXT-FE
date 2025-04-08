@@ -13,7 +13,14 @@ const TrialMessage = () => {
         with the carriers as an approved sender and you’ll have the full power of texting
         at your fingertips.
       </p>
-      
+       <Link to ='/intro'>
+            <button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl transition-all shadow-md mt-10"
+                  >
+                    Continue
+                  </button>
+                  </Link>
       <div className="mt-4">
         <a href="#" className="text-blue-400 text-sm hover:underline">
           Upgrade now to unlock full sending capabilities

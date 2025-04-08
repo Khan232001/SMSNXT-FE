@@ -20,12 +20,11 @@ const TrialMessage = () => {
         at your fingertips.
       </p>
 
-      <Link to="/intro">
+      
         <button className="bg-blue-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-600 transition">
           Got it! Show me around!
         </button>
-      </Link>
-
+      
       <div className="mt-4">
         <a href="#" className="text-blue-400 text-sm hover:underline">
           Upgrade now to unlock full sending capabilities
