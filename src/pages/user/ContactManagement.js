@@ -1,44 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import Select from 'react-select';
-import Tooltip from '../../components/Tooltip';
-import api from '../../utils/api';
 import Papa from 'papaparse';
+import api from '../../utils/api';
+import { useTags } from '../../context/TagsContext';
+import { useContacts } from '../../context/ContactsContext';
 
 const ContactManagement = () => {
-  const [contacts, setContacts] = useState([]);
+  const { tags: availableTags, fetchTags, setTags } = useTags();
+  const { contacts, setContacts, fetchAllContacts: fetchContacts } = useContacts();
+  console.log(contacts)
   const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
   const [isEditContactModalOpen, setIsEditContactModalOpen] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [importStep, setImportStep] = useState(1);
   const [isImporting, setIsImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
-
-  // States for adding a contact
-  const [newContact, setNewContact] = useState({
-    name: '',
-    email: '',
-    phoneNumber: '',
-    tag: ''
-  });
-
-  // States for editing a contact
-  const [editContact, setEditContact] = useState({
-    name: '',
-    email: '',
-    phoneNumber: '',
-    tag: ''
-  });
+  const [newContact, setNewContact] = useState({ name: '', email: '', phoneNumber: '', tag: '' });
+  const [editContact, setEditContact] = useState({ name: '', email: '', phoneNumber: '', tag: '' });
   const [currentContact, setCurrentContact] = useState(null);
-
-  // States for import contact
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [availableTags, setAvailableTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [importMode, setImportMode] = useState('importNew');
   const [fileError, setFileError] = useState('');
-
-  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -49,76 +33,47 @@ const ContactManagement = () => {
   }, []);
 
   const token = localStorage.getItem('token');
-  const authHeaders = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
+  const authHeaders = { headers: { Authorization: `Bearer ${token}` } };
 
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
-    }
+    if (e.type === 'dragenter' || e.type === 'dragover') setDragActive(true);
+    else if (e.type === 'dragleave') setDragActive(false);
   };
 
+  
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
     setFileError('');
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      validateFile(file);
-    }
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) validateFile(e.dataTransfer.files[0]);
   };
 
   const handleFileChange = (e) => {
     setFileError('');
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      validateFile(file);
-    }
+    if (e.target.files && e.target.files[0]) validateFile(e.target.files[0]);
   };
 
   const validateFile = (file) => {
-    if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
-      setSelectedFile(file);
-    } else {
+    if (file.type === 'text/csv' || file.name.endsWith('.csv')) setSelectedFile(file);
+    else {
       setFileError('Invalid file format. Only CSV files are allowed.');
       setSelectedFile(null);
     }
   };
 
-  const fetchContacts = async () => {
-    try {
-      const response = await api.get('/contacts', authHeaders);
-      setContacts(response.data.data || []);
-    } catch (error) {
-      console.error('Failed to fetch contacts:', error);
-    }
-  };
-
   const formatDate = (dateString) => {
     if (!dateString) return '-';
-
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return '-';
-
-    const options = { day: 'numeric', month: 'short', hour: 'numeric', minute: 'numeric', hour12: true };
-    return date.toLocaleString('en-US', options);
+    return date.toLocaleString('en-US', { day: 'numeric', month: 'short', hour: 'numeric', minute: 'numeric', hour12: true });
   };
 
   const handleAddContactChange = (e) => {
     const { name, value } = e.target;
-    setNewContact(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setNewContact(prev => ({ ...prev, [name]: value }));
   };
 
   const handleAddContact = async () => {
@@ -128,25 +83,17 @@ const ContactManagement = () => {
       phoneNumber: newContact.phoneNumber,
       tags: newContact.tag ? [{ name: newContact.tag }] : []
     };
-
     try {
       const response = await api.post('/contacts', contactData, authHeaders);
       setContacts(prev => [...prev, response.data.data]);
       handleAddContactCancel();
     } catch (error) {
-      if (error.response && error.response.status === 400) {
-        alert(error.response.data.message);
-      }
+      if (error.response?.status === 400) alert(error.response.data.message);
     }
   };
 
   const handleAddContactCancel = () => {
-    setNewContact({
-      name: '',
-      email: '',
-      phoneNumber: '',
-      tag: ''
-    });
+    setNewContact({ name: '', email: '', phoneNumber: '', tag: '' });
     setIsAddContactModalOpen(false);
   };
 
@@ -163,10 +110,7 @@ const ContactManagement = () => {
 
   const handleEditContactChange = (e) => {
     const { name, value } = e.target;
-    setEditContact(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setEditContact(prev => ({ ...prev, [name]: value }));
   };
 
   const handleUpdateContact = async () => {
@@ -176,14 +120,9 @@ const ContactManagement = () => {
       phoneNumber: editContact.phoneNumber,
       tags: editContact.tag ? [{ name: editContact.tag }] : []
     };
-
     try {
       const response = await api.put(`/contacts/${currentContact._id}`, updatedContact, authHeaders);
-      setContacts(prev =>
-        prev.map(contact =>
-          contact._id === currentContact._id ? response.data.data : contact
-        )
-      );
+      setContacts(prev => prev.map(c => (c._id === currentContact._id ? response.data.data : c)));
       handleEditContactCancel();
     } catch (error) {
       console.error('Failed to update contact:', error);
@@ -191,12 +130,7 @@ const ContactManagement = () => {
   };
 
   const handleEditContactCancel = () => {
-    setEditContact({
-      name: '',
-      email: '',
-      phoneNumber: '',
-      tag: ''
-    });
+    setEditContact({ name: '', email: '', phoneNumber: '', tag: '' });
     setCurrentContact(null);
     setIsEditContactModalOpen(false);
   };
@@ -212,24 +146,10 @@ const ContactManagement = () => {
     }
   };
 
-  const fetchTags = async () => {
-    try {
-      const response = await api.get('/tags', authHeaders);
-      setAvailableTags(response.data.data || []);
-    } catch (error) {
-      console.error('Failed to fetch tags', error);
-    }
-  };
-
-  const handleImportModeChange = (mode) => {
-    setImportMode(mode);
-  };
+  const handleImportModeChange = (mode) => setImportMode(mode);
 
   const handleImportCSV = async () => {
-    if (!selectedFile) {
-      alert('Please select a CSV file.');
-      return;
-    }
+    if (!selectedFile) return alert('Please select a CSV file.');
 
     setIsImporting(true);
     setImportProgress(0);
@@ -238,9 +158,7 @@ const ContactManagement = () => {
       header: true,
       skipEmptyLines: true,
       complete: async (result) => {
-        console.log('Parsed CSV Data:', result.data);  // Log the parsed data for debugging
         const parsedData = result.data;
-
         if (!Array.isArray(parsedData) || parsedData.length === 0) {
           alert('Invalid or empty CSV file.');
           setIsImporting(false);
@@ -252,8 +170,7 @@ const ContactManagement = () => {
         const nameKey = Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "name");
         const emailKey = Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "email");
         const phoneKey = Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "phone");
-        const tagKey = Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "tag");
-
+      
         if (!nameKey || !emailKey || !phoneKey) {
           alert('Invalid CSV format. Ensure columns: Name, Email, Phone.');
           setIsImporting(false);
@@ -261,13 +178,23 @@ const ContactManagement = () => {
         }
 
         const contacts = parsedData
-          .map(row => ({
-            name: row[nameKey]?.trim(),
-            email: row[emailKey]?.trim(),
-            phoneNumber: row[phoneKey]?.trim(),
-            // tags: row[tagKey]?.trim() ? row[tagKey].trim().split(',').map(tag => tag.trim()) : []
-          }))
-          .filter(contact => contact.name && contact.email && contact.phoneNumber);
+          .map(row => {
+            const tagIds = selectedTags
+              .map(tag => {
+                const matchedTag = availableTags.find(t => t.name === tag.label);
+                return matchedTag ? matchedTag._id : null;
+              })
+              .filter(Boolean);
+
+            return {
+              name: row[nameKey]?.trim(),
+              email: row[emailKey]?.trim(),
+              phoneNumber: row[phoneKey]?.trim(),
+              tags: tagIds
+
+            };
+          })
+          .filter(c => c.name && c.email && c.phoneNumber);
 
 
         if (contacts.length === 0) {
@@ -281,11 +208,11 @@ const ContactManagement = () => {
         try {
           const response = await api.post('/contacts/import', { contacts, importMode }, authHeaders);
           const { totalImported, totalSkipped } = response.data;
+          console.log(response, "response inside the import function")
+          console.log(totalImported)
 
-          let message = `✅ Imported: ${totalImported} contacts.\n`;
-          if (totalSkipped > 0) {
-            message += `⚠️ Skipped: ${totalSkipped} due to duplicates.\n`;
-          }
+          let message = `✅ Imported: ${contacts.length} contacts.\n`;
+          if (totalSkipped > 0) message += `⚠️ Skipped: ${totalSkipped} due to duplicates.\n`;
 
           setImportProgress(100);
           setTimeout(() => {
@@ -305,13 +232,11 @@ const ContactManagement = () => {
         alert('Error parsing CSV file: ' + error.message);
       }
     });
+    setSelectedFile(null)
+    setImportStep(1)
   };
 
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
+  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
   return (
     <div className="flex flex-col md:flex-row h-screen">
       {/* Main Content */}
@@ -764,6 +689,20 @@ const ContactManagement = () => {
                               classNamePrefix="select"
                             />
                           </div>
+                            <div className="grid grid-cols-2 gap-4 items-center">
+                              <div className="text-sm text-gray-600">Tags</div>
+                              <Select
+                                options={[
+                                  { value: 'name', label: 'Name' },
+                                  { value: 'email', label: 'Email' },
+                                  { value: 'phone', label: 'Phone' },
+                                  { value: 'tags', label: 'Tag' }
+                                ]}
+                                defaultValue={{ value: 'tags', label: 'Tag' }}
+                                className="basic-select"
+                                classNamePrefix="select"
+                              />
+                            </div>
                         </div>
                       </div>
 
@@ -815,7 +754,7 @@ const ContactManagement = () => {
                     </div>
                   )}
 
-                  {importStep === 3 && (
+                  {selectedFile && importStep === 3 && (
                     <div className="space-y-6">
                       <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
                         <h5 className="font-medium text-gray-800 mb-4">Review and Import</h5>

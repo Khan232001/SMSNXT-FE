@@ -1,97 +1,61 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "../../layout/Navbar";
-import Sidebar from "../../layout/Sidebar";
-import api from "../../utils/api";
 import { FaTrashCan } from "react-icons/fa6";
 import { FaEdit } from "react-icons/fa";
 import { RiContactsLine } from "react-icons/ri";
+import { useTags } from "../../context/TagsContext";
+import { useContacts } from "../../context/ContactsContext";
 
 const TagsManagement = () => {
-  const [tags, setTags] = useState([]);
-  const [contacts, setContacts] = useState([]);
-  const [allContacts, setAllContacts] = useState([]); 
-  const [selectedContacts, setSelectedContacts] = useState([]); 
+  const {
+    tags,
+    createTag,
+    updateTag,
+    deleteTag,
+    addContactsToTag,
+    removeContactFromTag,
+  } = useTags();
+
+  const {
+    contacts,
+    allContacts,
+    fetchContactsByTag,
+    fetchAllContacts,
+    setContacts,
+  } = useContacts();
+
+  const [selectedContacts, setSelectedContacts] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddContactsModalOpen, setIsAddContactsModalOpen] = useState(false);
-  const [isSelectContactsModalOpen, setIsSelectContactsModalOpen] =
-    useState(false);
-
+  const [isSelectContactsModalOpen, setIsSelectContactsModalOpen] = useState(false);
   const [tagName, setTagName] = useState("");
   const [signupKeyword, setSignupKeyword] = useState("");
-
   const [editTagId, setEditTagId] = useState(null);
   const [editTagName, setEditTagName] = useState("");
   const [editSignupKeyword, setEditSignupKeyword] = useState("");
-
   const [currentTagId, setCurrentTagId] = useState(null);
   const [currentTagName, setCurrentTagName] = useState("");
   const [currentSignupKeyword, setCurrentSignupKeyword] = useState("");
-
-  useEffect(() => {
-    fetchTags();
-  }, []);
-
-  const token = localStorage.getItem("token");
-
-  const authHeaders = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-
-  const fetchTags = async () => {
-    try {
-      const response = await api.get("/tags", authHeaders);
-      setTags(response.data.data || []);
-    } catch (error) {
-      console.error("Failed to fetch tags:", error);
-    }
-  };
-
-  const fetchContacts = async (tagId) => {
-    try {
-      const response = await api.get(`/tags/${tagId}/contacts`, authHeaders); 
-      setContacts(response.data.data || []);
-    } catch (error) {
-      console.error("Failed to fetch contacts:", error);
-      alert("Failed to fetch contacts.");
-    }
-  };
-
-  const fetchAllContacts = async () => {
-    try {
-      const response = await api.get("/contacts", authHeaders); 
-      const availableContacts = response.data.data.filter(
-        (contact) =>
-          !contacts.some((addedContact) => addedContact._id === contact._id)
-      );
-      setAllContacts(availableContacts);
-    } catch (error) {
-      console.error("Failed to fetch all contacts:", error);
-      alert("Failed to fetch contacts.");
-    }
-  };
 
   const handleAddContacts = (tagId, tagName, signupKeyword) => {
     setCurrentTagId(tagId);
     setCurrentTagName(tagName);
     setCurrentSignupKeyword(signupKeyword);
-    setIsAddContactsModalOpen(!isAddContactsModalOpen);
-    fetchContacts(tagId);
+    setIsAddContactsModalOpen(true);
+    fetchContactsByTag(tagId);
   };
 
   const handleAddContactsCancel = () => {
-    setIsAddContactsModalOpen(!isAddContactsModalOpen);
+    setIsAddContactsModalOpen(false);
     setCurrentTagId(null);
     setCurrentTagName("");
     setCurrentSignupKeyword("");
-    fetchTags(); 
   };
 
-  const handleOpenSelectContactsModal = () => {
-    setIsSelectContactsModalOpen(!isSelectContactsModalOpen);
-    fetchAllContacts();
+  const handleOpenSelectContactsModal = async () => {
+    const excluded = contacts.map(c => c._id);
+    await fetchAllContacts(excluded);
+    setIsSelectContactsModalOpen(true);
   };
 
   const handleCheckboxChange = (contact) => {
@@ -108,27 +72,16 @@ const TagsManagement = () => {
   };
 
   const handleSaveSelectedContacts = () => {
-    setContacts((prev) => [...prev, ...selectedContacts]); 
-    setSelectedContacts([]); 
-    setIsSelectContactsModalOpen(!isSelectContactsModalOpen);
-  
-    fetchAllContacts();
+    setContacts((prev) => [...prev, ...selectedContacts]);
+    setSelectedContacts([]);
+    setIsSelectContactsModalOpen(false);
   };
 
   const handleSaveContactsToTag = async () => {
     try {
-      const contactIds = contacts.map((contact) => contact._id); 
-      const response = await api.put(`/tags/${currentTagId}`, {
-        contacts: contactIds,
-        authHeaders
-      });
-      if (response.status === 200) {
-        // alert("Contacts saved to tag successfully!");
-        setIsAddContactsModalOpen(!isAddContactsModalOpen);
-        fetchTags(); 
-      } else {
-        alert("Failed to save contacts to tag.");
-      }
+      const contactIds = contacts.map((contact) => contact._id);
+      await addContactsToTag(currentTagId, contactIds);
+      setIsAddContactsModalOpen(false);
     } catch (error) {
       console.error("Failed to save contacts to tag:", error);
       alert("An error occurred while saving contacts to the tag.");
@@ -137,29 +90,17 @@ const TagsManagement = () => {
 
   const handleDeleteContactFromTag = async (contactId) => {
     try {
-      const response = await api.delete(`/tags/${currentTagId}/contacts`, {
-        data: { contactId },
-        ...authHeaders
-      });
-  
-      if (response.status === 200) {
-        // alert("Contact removed from tag successfully!");
-  
-        fetchContacts(currentTagId);
-      } else {
-        alert("Failed to remove contact from tag.");
-      }
+      await removeContactFromTag(currentTagId, contactId);
+      fetchContactsByTag(currentTagId);
     } catch (error) {
       console.error("Failed to remove contact from tag:", error);
       alert("An error occurred while removing the contact from the tag.");
     }
   };
-  
-  
+
   const handleDeleteTag = async (id) => {
     try {
-      await api.delete(`/tags/${id}`, authHeaders);
-      setTags((prevTags) => prevTags.filter((tag) => tag._id !== id));
+      await deleteTag(id);
     } catch (error) {
       console.error("Failed to delete tag:", error);
       alert("Failed to delete tag.");
@@ -167,24 +108,21 @@ const TagsManagement = () => {
   };
 
   const handleAddTagCancel = () => {
-    setIsAddModalOpen(!isAddModalOpen);
+    setIsAddModalOpen(false);
     setTagName("");
     setSignupKeyword("");
   };
 
   const handleEditTagCancel = () => {
-    setIsEditModalOpen(!isEditModalOpen);
+    setIsEditModalOpen(false);
     setEditTagId(null);
     setEditTagName("");
     setEditSignupKeyword("");
   };
 
   const handleSaveNewTag = async () => {
-    const newTag = { name: tagName, signupKeyword: signupKeyword };
-
     try {
-      const response = await api.post("/tags", newTag, authHeaders);
-      setTags((prevTags) => [...prevTags, response.data.data]);
+      await createTag({ name: tagName, signupKeyword });
       handleAddTagCancel();
     } catch (error) {
       console.error("Error:", error);
@@ -193,42 +131,28 @@ const TagsManagement = () => {
   };
 
   const handleEditTag = (id, name, signupKeyword) => {
-    setIsEditModalOpen(!isEditModalOpen);
+    setIsEditModalOpen(true);
     setEditTagId(id);
     setEditTagName(name);
     setEditSignupKeyword(signupKeyword);
   };
 
   const handleSaveEditedTag = async () => {
-    const updatedTag = { name: editTagName, signupKeyword: editSignupKeyword };
-
     try {
-      const response = await api.put(`/tags/${editTagId}`, updatedTag, authHeaders);
-      setTags((prevTags) =>
-        prevTags.map((tag) =>
-          tag._id === editTagId ? { ...tag, ...response.data.data } : tag
-        )
-      );
+      await updateTag(editTagId, {
+        name: editTagName,
+        signupKeyword: editSignupKeyword,
+      });
       handleEditTagCancel();
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to update tag.");
     }
   };
-
+  
   return (
     <div className="flex flex-col md:flex-row h-screen">
-
-      <div className="md:w-64 text-white">
-        <Sidebar />
-      </div>
-
       <div className="flex-1 bg-blue-50">
-        {/* Navbar */}
-        <div className=" text-white z-50 shadow-md">
-          <Navbar />
-        </div>
-
         <div className="bg-white shadow-md rounded-lg p-6 mt-4">
           <h1 className="text-xl font-semibold mb-4">Tags</h1>
 

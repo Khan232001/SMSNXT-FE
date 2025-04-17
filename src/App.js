@@ -3,8 +3,9 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { AuthProvider } from "./context/AuthContext";
+import { TagsProvider } from "./context/TagsContext"; // Import the TagsProvider
 
-// Pages
+// Pages (imports remain the same)
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserDashboard from "./pages/user/Dashboard";
 import Campaigns from "./pages/admin/Campaigns";
@@ -40,7 +41,7 @@ import CampaignManagementAdmin from "./pages/admin/CampaignManagement";
 import TagsManagementAdmin from "./pages/admin/TagsManagement";
 import ContactManagementAdmin from "./pages/admin/ContactManagement";
 
-// Components
+// Components (imports remain the same)
 import Templates from "./components/Templates";
 import UserLayout from "./layout/UserLayout";
 import ChatMessage from "./pages/user/ChatMessage";
@@ -64,103 +65,99 @@ import Step3 from "./components/Step3";
 import Lastthing from "./components/Lastthing";
 import Intro from "./components/Intro";
 import Lastpage from './components/Lastpage';
+import { ContactsProvider } from "./context/ContactsContext";
+
 // Stripe Setup
 const stripePromise = loadStripe("your-publishable-key-here");
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
 
-function handleCollapse() {
-  setCollapsed(!collapsed);
-}
+  function handleCollapse() {
+    setCollapsed(!collapsed);
+  }
 
   return (
     <Elements stripe={stripePromise}>
       <Router>
         <AuthProvider>
-          <Routes>
-            {/* Auth Routes */}
-            <Route path="sign" element={<SignUp />} />
-            <Route path="login" element={<Login />} />
+          <TagsProvider> 
+            <ContactsProvider>
+            <Routes>
+              {/* Auth Routes */}
+              <Route path="sign" element={<SignUp />} />
+              <Route path="login" element={<Login />} />
 
-      
-            <Route index element={<Home />} />
-            <Route
-              path="/"
-              element={<UserLayout collapsed={collapsed} toggleCollapse={handleCollapse} />}
-            >
-              <Route index path="getting-started" element={<Welcome />} />
-              <Route  path="dashboard" element={<UserDashboard />} />
-              <Route path="compose" element={<ChatMessage />} />
-              <Route path="templates" element={<Templates />} />
-              <Route path="contact" element={<Contact />} />
-              <Route path="pricing" element={<Pricing />} />
-              <Route path="subscription-plans" element={<SubscriptionPlans />} />
-              <Route path="subscription-pricing" element={<SubscriptionPricing />} />
-              <Route path="order-recharge-history" element={<OrderHistory />} />
-              <Route path="campaign" element={<CampaignManagement />} />
-              <Route path="contact-management" element={<ContactManagement />} />
-              <Route path="tags-management" element={<TagsManagement />} />
-              <Route path="reporting" element={<Reporting />} />
-              <Route path="sender-id-management" element={<SenderIDManagement />} />
-              <Route path="payment" element={<PaymentForm />} />
-              <Route path="thank-you" element={<ThankYou />} />
-              <Route path="terms" element={<Terms />} />
-              <Route path="policy" element={<Policy />} />
-              <Route path="/modal" element={<Modal />} />
-          <Route path="/businesspage" element={<Businesspage />} />
-          <Route path="/usecase" element={<Usecase />} />
-          <Route path="/Compaigndetails" element={<Compaigndetails />} />
-          <Route path="/samplemessages" element={<Samplemessages />} />
-          <Route path="/summary" element={<Summary />} />
-          <Route path="/signupquest" element={<Signupquest />} />
-          <Route path="/otpverify" element={<Otpverify />} />
-          <Route path="/welcomesmsnxt" element={<WelcomeSMSNXT />} />
-          <Route path="/step1" element={<Step1 />} />
-          <Route path="/step2" element={<Step2 />} />
-          <Route path="/step3" element={<Step3 />} />
-          <Route path="/lastthing" element={<Lastthing />} />
-          <Route path="/intro" element={<Intro />} />
-          <Route path="/lastpage" element={<Lastpage />} />
+              <Route index element={<Home />} />
+              <Route
+                path="/"
+                element={<UserLayout collapsed={collapsed} toggleCollapse={handleCollapse} />}
+              >
+                <Route index path="getting-started" element={<Welcome />} />
+                <Route path="dashboard" element={<UserDashboard />} />
+                <Route path="compose" element={<ChatMessage />} />
+                <Route path="templates" element={<Templates />} />
+                <Route path="contact" element={<Contact />} />
+                <Route path="pricing" element={<Pricing />} />
+                <Route path="subscription-plans" element={<SubscriptionPlans />} />
+                <Route path="subscription-pricing" element={<SubscriptionPricing />} />
+                <Route path="order-recharge-history" element={<OrderHistory />} />
+                <Route path="campaign" element={<CampaignManagement />} />
+                <Route path="contact-management" element={<ContactManagement />} />
+                <Route path="tags-management" element={<TagsManagement />} />
+                <Route path="reporting" element={<Reporting />} />
+                <Route path="sender-id-management" element={<SenderIDManagement />} />
+                <Route path="payment" element={<PaymentForm />} />
+                <Route path="thank-you" element={<ThankYou />} />
+                <Route path="terms" element={<Terms />} />
+                <Route path="policy" element={<Policy />} />
+                <Route path="/modal" element={<Modal />} />
+                <Route path="/businesspage" element={<Businesspage />} />
+                <Route path="/usecase" element={<Usecase />} />
+                <Route path="/Compaigndetails" element={<Compaigndetails />} />
+                <Route path="/samplemessages" element={<Samplemessages />} />
+                <Route path="/summary" element={<Summary />} />
+                <Route path="/signupquest" element={<Signupquest />} />
+                <Route path="/otpverify" element={<Otpverify />} />
+                <Route path="/welcomesmsnxt" element={<WelcomeSMSNXT />} />
+                <Route path="/step1" element={<Step1 />} />
+                <Route path="/step2" element={<Step2 />} />
+                <Route path="/step3" element={<Step3 />} />
+                <Route path="/lastthing" element={<Lastthing />} />
+                <Route path="/intro" element={<Intro />} />
+                <Route path="/lastpage" element={<Lastpage />} />
 
-
-
-
-
-
-
-
-
-              {/* Messaging Nested Routes */}
-              <Route path="messaging">
-                <Route index element={<Conversations />} />
-                <Route path="open" element={<ChatWindow />} />
-                {/* <Route path="scheduled" element={<ScheduledMessages />} /> */}
+                {/* Messaging Nested Routes */}
+                <Route path="messaging">
+                  <Route index element={<Conversations />} />
+                  <Route path="open" element={<ChatWindow />} />
+                </Route>
               </Route>
-            </Route>
 
-            {/* Admin Routes */}
-            <Route path="/admin">
-              <Route path="login" element={<AdminLogin />} />
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="senderids" element={<SenderIDs />} />
-              <Route path="reports" element={<Reports />} />
-              <Route path="plans" element={<Plans />} />
-              <Route path="payments" element={<Payments />} />
-              <Route path="campaigns" element={<Campaigns />} />
-              <Route path="customers" element={<Customers />} />
-              <Route path="orders" element={<Orders />} />
-              <Route path="staff-management" element={<StaffManagement />} />
-              <Route path="campaign-management" element={<CampaignManagementAdmin />} />
-              <Route path="system-settings" element={<Settings />} />
-              <Route path="sms-gateway" element={<SmsGateway />} />
-              <Route path="tags-management" element={<TagsManagementAdmin />} />
-              <Route path="contact-management" element={<ContactManagementAdmin />} />
-            </Route>
+              {/* Admin Routes */}
+              <Route path="/admin">
+                <Route path="login" element={<AdminLogin />} />
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="senderids" element={<SenderIDs />} />
+                <Route path="reports" element={<Reports />} />
+                <Route path="plans" element={<Plans />} />
+                <Route path="payments" element={<Payments />} />
+                <Route path="campaigns" element={<Campaigns />} />
+                <Route path="customers" element={<Customers />} />
+                <Route path="orders" element={<Orders />} />
+                <Route path="staff-management" element={<StaffManagement />} />
+                <Route path="campaign-management" element={<CampaignManagementAdmin />} />
+                <Route path="system-settings" element={<Settings />} />
+                <Route path="sms-gateway" element={<SmsGateway />} />
+                <Route path="tags-management" element={<TagsManagementAdmin />} />
+                <Route path="contact-management" element={<ContactManagementAdmin />} />
+              </Route>
 
-            {/* Catch-all Route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              {/* Catch-all Route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            </ContactsProvider>
+          </TagsProvider>
         </AuthProvider>
       </Router>
     </Elements>
