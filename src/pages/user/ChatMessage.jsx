@@ -1,18 +1,59 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import {
-  Box, Button, MenuItem, Select, TextField, Typography, Paper, List,
-  ListItem, ListItemText, Alert, InputAdornment, IconButton, Divider, Avatar
+  Box,
+  Button,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  Alert,
+  Modal,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Checkbox,
+  IconButton,
+  InputAdornment,
+  Avatar,
+  Divider,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import {
-  Contacts, DynamicFeed, AttachFile, Schedule, Send
+  InsertDriveFile,
+  DynamicFeed,
+  AttachFile,
+  Schedule,
+  Contacts,
+  ListAlt,
+  GroupWork,
+  History,
+  ManageAccounts,
+  Close,
+  Search,
+  Send,
+  MoreVert,
+  InsertEmoticon,
+  Mic,
 } from "@mui/icons-material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
-import { InsertEmoticon, Mic } from "@mui/icons-material";
+
+import { useContacts } from "../../context/ContactsContext";
 
 const ComposeMessagePage = () => {
+  const [multiSelectMode, setMultiSelectMode] = useState(false);
+
   const [message, setMessage] = useState("");
   const [recipients, setRecipients] = useState("");
   const [senderId, setSenderId] = useState("CUSTOM");
@@ -20,7 +61,106 @@ const ComposeMessagePage = () => {
   const [timezone, setTimezone] = useState("America/New_York");
   const [repeat, setRepeat] = useState("none");
   const [previewMode, setPreviewMode] = useState(false);
+  // Contacts modal state
+  const [openContactsModal, setOpenContactsModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedContacts, setSelectedContacts] = useState([]);
 
+  // Contacts context
+  const { contacts, allContacts, fetchAllContacts } = useContacts();
+
+  // Fetch contacts on component mount
+  useEffect(() => {
+    fetchAllContacts();
+  }, [fetchAllContacts]);
+
+  // Open contacts modal
+  const handleOpenContactsModal = () => {
+    setOpenContactsModal(true);
+    setSelectedContacts([]);
+  };
+const handleRowClick = (contact) => {
+  if (multiSelectMode) {
+    handleContactSelect(contact);
+  } else {
+    // Single selection mode - replace current selection
+    setSelectedContacts(
+      selectedContacts.some((c) => c.id === contact.id) ? [] : [contact]
+    );
+  }
+};
+  // Close contacts modal
+  const handleCloseContactsModal = () => {
+    setOpenContactsModal(false);
+  };
+
+  // Toggle contact selection
+const handleContactSelect = (contact) => {
+  setSelectedContacts((prev) => {
+    // Check if contact exists and has an id
+    if (!contact?.id) return prev;
+
+    const isSelected = prev.some((c) => c.id === contact.id);
+
+    if (multiSelectMode) {
+      // Multiple selection mode - toggle this contact
+      return isSelected
+        ? prev.filter((c) => c.id !== contact.id) // Remove if already selected
+        : [...prev, contact]; // Add if not selected
+    } else {
+      // Single selection mode - replace entire selection
+      return isSelected
+        ? [] // Deselect if clicking the same contact
+        : [contact]; // Select only this contact
+    }
+  });
+};
+
+  // Add selected contacts to recipients
+  const handleAddSelectedContacts = () => {
+    const phoneNumbers = selectedContacts.map((contact) => contact.phoneNumber);
+
+    setRecipients((prev) => {
+      // Remove any existing commas and trim whitespace
+      const currentRecipients = prev
+        ? prev
+            .split(",")
+            .map((r) => r.trim())
+            .filter((r) => r)
+        : [];
+
+      // Combine existing with new, remove duplicates
+      const combined = [...new Set([...currentRecipients, ...phoneNumbers])];
+
+      return combined.join(", ");
+    });
+
+    handleCloseContactsModal();
+  };
+
+  // Filter contacts based on search term
+  const filteredContacts = allContacts.filter(
+    (contact) =>
+      (contact.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.phone_number?.includes(searchTerm)) &&
+      !recipients.includes(contact.phone_number) // Exclude already added contacts
+  );
+
+  // Replace template tags with sample values
+  const getPreviewMessage = () => {
+    return message
+      .replace(/<FIRST_NAME>/g, "John")
+      .replace(/<MANAGER_FIRST_NAME>/g, "Sarah")
+      .replace(/<COMPANY_NAME>/g, "Acme Inc");
+  };
+
+  const handleToggleSelectAll = () => {
+    if (selectedContacts.length === filteredContacts.length) {
+      setSelectedContacts([]);
+    } else {
+      setSelectedContacts([...filteredContacts]);
+    }
+  };
   return (
     <Box sx={{ width: "100%" }}>
       <Box sx={{ px: 3, mt: 2, maxWidth: 1450, mx: "auto" }}>
@@ -40,7 +180,8 @@ const ComposeMessagePage = () => {
       </Box>
 
       <Box sx={{ display: "flex", justifyContent: "center", px: 3, mt: 3 }}>
-        <Box sx={{ display: "flex", gap: 3, maxWidth: 1450, alignItems: "flex-start" }}>
+        <Box sx={{ display: "flex", gap: 3, maxWidth: 1450,mx: "auto", alignItems: "flex-start",px: 3,
+    mt: 3,}}>
 
           <Box sx={{ flex: 1, minWidth: "500px" }}>
             <Typography fontWeight="bold" mb={1}>To</Typography>
@@ -53,7 +194,10 @@ const ComposeMessagePage = () => {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton>
+                    <IconButton
+                    onClick={handleOpenContactsModal}
+                    aria-label="open contacts"
+                  >
                       <Contacts />
                     </IconButton>
                   </InputAdornment>
@@ -147,7 +291,8 @@ const ComposeMessagePage = () => {
                   <MenuItem value="America/Los_Angeles">(UTC-0800) America/Los_Angeles</MenuItem>
                 </Select>
                 <Typography variant="caption" color="text.secondary">
-                  Automatically accounts for daylight saving time.
+                This system automatically considers daylight saving time (DST)
+                changes.
                 </Typography>
               </Box>
 
@@ -166,9 +311,9 @@ const ComposeMessagePage = () => {
             </Box>
 
             <Box mt={4} display="flex" justifyContent="space-between" flexWrap="wrap" gap={2}>
-              <Button variant="text" sx={{ textTransform: "uppercase" }}>Cancel</Button>
+              <Button variant="text" sx={{ textTransform: "uppercase", cursor: "pointer" }}>Cancel</Button>
               <Box display="flex" gap={2}>
-                <Button variant="outlined" onClick={() => setPreviewMode(!previewMode)}>
+                <Button variant="outlined" sx={{ cursor: "pointer" }} onClick={() => setPreviewMode(!previewMode)}>
                   {previewMode ? "Hide Preview" : "Preview Message"}
                 </Button>
                 <Button
@@ -190,73 +335,88 @@ const ComposeMessagePage = () => {
             </Box>
           </Box>
 
-          <Box sx={{ minWidth: 260, maxWidth: 300 }}>
-          <Paper elevation={0} sx={{ p: 4, backgroundColor: "#ffffff", borderRadius: 3, border: "1px solid #E0E0E0" }}>
-  {/* Quick Actions */}
-  <Typography variant="subtitle2" fontWeight="bold" mb={1}>Quick Actions</Typography>
-  <List>
-    <ListItem button>
-      <Contacts fontSize="small" sx={{ mr: 1, color: "#4A90E2" }} />
-      <ListItemText primary="Add Contacts" />
-    </ListItem>
-    <ListItem button>
-      <DynamicFeed fontSize="small" sx={{ mr: 1, color: "#00C49F" }} />
-      <ListItemText primary="Insert Template" />
-    </ListItem>
-    <ListItem button>
-      <AttachFile fontSize="small" sx={{ mr: 1, color: "#F57C00" }} />
-      <ListItemText primary="Add Media" />
-    </ListItem>
-  </List>
-
-  <Divider sx={{ my: 2 }} />
-
-  {/* Message Options */}
-  <Typography variant="subtitle2" fontWeight="bold" mb={1}>Message Options</Typography>
-  <List>
-    <ListItem button>
-      <Send fontSize="small" sx={{ mr: 1, color: "#4CAF50" }} />
-      <ListItemText primary="Send Immediately" />
-    </ListItem>
-    <ListItem button>
-      <Schedule fontSize="small" sx={{ mr: 1, color: "#2196F3" }} />
-      <ListItemText primary="Schedule for Later" />
-    </ListItem>
-  </List>
-
-  {/*  Analytics Section — ADD THIS INSIDE THE PAPER */}
-  <Divider sx={{ my: 2 }} />
-  <Typography variant="subtitle2" fontWeight="bold" mb={1}>Analytics</Typography>
-  <Box
+      
+          </Box>
+          {/* RIGHT SIDE - Sidebar with additional options */}
+<Box sx={{ minWidth: 260, maxWidth: 300  }}>
+  <Paper
+    elevation={0}
     sx={{
       p: 2,
-      backgroundColor: "#f5f5f5",
-      borderRadius: 2,
-      border: "1px solid #ddd",
-      boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+      backgroundColor: "#ffffff",
+      borderRadius: 3,
+      border: "1px solid #E0E0E0",
     }}
   >
-    <Typography variant="caption" color="text.secondary">
-      Estimated Delivery
+    <Typography variant="subtitle2" fontWeight="bold" mb={1}>
+      Quick Actions
     </Typography>
-    <Typography fontWeight="bold" mb={1}>Instant</Typography>
-    <Typography variant="caption" color="text.secondary">
-      Message Cost
+    <List>
+      <ListItem
+        button
+        sx={{ cursor: "pointer" }}
+        onClick={handleOpenContactsModal}
+      >
+        <Contacts fontSize="small" sx={{ mr: 1, color: "#4A90E2" }} />
+        <ListItemText primary="Add Contacts" />
+      </ListItem>
+      <ListItem button sx={{ cursor: "pointer" }}>
+        <DynamicFeed
+          fontSize="small"
+          sx={{ mr: 1, color: "#00C49F" }}
+        />
+        <ListItemText primary="Insert Template" />
+      </ListItem>
+      <ListItem button sx={{ cursor: "pointer" }}>
+        <AttachFile fontSize="small" sx={{ mr: 1, color: "#F57C00" }} />
+        <ListItemText primary="Add Media" />
+      </ListItem>
+    </List>
+
+    <Divider sx={{ my: 2 }} />
+
+    <Typography variant="subtitle2" fontWeight="bold" mb={1}>
+      Message Options
     </Typography>
-    <Typography fontWeight="bold">
-      ${(Math.ceil(message.length / 153) * 0.01).toFixed(2)}
+    <List>
+      <ListItem button sx={{ cursor: "pointer" }}>
+        <Send fontSize="small" sx={{ mr: 1, color: "#4CAF50" }} />
+        <ListItemText primary="Send Immediately" />
+      </ListItem>
+      <ListItem button sx={{ cursor: "pointer" }}>
+        <Schedule fontSize="small" sx={{ mr: 1, color: "#2196F3" }} />
+        <ListItemText primary="Schedule for Later" />
+      </ListItem>
+    </List>
+
+    <Divider sx={{ my: 2 }} />
+
+    <Typography variant="subtitle2" fontWeight="bold" mb={1}>
+      Analytics
     </Typography>
-  </Box>
-</Paper>
-          </Box>
-          
+    <Box sx={{ p: 2, backgroundColor: "#f5f5f5", borderRadius: 2 }}>
+      <Typography variant="caption" display="block">
+        Estimated Delivery
+      </Typography>
+      <Typography fontWeight="bold">Instant</Typography>
+      <Typography variant="caption" display="block" mt={1}>
+        Message Cost
+      </Typography>
+      <Typography fontWeight="bold">
+        ${(Math.ceil(message.length / 153) * 0.01).toFixed(2)}
+      </Typography>
+    </Box>
+  </Paper>
+</Box>
 
           {previewMode && (
   <Box
     sx={{
       display: { xs: "none", md: "flex" },
-      flexDirection: "column",
+      flexDirection: "row", 
       alignItems: "flex-start",
+      gap: 4,
+      mt: 2,
     }}
   >
     <Box
@@ -310,6 +470,9 @@ const ComposeMessagePage = () => {
             +1 (456) 412-3452
           </Typography>
         </Box>
+        <IconButton sx={{ ml: "auto" }}>
+                    <MoreVert />
+                  </IconButton>
       </Box>
 
       {/* Messages Area */}
@@ -317,8 +480,11 @@ const ComposeMessagePage = () => {
         sx={{
           flex: 1,
           p: 2,
+          height: "calc(100% - 120px)",
           overflowY: "auto",
           backgroundColor: "#e5ddd5",
+          backgroundImage:
+                      "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABnSURBVDhP7cxBCsAgDETR6P3P3KVLFy4K+QNpkVLwQcDMm0A2pZRSSimllP7qA3kXjTFijHnvWGtZa1lrWWtZa1lrWWtZa1lrWWtZa1lrWWtZa1lrWWtZa1lrWWtZa1lrWWtZa+0D+QBN+JCwWw2F3QAAAABJRU5ErkJggg==')",
         }}
       >
         {message ? (
@@ -332,7 +498,7 @@ const ComposeMessagePage = () => {
                   maxWidth: "70%",
                 }}
               >
-                <Typography>{message}</Typography>
+                <Typography>{getPreviewMessage()}</Typography>
               </Box>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 1 }}>
@@ -404,7 +570,7 @@ const ComposeMessagePage = () => {
           }}
         >
           <Typography variant="caption" color="text.secondary">
-            Reply STOP to unsubscribe
+            Reply STOP to unsubscribe:6664
           </Typography>
         </Box>
       )}
@@ -412,9 +578,183 @@ const ComposeMessagePage = () => {
   </Box>
   
 )}
-        </Box>
+ </Box>
+
+
+
+{/* Contacts Modal */}
+<Modal
+  open={openContactsModal}
+  onClose={handleCloseContactsModal}
+  aria-labelledby="contacts-modal-title"
+  aria-describedby="contacts-modal-description"
+>
+  <Box
+    sx={{
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      width: "80%",
+      maxWidth: 800,
+      bgcolor: "background.paper",
+      boxShadow: 24,
+      borderRadius: 2,
+      p: 4,
+      maxHeight: "80vh",
+      display: "flex",
+      flexDirection: "column",
+    }}
+  >
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+      mb={3}
+    >
+      <Typography id="contacts-modal-title" variant="h6">
+        Select Contacts
+      </Typography>
+      <IconButton onClick={handleCloseContactsModal}>
+        <Close />
+      </IconButton>
+    </Box>
+
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+      mb={2}
+    >
+      <TextField
+        fullWidth
+        placeholder="Search contacts..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        sx={{ mr: 2 }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Search />
+            </InputAdornment>
+          ),
+        }}
+      />
+      <Box display="flex" alignItems="center">
+        <FormControlLabel
+          control={
+            <Switch
+              checked={multiSelectMode}
+              onChange={() => setMultiSelectMode(!multiSelectMode)}
+              color="primary"
+            />
+          }
+          label="Multiple Selection"
+          sx={{ mr: 2 }}
+        />
+        {multiSelectMode && (
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={handleToggleSelectAll}
+            disabled={filteredContacts.length === 0}
+          >
+            {selectedContacts.length === filteredContacts.length
+              ? "Deselect All"
+              : "Select All"}
+          </Button>
+        )}
       </Box>
     </Box>
+
+    <TableContainer sx={{ flex: 1, overflow: "auto" }}>
+      <Table stickyHeader>
+        <TableHead>
+          <TableRow>
+            <TableCell padding="checkbox">
+              {multiSelectMode && (
+                <Checkbox
+                  indeterminate={
+                    selectedContacts.length > 0 &&
+                    selectedContacts.length < filteredContacts.length
+                  }
+                  checked={
+                    filteredContacts.length > 0 &&
+                    selectedContacts.length === filteredContacts.length
+                  }
+                  onChange={handleToggleSelectAll}
+                />
+              )}
+            </TableCell>
+            <TableCell>Name</TableCell>
+            <TableCell>Phone Number</TableCell>
+            <TableCell>Email</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {filteredContacts.length > 0 ? (
+            filteredContacts.map((contact) => (
+              <TableRow
+                key={contact.id}
+                hover
+                sx={{ cursor: "pointer" }}
+                onClick={() => handleRowClick(contact)}
+              >
+                <TableCell
+                  padding="checkbox"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Checkbox
+                    checked={selectedContacts.some(
+                      (c) => c.id === contact.id
+                    )}
+                    onChange={() => handleContactSelect(contact)}
+                  />
+                </TableCell>
+                <TableCell>{contact.name || "No name"}</TableCell>
+                <TableCell>
+                  {contact.phoneNumber || "No phone"}
+                </TableCell>
+                <TableCell>{contact.email || "No email"}</TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={4} align="center">
+                No contacts found
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
+
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+      mt={2}
+    >
+      <Typography variant="body2">
+        {selectedContacts.length} contact(s) selected
+      </Typography>
+      <Box display="flex" gap={2}>
+        <Button variant="outlined" onClick={handleCloseContactsModal}>
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleAddSelectedContacts}
+          disabled={selectedContacts.length === 0}
+        >
+          {multiSelectMode ? "Add Selected" : "Add Contact"}
+        </Button>
+      </Box>
+        </Box>
+        </Box>
+        </Modal>
+      </Box>
+     
   );
 };
 
