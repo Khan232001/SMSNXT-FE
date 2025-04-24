@@ -348,46 +348,60 @@ const handleContactSelect = (contact) => {
       border: "1px solid #E0E0E0",
     }}
   >
-    <Typography variant="subtitle2" fontWeight="bold" mb={1}>
-      Quick Actions
-    </Typography>
-    <List>
-      <ListItem
-        button
-        sx={{ cursor: "pointer" }}
-        onClick={handleOpenContactsModal}
-      >
-        <Contacts fontSize="small" sx={{ mr: 1, color: "#4A90E2" }} />
-        <ListItemText primary="Add Contacts" />
-      </ListItem>
-      <ListItem button sx={{ cursor: "pointer" }}>
-        <DynamicFeed
-          fontSize="small"
-          sx={{ mr: 1, color: "#00C49F" }}
-        />
-        <ListItemText primary="Insert Template" />
-      </ListItem>
-      <ListItem button sx={{ cursor: "pointer" }}>
-        <AttachFile fontSize="small" sx={{ mr: 1, color: "#F57C00" }} />
-        <ListItemText primary="Add Media" />
-      </ListItem>
-    </List>
+   <Typography variant="subtitle2" fontWeight="bold" mb={1}>
+   Contacts
+</Typography>
 
-    <Divider sx={{ my: 2 }} />
+{/* CONTACTS SECTION */}
 
-    <Typography variant="subtitle2" fontWeight="bold" mb={1}>
-      Message Options
-    </Typography>
-    <List>
-      <ListItem button sx={{ cursor: "pointer" }}>
-        <Send fontSize="small" sx={{ mr: 1, color: "#4CAF50" }} />
-        <ListItemText primary="Send Immediately" />
-      </ListItem>
-      <ListItem button sx={{ cursor: "pointer" }}>
-        <Schedule fontSize="small" sx={{ mr: 1, color: "#2196F3" }} />
-        <ListItemText primary="Schedule for Later" />
-      </ListItem>
-    </List>
+<List>
+  <ListItem button onClick={handleOpenContactsModal}>
+    <Contacts fontSize="small" sx={{ mr: 1, color: "#4A90E2" }} />
+    <ListItemText primary="Add Contacts" />
+  </ListItem>
+  <ListItem button>
+    <ListAlt fontSize="small" sx={{ mr: 1, color: "#7C4DFF" }} />
+    <ListItemText primary="Lists" />
+  </ListItem>
+  <ListItem button>
+    <GroupWork fontSize="small" sx={{ mr: 1, color: "#FF4081" }} />
+    <ListItemText primary="Segments" />
+  </ListItem>
+  <ListItem button>
+    <History fontSize="small" sx={{ mr: 1, color: "#2196F3" }} />
+    <ListItemText primary="Frequently Sent" />
+  </ListItem>
+</List>
+
+{/* SENDER SETTINGS SECTION */}
+<Typography variant="subtitle2" fontWeight="bold" mb={1}>
+   Sender Settings
+</Typography>
+<List>
+  <ListItem button>
+    <ManageAccounts fontSize="small" sx={{ mr: 1, color: "#00C49F" }} />
+    <ListItemText primary="Customize Sender Info" />
+  </ListItem>
+</List>
+
+{/* ACTIONS SECTION */}
+<Typography variant="subtitle2" fontWeight="bold" mb={1}>
+   Actions
+</Typography>
+<List>
+  <ListItem button>
+    <DynamicFeed fontSize="small" sx={{ mr: 1, color: "#00ACC1" }} />
+    <ListItemText primary="Insert Template" />
+  </ListItem>
+  <ListItem button>
+    <InsertDriveFile fontSize="small" sx={{ mr: 1, color: "#9CCC65" }} />
+    <ListItemText primary="Add Dynamic Field" />
+  </ListItem>
+  <ListItem button>
+    <AttachFile fontSize="small" sx={{ mr: 1, color: "#F57C00" }} />
+    <ListItemText primary="Attach File" />
+  </ListItem>
+</List>
 
     <Divider sx={{ my: 2 }} />
 
@@ -413,9 +427,9 @@ const handleContactSelect = (contact) => {
   <Box
     sx={{
       display: { xs: "none", md: "flex" },
-      flexDirection: "row", 
+      flexDirection: "row", // ← This is the fix
       alignItems: "flex-start",
-      gap: 4,
+      gap: 8,
       mt: 2,
     }}
   >
