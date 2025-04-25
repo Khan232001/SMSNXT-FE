@@ -15,8 +15,8 @@ const ContactManagement = () => {
   const [importStep, setImportStep] = useState(1);
   const [isImporting, setIsImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
-  const [newContact, setNewContact] = useState({ name: '', email: '', phoneNumber: '', tag: '' });
-  const [editContact, setEditContact] = useState({ name: '', email: '', phoneNumber: '', tag: '' });
+  const [newContact, setNewContact] = useState({ firstName: '', lastName: '', email: '', phoneNumber: '', tag: '' });
+  const [editContact, setEditContact] = useState({ firstName: '', lastName: '', email: '', phoneNumber: '', tag: '' });
   const [currentContact, setCurrentContact] = useState(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -26,6 +26,7 @@ const ContactManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [validationErrors, setValidationErrors] = useState({});
 
   useEffect(() => {
     fetchContacts();
@@ -42,7 +43,6 @@ const ContactManagement = () => {
     else if (e.type === 'dragleave') setDragActive(false);
   };
 
-  
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -64,6 +64,38 @@ const ContactManagement = () => {
     }
   };
 
+  // Validate US phone number format
+  const validatePhoneNumber = (phone) => {
+    const usPhoneRegex = /^(\+1|1)?[\s-]?\(?[0-9]{3}\)?[\s-]?[0-9]{3}[\s-]?[0-9]{4}$/;
+    return usPhoneRegex.test(phone);
+  };
+
+  const validateContact = (contact) => {
+    const errors = {};
+
+    if (!contact.firstName) {
+      errors.firstName = 'First name is required';
+    }
+
+    if (!contact.lastName) {
+      errors.lastName = 'Last name is required';
+    }
+
+    if (!contact.email) {
+      errors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email)) {
+      errors.email = 'Invalid email format';
+    }
+
+    if (!contact.phoneNumber) {
+      errors.phoneNumber = 'Phone number is required';
+    } else if (!validatePhoneNumber(contact.phoneNumber)) {
+      errors.phoneNumber = 'Phone number must be in US format (e.g., 123-456-7890)';
+    }
+
+    return errors;
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     const date = new Date(dateString);
@@ -77,12 +109,21 @@ const ContactManagement = () => {
   };
 
   const handleAddContact = async () => {
+    const errors = validateContact(newContact);
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
     const contactData = {
-      name: newContact.name,
+      name: `${newContact.firstName} ${newContact.lastName}`.trim(),
+      firstName: newContact.firstName,
+      lastName: newContact.lastName,
       email: newContact.email,
       phoneNumber: newContact.phoneNumber,
       tags: newContact.tag ? [{ name: newContact.tag }] : []
     };
+
     try {
       const response = await api.post('/contacts', contactData, authHeaders);
       setContacts(prev => [...prev, response.data.data]);
@@ -93,14 +134,21 @@ const ContactManagement = () => {
   };
 
   const handleAddContactCancel = () => {
-    setNewContact({ name: '', email: '', phoneNumber: '', tag: '' });
+    setNewContact({ firstName: '', lastName: '', email: '', phoneNumber: '', tag: '' });
+    setValidationErrors({});
     setIsAddContactModalOpen(false);
   };
 
   const handleEditContact = (contact) => {
+    // Split the name into first and last names
+    const nameParts = contact.name ? contact.name.split(' ') : ['', ''];
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
     setCurrentContact(contact);
     setEditContact({
-      name: contact.name,
+      firstName,
+      lastName,
       email: contact.email,
       phoneNumber: contact.phoneNumber,
       tag: contact.tags?.[0]?.name || ''
@@ -114,15 +162,29 @@ const ContactManagement = () => {
   };
 
   const handleUpdateContact = async () => {
+    const errors = validateContact(editContact);
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
     const updatedContact = {
-      name: editContact.name,
+      name: `${editContact.firstName} ${editContact.lastName}`.trim(),
+      firstName: editContact.firstName,
+      lastName: editContact.lastName,
       email: editContact.email,
       phoneNumber: editContact.phoneNumber,
       tags: editContact.tag ? [{ name: editContact.tag }] : []
     };
+
     try {
       const response = await api.put(`/contacts/${currentContact._id}`, updatedContact, authHeaders);
-      setContacts(prev => prev.map(c => (c._id === currentContact._id ? response.data.data : c)));
+      setContacts(prev =>
+        prev.map(c =>
+          c._id === currentContact._id ? response.data.data : c
+        )
+      );
+
       handleEditContactCancel();
     } catch (error) {
       console.error('Failed to update contact:', error);
@@ -130,7 +192,8 @@ const ContactManagement = () => {
   };
 
   const handleEditContactCancel = () => {
-    setEditContact({ name: '', email: '', phoneNumber: '', tag: '' });
+    setEditContact({ firstName: '', lastName: '', email: '', phoneNumber: '', tag: '' });
+    setValidationErrors({});
     setCurrentContact(null);
     setIsEditContactModalOpen(false);
   };
@@ -147,7 +210,6 @@ const ContactManagement = () => {
   };
 
   const handleImportModeChange = (mode) => setImportMode(mode);
-
   const handleImportCSV = async () => {
     if (!selectedFile) return alert('Please select a CSV file.');
 
@@ -159,6 +221,7 @@ const ContactManagement = () => {
       skipEmptyLines: true,
       complete: async (result) => {
         const parsedData = result.data;
+
         if (!Array.isArray(parsedData) || parsedData.length === 0) {
           alert('Invalid or empty CSV file.');
           setIsImporting(false);
@@ -167,38 +230,71 @@ const ContactManagement = () => {
 
         setImportProgress(60);
 
-        const nameKey = Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "name");
-        const emailKey = Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "email");
-        const phoneKey = Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "phone");
-      
-        if (!nameKey || !emailKey || !phoneKey) {
-          alert('Invalid CSV format. Ensure columns: Name, Email, Phone.');
+        // Detect column keys
+        const firstNameKey = Object.keys(parsedData[0]).find(h =>
+          h.trim().toLowerCase().includes("first") || h.trim().toLowerCase().includes("given")
+        );
+        const lastNameKey = Object.keys(parsedData[0]).find(h =>
+          h.trim().toLowerCase().includes("last") || h.trim().toLowerCase().includes("family")
+        );
+        const nameKey = (!firstNameKey || !lastNameKey) &&
+          Object.keys(parsedData[0]).find(h => h.trim().toLowerCase() === "name");
+
+        const emailKey = Object.keys(parsedData[0]).find(h =>
+          h.trim().toLowerCase().includes("email")
+        );
+        const phoneKey = Object.keys(parsedData[0]).find(h =>
+          h.trim().toLowerCase().includes("phone") ||
+          h.trim().toLowerCase().includes("mobile") ||
+          h.trim().toLowerCase().includes("tel")
+        );
+
+        if ((!firstNameKey || !lastNameKey) && !nameKey || !emailKey || !phoneKey) {
+          alert('Invalid CSV format. Make sure it contains name (or first/last), email, and phone.');
           setIsImporting(false);
           return;
         }
 
-        const contacts = parsedData
-          .map(row => {
-            const tagIds = selectedTags
-              .map(tag => {
-                const matchedTag = availableTags.find(t => t.name === tag.label);
-                return matchedTag ? matchedTag._id : null;
-              })
-              .filter(Boolean);
+        const contacts = parsedData.map(row => {
+          let firstName = '';
+          let lastName = '';
 
-            return {
-              name: row[nameKey]?.trim(),
-              email: row[emailKey]?.trim(),
-              phoneNumber: row[phoneKey]?.trim(),
-              tags: tagIds
+          if (nameKey) {
+            const nameParts = row[nameKey]?.trim().split(' ') || [];
+            firstName = nameParts[0] || '';
+            lastName = nameParts.slice(1).join(' ') || '';
+          } else {
+            firstName = row[firstNameKey]?.trim() || '';
+            lastName = row[lastNameKey]?.trim() || '';
+          }
 
-            };
-          })
-          .filter(c => c.name && c.email && c.phoneNumber);
+          const email = row[emailKey]?.trim();
+          const phoneNumber = row[phoneKey]?.trim();
 
+          const tagIds = selectedTags
+            .map(tag => {
+              const matchedTag = availableTags.find(t => t.name === tag.label);
+              return matchedTag ? matchedTag._id : null;
+            })
+            .filter(Boolean);
+
+          return {
+            name: `${firstName} ${lastName}`.trim(), // ✅ Add this
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            tags: tagIds,
+          };
+        }).filter(c =>
+          c.firstName && c.lastName &&
+          c.email &&
+          c.phoneNumber &&
+          validatePhoneNumber(c.phoneNumber)
+        );
 
         if (contacts.length === 0) {
-          alert('No valid contacts found in the CSV file.');
+          alert('No valid contacts found. Ensure all required fields are present and phone numbers are valid US format.');
           setIsImporting(false);
           return;
         }
@@ -207,12 +303,11 @@ const ContactManagement = () => {
 
         try {
           const response = await api.post('/contacts/import', { contacts, importMode }, authHeaders);
-          const { totalImported, totalSkipped } = response.data;
-          console.log(response, "response inside the import function")
-          console.log(totalImported)
+          const { totalImported, totalSkipped } = response.data.data;
 
-          let message = `✅ Imported: ${contacts.length} contacts.\n`;
-          if (totalSkipped > 0) message += `⚠️ Skipped: ${totalSkipped} due to duplicates.\n`;
+
+          let message = `✅ Imported: ${totalImported} contacts.\n`;
+          if (totalSkipped > 0) message += `⚠️ Skipped: ${totalSkipped} duplicate(s).\n`;
 
           setImportProgress(100);
           setTimeout(() => {
@@ -232,11 +327,15 @@ const ContactManagement = () => {
         alert('Error parsing CSV file: ' + error.message);
       }
     });
-    setSelectedFile(null)
-    setImportStep(1)
+
+    setSelectedFile(null);
+    setImportStep(1);
   };
+  console.log(contacts)
+
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className="flex flex-col md:flex-row h-screen">
       {/* Main Content */}
@@ -281,7 +380,8 @@ const ContactManagement = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tags</th>
@@ -294,7 +394,8 @@ const ContactManagement = () => {
               {contacts.length > 0 ? (
                 contacts.map((contact) => (
                   <tr key={contact._id} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{contact.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{contact.name.trim().split(" ")[0]}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{contact.name.trim().split(" ")[1]}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{contact.phoneNumber}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{contact.email}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -338,7 +439,7 @@ const ContactManagement = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
+                  <td colSpan="9" className="px-6 py-4 text-center text-sm text-gray-500">
                     No contacts found. Add your first contact to get started.
                   </td>
                 </tr>
@@ -393,15 +494,32 @@ const ContactManagement = () => {
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
                 <input
                   type="text"
-                  name="name"
-                  value={newContact.name}
+                  name="firstName"
+                  value={newContact.firstName}
                   onChange={handleAddContactChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className={`w-full px-4 py-2 border ${validationErrors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
                   required
                 />
+                {validationErrors.firstName && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.firstName}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={newContact.lastName}
+                  onChange={handleAddContactChange}
+                  className={`w-full px-4 py-2 border ${validationErrors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
+                  required
+                />
+                {validationErrors.lastName && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.lastName}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -410,20 +528,27 @@ const ContactManagement = () => {
                   name="email"
                   value={newContact.email}
                   onChange={handleAddContactChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className={`w-full px-4 py-2 border ${validationErrors.email ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
                   required
                 />
+                {validationErrors.email && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
+                )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone (US Format)</label>
                 <input
                   type="text"
                   name="phoneNumber"
                   value={newContact.phoneNumber}
                   onChange={handleAddContactChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className={`w-full px-4 py-2 border ${validationErrors.phoneNumber ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
+                  placeholder="e.g., 123-456-7890"
                   required
                 />
+                {validationErrors.phoneNumber && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.phoneNumber}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Tag</label>
@@ -471,15 +596,32 @@ const ContactManagement = () => {
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
                 <input
                   type="text"
-                  name="name"
-                  value={editContact.name}
+                  name="firstName"
+                  value={editContact.firstName}
                   onChange={handleEditContactChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className={`w-full px-4 py-2 border ${validationErrors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
                   required
                 />
+                {validationErrors.firstName && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.firstName}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={editContact.lastName}
+                  onChange={handleEditContactChange}
+                  className={`w-full px-4 py-2 border ${validationErrors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
+                  required
+                />
+                {validationErrors.lastName && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.lastName}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -488,20 +630,27 @@ const ContactManagement = () => {
                   name="email"
                   value={editContact.email}
                   onChange={handleEditContactChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className={`w-full px-4 py-2 border ${validationErrors.email ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
                   required
                 />
+                {validationErrors.email && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
+                )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone (US Format)</label>
                 <input
                   type="text"
                   name="phoneNumber"
                   value={editContact.phoneNumber}
                   onChange={handleEditContactChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className={`w-full px-4 py-2 border ${validationErrors.phoneNumber ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
+                  placeholder="e.g., 123-456-7890"
                   required
                 />
+                {validationErrors.phoneNumber && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.phoneNumber}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Tag</label>
@@ -569,6 +718,7 @@ const ContactManagement = () => {
                         style={{ width: `${importProgress}%` }}
                       ></div>
                     </div>
+                    
                     <p className="text-sm text-gray-600 mt-2">{importProgress}% complete</p>
                   </div>
                 </div>
@@ -635,65 +785,86 @@ const ContactManagement = () => {
 
                   {importStep === 2 && (
                     <div className="space-y-6">
-                      <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                        <h5 className="font-medium text-gray-800 mb-4">Map Your Fields</h5>
-                        <p className="text-sm text-gray-600 mb-4">Match your file's columns to the correct contact fields.</p>
+                        <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                          <h5 className="font-medium text-gray-800 mb-4">Map Your Fields</h5>
+                          <p className="text-sm text-gray-600 mb-4">Match your file's columns to the correct contact fields.</p>
 
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="font-medium text-sm text-gray-700">File Column</div>
-                            <div className="font-medium text-sm text-gray-700">Contact Field</div>
-                          </div>
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="font-medium text-sm text-gray-700">File Column</div>
+                              <div className="font-medium text-sm text-gray-700">Contact Field</div>
+                            </div>
 
-                          <div className="grid grid-cols-2 gap-4 items-center">
-                            <div className="text-sm text-gray-600">Name</div>
-                            <Select
-                              options={[
-                                { value: 'name', label: 'Name' },
-                                { value: 'email', label: 'Email' },
-                                { value: 'phone', label: 'Phone' },
-                                { value: 'tag', label: 'Tag' }
-                              ]}
-                              defaultValue={{ value: 'name', label: 'Name' }}
-                              className="basic-select"
-                              classNamePrefix="select"
-                            />
-                          </div>
+                            <div className="grid grid-cols-2 gap-4 items-center">
+                              <div className="text-sm text-gray-600">First Name</div>
+                              <Select
+                                options={[
+                                  { value: 'firstName', label: 'First Name' },
+                                  { value: 'lastName', label: 'Last Name' },
+                                  { value: 'email', label: 'Email' },
+                                  { value: 'phone', label: 'Phone' },
+                                  { value: 'tag', label: 'Tag' }
+                                ]}
+                                defaultValue={{ value: 'firstName', label: 'First Name' }}
+                                className="basic-select"
+                                classNamePrefix="select"
+                              />
+                            </div>
 
-                          <div className="grid grid-cols-2 gap-4 items-center">
-                            <div className="text-sm text-gray-600">Email Address</div>
-                            <Select
-                              options={[
-                                { value: 'name', label: 'Name' },
-                                { value: 'email', label: 'Email' },
-                                { value: 'phone', label: 'Phone' },
-                                { value: 'tag', label: 'Tag' }
-                              ]}
-                              defaultValue={{ value: 'email', label: 'Email' }}
-                              className="basic-select"
-                              classNamePrefix="select"
-                            />
-                          </div>
+                            <div className="grid grid-cols-2 gap-4 items-center">
+                              <div className="text-sm text-gray-600">Last Name</div>
+                              <Select
+                                options={[
+                                  { value: 'firstName', label: 'First Name' },
+                                  { value: 'lastName', label: 'Last Name' },
+                                  { value: 'email', label: 'Email' },
+                                  { value: 'phone', label: 'Phone' },
+                                  { value: 'tag', label: 'Tag' }
+                                ]}
+                                defaultValue={{ value: 'lastName', label: 'Last Name' }}
+                                className="basic-select"
+                                classNamePrefix="select"
+                              />
+                            </div>
 
-                          <div className="grid grid-cols-2 gap-4 items-center">
-                            <div className="text-sm text-gray-600">Phone</div>
-                            <Select
-                              options={[
-                                { value: 'name', label: 'Name' },
-                                { value: 'email', label: 'Email' },
-                                { value: 'phone', label: 'Phone' },
-                                { value: 'tag', label: 'Tag' }
-                              ]}
-                              defaultValue={{ value: 'phone', label: 'Phone' }}
-                              className="basic-select"
-                              classNamePrefix="select"
-                            />
-                          </div>
+                            <div className="grid grid-cols-2 gap-4 items-center">
+                              <div className="text-sm text-gray-600">Email Address</div>
+                              <Select
+                                options={[
+                                  { value: 'firstName', label: 'First Name' },
+                                  { value: 'lastName', label: 'Last Name' },
+                                  { value: 'email', label: 'Email' },
+                                  { value: 'phone', label: 'Phone' },
+                                  { value: 'tag', label: 'Tag' }
+                                ]}
+                                defaultValue={{ value: 'email', label: 'Email' }}
+                                className="basic-select"
+                                classNamePrefix="select"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 items-center">
+                              <div className="text-sm text-gray-600">Phone</div>
+                              <Select
+                                options={[
+                                  { value: 'firstName', label: 'First Name' },
+                                  { value: 'lastName', label: 'Last Name' },
+                                  { value: 'email', label: 'Email' },
+                                  { value: 'phone', label: 'Phone' },
+                                  { value: 'tag', label: 'Tag' }
+                                ]}
+                                defaultValue={{ value: 'phone', label: 'Phone' }}
+                                className="basic-select"
+                                classNamePrefix="select"
+                              />
+                            </div>
+
                             <div className="grid grid-cols-2 gap-4 items-center">
                               <div className="text-sm text-gray-600">Tags</div>
                               <Select
                                 options={[
-                                  { value: 'name', label: 'Name' },
+                                  { value: 'firstName', label: 'First Name' },
+                                  { value: 'lastName', label: 'Last Name' },
                                   { value: 'email', label: 'Email' },
                                   { value: 'phone', label: 'Phone' },
                                   { value: 'tags', label: 'Tag' }
@@ -703,8 +874,8 @@ const ContactManagement = () => {
                                 classNamePrefix="select"
                               />
                             </div>
+                          </div>
                         </div>
-                      </div>
 
                       <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
                         <h5 className="font-medium text-gray-800 mb-3">Import Options</h5>

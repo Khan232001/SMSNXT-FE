@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { current } from "@reduxjs/toolkit";
 import FormValidationError from "../../components/FormValidatorError";
 import { MultiSelect } from "react-multi-select-component";
-import Modal from "../../components/Modal";
+// import Modal from "../../components/Modal";
 
 const tags = [
   { id: 1, name: "Select an option", value: "" },
@@ -271,6 +271,8 @@ const TextBlast = ({
 
     const newMessage = beforeText + selectedValue + afterText;
     setMessage(newMessage);
+    console.log(campaigns, "campaigns")
+    console.log(campaignData, "campaign data")
 
     // Set cursor position after the inserted field
     const newCursorPos = startPos + selectedValue.length;
@@ -1563,20 +1565,7 @@ const TextBlast = ({
           </div>
         </div>
       </div>
-      <Modal
-        confirm={true}
-        handleConfirm={handleActivateCampaign}
-        open={isConfirmModalOpen}
-        children={<div>Are you sure you want to Activate this campaign?</div>}
-        handleClose={handleCloseConfirmModal}
-        title="Confirm Campaign"
-      />
-      <Modal
-        open={sendMesageOpen}
-        children={<div>Test message sent successfully</div>}
-        handleClose={handleSendMessageClose}
-        title=" Message Confirmation"
-      />
+      
     </>
   );
 };

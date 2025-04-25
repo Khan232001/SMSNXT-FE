@@ -7,8 +7,6 @@ export const ContactsProvider = ({ children }) => {
     const [contacts, setContacts] = useState([]);
     const [allContacts, setAllContacts] = useState([]);
     const token = localStorage.getItem("token");
-    console.log(contacts, "contacts")
-    console.log(allContacts, "all contacts")
     const authHeaders = {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -40,6 +38,8 @@ export const ContactsProvider = ({ children }) => {
             throw error;
         }
     };
+
+
 
     return (
         <ContactsContext.Provider
