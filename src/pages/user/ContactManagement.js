@@ -6,7 +6,7 @@ import { useTags } from '../../context/TagsContext';
 import { useContacts } from '../../context/ContactsContext';
 
 const ContactManagement = () => {
-  const { tags: availableTags, fetchTags, setTags } = useTags();
+  const { tags: availableTags, fetchTags } = useTags();
   const { contacts, setContacts, fetchAllContacts: fetchContacts } = useContacts();
   console.log(contacts)
   const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
@@ -15,8 +15,8 @@ const ContactManagement = () => {
   const [importStep, setImportStep] = useState(1);
   const [isImporting, setIsImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
-  const [newContact, setNewContact] = useState({ firstName: '', lastName: '', email: '', phoneNumber: '', tag: '' });
-  const [editContact, setEditContact] = useState({ firstName: '', lastName: '', email: '', phoneNumber: '', tag: '' });
+  const [newContact, setNewContact] = useState({ firstName: '', lastName: '', email: '', phoneNumber: '', tag: '', city: '', state: '' });
+  const [editContact, setEditContact] = useState({ firstName: '', lastName: '', email: '', phoneNumber: '', tag: '', city: '', state: '' });
   const [currentContact, setCurrentContact] = useState(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -87,6 +87,13 @@ const ContactManagement = () => {
       errors.email = 'Invalid email format';
     }
 
+    if (!contact.city) {
+      errors.city = 'City is required'
+    }
+    if (!contact.state) {
+      errors.state = 'City is required'
+    }
+
     if (!contact.phoneNumber) {
       errors.phoneNumber = 'Phone number is required';
     } else if (!validatePhoneNumber(contact.phoneNumber)) {
@@ -95,6 +102,7 @@ const ContactManagement = () => {
 
     return errors;
   };
+
 
   const formatDate = (dateString) => {
     if (!dateString) return '-';
@@ -121,7 +129,10 @@ const ContactManagement = () => {
       lastName: newContact.lastName,
       email: newContact.email,
       phoneNumber: newContact.phoneNumber,
-      tags: newContact.tag ? [{ name: newContact.tag }] : []
+      tags: newContact.tag ? [{ name: newContact.tag }] : [],
+      city: newContact.city,
+      state : newContact.state
+
     };
 
     try {
@@ -134,7 +145,7 @@ const ContactManagement = () => {
   };
 
   const handleAddContactCancel = () => {
-    setNewContact({ firstName: '', lastName: '', email: '', phoneNumber: '', tag: '' });
+    setNewContact({ firstName: '', lastName: '', email: '', phoneNumber: '', tag: '', city: '', state: ''  });
     setValidationErrors({});
     setIsAddContactModalOpen(false);
   };
@@ -151,7 +162,10 @@ const ContactManagement = () => {
       lastName,
       email: contact.email,
       phoneNumber: contact.phoneNumber,
-      tag: contact.tags?.[0]?.name || ''
+      tag: contact.tags?.[0]?.name || '',
+      state: contact.state,
+      city: contact.city,
+
     });
     setIsEditContactModalOpen(true);
   };
@@ -174,7 +188,10 @@ const ContactManagement = () => {
       lastName: editContact.lastName,
       email: editContact.email,
       phoneNumber: editContact.phoneNumber,
-      tags: editContact.tag ? [{ name: editContact.tag }] : []
+      tags: editContact.tag ? [{ name: editContact.tag }] : [],
+      state: editContact.state,
+      city: editContact.city
+ 
     };
 
     try {
@@ -192,7 +209,7 @@ const ContactManagement = () => {
   };
 
   const handleEditContactCancel = () => {
-    setEditContact({ firstName: '', lastName: '', email: '', phoneNumber: '', tag: '' });
+    setEditContact({ firstName: '', lastName: '', email: '', phoneNumber: '', tag: '', city: '', state: '' });
     setValidationErrors({});
     setCurrentContact(null);
     setIsEditContactModalOpen(false);
@@ -248,8 +265,13 @@ const ContactManagement = () => {
           h.trim().toLowerCase().includes("mobile") ||
           h.trim().toLowerCase().includes("tel")
         );
-
-        if ((!firstNameKey || !lastNameKey) && !nameKey || !emailKey || !phoneKey) {
+        const stateKey = Object.keys(parsedData[0]).find(h =>
+          h.trim().toLowerCase().includes("state")
+        );
+        const cityKey = Object.keys(parsedData[0]).find(h =>
+          h.trim().toLowerCase().includes("city")
+        );
+        if ((!firstNameKey || !lastNameKey) && !nameKey || !emailKey || !phoneKey || !cityKey || !stateKey) {
           alert('Invalid CSV format. Make sure it contains name (or first/last), email, and phone.');
           setIsImporting(false);
           return;
@@ -270,6 +292,8 @@ const ContactManagement = () => {
 
           const email = row[emailKey]?.trim();
           const phoneNumber = row[phoneKey]?.trim();
+          const city = row[cityKey]?.trim();
+          const state = row[stateKey]?.trim();
 
           const tagIds = selectedTags
             .map(tag => {
@@ -285,12 +309,16 @@ const ContactManagement = () => {
             email,
             phoneNumber,
             tags: tagIds,
+            city,
+            state
           };
         }).filter(c =>
           c.firstName && c.lastName &&
           c.email &&
           c.phoneNumber &&
-          validatePhoneNumber(c.phoneNumber)
+          validatePhoneNumber(c.phoneNumber) &&
+          c.city &&
+          c.state
         );
 
         if (contacts.length === 0) {
@@ -380,10 +408,12 @@ const ContactManagement = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tags</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Created</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
@@ -394,10 +424,12 @@ const ContactManagement = () => {
               {contacts.length > 0 ? (
                 contacts.map((contact) => (
                   <tr key={contact._id} className="hover:bg-gray-50 transition-colors duration-150">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{contact.phoneNumber}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{contact.name.trim().split(" ")[0]}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{contact.name.trim().split(" ")[1]}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{contact.phoneNumber}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{contact.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{contact.city}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{contact.state}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {contact.tags && contact.tags.length > 0 ? (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -796,6 +828,25 @@ const ContactManagement = () => {
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 items-center">
+                              <div className="text-sm text-gray-600">Phone</div>
+                              <Select
+                                options={[
+                                  { value: 'firstName', label: 'First Name' },
+                                  { value: 'lastName', label: 'Last Name' },
+                                  { value: 'email', label: 'Email' },
+                                  { value: 'phone', label: 'Phone' },
+                                  { value: 'tag', label: 'Tag' },
+                                  { value: 'city', label: 'City' },
+                                  { value: 'state', label: 'State' }
+                                ]}
+                                defaultValue={{ value: 'phone', label: 'Phone' }}
+                                className="basic-select"
+                                classNamePrefix="select"
+                              />
+                            </div>
+
+
+                            <div className="grid grid-cols-2 gap-4 items-center">
                               <div className="text-sm text-gray-600">First Name</div>
                               <Select
                                 options={[
@@ -803,7 +854,9 @@ const ContactManagement = () => {
                                   { value: 'lastName', label: 'Last Name' },
                                   { value: 'email', label: 'Email' },
                                   { value: 'phone', label: 'Phone' },
-                                  { value: 'tag', label: 'Tag' }
+                                  { value: 'tag', label: 'Tag' },
+                                  { value: 'city', label: 'City' },
+                                  { value: 'state', label: 'State' }
                                 ]}
                                 defaultValue={{ value: 'firstName', label: 'First Name' }}
                                 className="basic-select"
@@ -819,7 +872,9 @@ const ContactManagement = () => {
                                   { value: 'lastName', label: 'Last Name' },
                                   { value: 'email', label: 'Email' },
                                   { value: 'phone', label: 'Phone' },
-                                  { value: 'tag', label: 'Tag' }
+                                  { value: 'tag', label: 'Tag' },
+                                  { value: 'city', label: 'City' },
+                                  { value: 'state', label: 'State' }
                                 ]}
                                 defaultValue={{ value: 'lastName', label: 'Last Name' }}
                                 className="basic-select"
@@ -828,14 +883,16 @@ const ContactManagement = () => {
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 items-center">
-                              <div className="text-sm text-gray-600">Email Address</div>
+                              <div className="text-sm text-gray-600">Email</div>
                               <Select
                                 options={[
                                   { value: 'firstName', label: 'First Name' },
                                   { value: 'lastName', label: 'Last Name' },
                                   { value: 'email', label: 'Email' },
                                   { value: 'phone', label: 'Phone' },
-                                  { value: 'tag', label: 'Tag' }
+                                  { value: 'tag', label: 'Tag' },
+                                  { value: 'city', label: 'City' },
+                                  { value: 'state', label: 'State' }
                                 ]}
                                 defaultValue={{ value: 'email', label: 'Email' }}
                                 className="basic-select"
@@ -844,16 +901,35 @@ const ContactManagement = () => {
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 items-center">
-                              <div className="text-sm text-gray-600">Phone</div>
+                              <div className="text-sm text-gray-600">City</div>
                               <Select
                                 options={[
                                   { value: 'firstName', label: 'First Name' },
                                   { value: 'lastName', label: 'Last Name' },
                                   { value: 'email', label: 'Email' },
                                   { value: 'phone', label: 'Phone' },
-                                  { value: 'tag', label: 'Tag' }
+                                  { value: 'tag', label: 'Tag' }, 
+                                  { value : 'city', label: 'City'}
                                 ]}
-                                defaultValue={{ value: 'phone', label: 'Phone' }}
+                                defaultValue={{ value: 'city', label: 'City' }}
+                                className="basic-select"
+                                classNamePrefix="select"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 items-center">
+                              <div className="text-sm text-gray-600">City</div>
+                              <Select
+                                options={[
+                                  { value: 'firstName', label: 'First Name' },
+                                  { value: 'lastName', label: 'Last Name' },
+                                  { value: 'email', label: 'Email' },
+                                  { value: 'phone', label: 'Phone' },
+                                  { value: 'tag', label: 'Tag' },
+                                  { value: 'city', label: 'City' },
+                                  { value: 'state', label: 'State' }
+                                ]}
+                                defaultValue={{ value: 'state', label: 'State' }}
                                 className="basic-select"
                                 classNamePrefix="select"
                               />
