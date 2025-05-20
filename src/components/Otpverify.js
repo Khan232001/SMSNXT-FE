@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react";
 import { Mail, Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+<<<<<<< HEAD
 
 export default function EmailVerification() {
   const [timer, setTimer] = useState(120); // 2 minutes
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(Array(6).fill(""));
+=======
+import { Link } from "react-router-dom";
+export default function EmailVerification() {
+  const [timer, setTimer] = useState(120); // 2 minutes
+  const [email, setEmail] = useState("");
+>>>>>>> main
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,6 +35,7 @@ export default function EmailVerification() {
     return `${min}m ${sec < 10 ? "0" : ""}${sec}s`;
   };
 
+<<<<<<< HEAD
   const handleOtpChange = (value, index) => {
     if (!/^\d*$/.test(value)) return;
     const newOtp = [...otp];
@@ -95,14 +103,23 @@ export default function EmailVerification() {
       console.error("Error resending OTP:", err);
       alert("Error resending OTP. Please try again later.");
     }
+=======
+  const handleNext = () => {
+    // Perform OTP validation if needed, then:
+    navigate("/dashboard"); // Replace with your actual next route
+>>>>>>> main
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4">
       <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-md text-center">
+<<<<<<< HEAD
         <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
           Please verify your email
         </h2>
+=======
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Please verify your email</h2>
+>>>>>>> main
         <p className="text-gray-600 mb-6">
           We have sent a 6-character code to{" "}
           <span className="font-medium text-gray-900">{email}</span>{" "}
@@ -112,6 +129,7 @@ export default function EmailVerification() {
           </button>
         </p>
 
+<<<<<<< HEAD
         {/* OTP Input Fields */}
         <div className="flex justify-center gap-2 mb-4">
           {otp.map((digit, index) => (
@@ -122,6 +140,15 @@ export default function EmailVerification() {
               maxLength={1}
               value={digit}
               onChange={(e) => handleOtpChange(e.target.value, index)}
+=======
+        {/* OTP boxes */}
+        <div className="flex justify-center gap-2 mb-4">
+          {[...Array(6)].map((_, index) => (
+            <input
+              key={index}
+              maxLength={1}
+              type="text"
+>>>>>>> main
               className="w-12 h-12 text-center border rounded-md shadow-sm text-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           ))}
@@ -133,6 +160,7 @@ export default function EmailVerification() {
           <br />
           <span className="text-gray-800 font-semibold">
             Resend code in {formatTime(timer)}
+<<<<<<< HEAD
           </span>
           <br />
           <button
@@ -167,12 +195,36 @@ export default function EmailVerification() {
 
         {/* Next Button */}
         <div className="mt-6">
+=======
+          </span>{" "}
+          or{" "}
+          <button className="text-blue-600 hover:underline text-sm font-medium">
+            Edit email
+          </button>
+        </p>
+
+        {/* Email buttons */}
+        <div className="flex gap-4 justify-center mt-6">
+          <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg shadow hover:shadow-md transition">
+            <img src="https://www.gstatic.com/images/branding/product/1x/gmail_48dp.png" alt="Gmail" className="w-5 h-5" />
+            Open Gmail
+          </button>
+        </div>
+
+        {/* NEXT Button */}
+        <div className="mt-6">
+        <Link to='/welcomesmsnxt'>
+>>>>>>> main
           <button
             onClick={handleNext}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md font-semibold transition"
           >
             Next
           </button>
+<<<<<<< HEAD
+=======
+          </Link>
+>>>>>>> main
         </div>
       </div>
     </div>

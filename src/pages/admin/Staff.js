@@ -57,9 +57,13 @@ function Staff() {
         <tbody>
           {staff.map((user) => (
             <tr key={user._id}>
+<<<<<<< HEAD
               <td className="py-2 px-4 border-b">
                 {user.firstName} {user.lastName}
               </td>
+=======
+              <td className="py-2 px-4 border-b">{user.firstName} {user.lastName}</td>
+>>>>>>> main
               <td className="py-2 px-4 border-b">{user.email}</td>
               <td className="py-2 px-4 border-b">{user.phoneNumber}</td>
               <td className="py-2 px-4 border-b capitalize">{user.role}</td>
@@ -69,6 +73,7 @@ function Staff() {
                   onChange={(e) => handleRoleChange(user._id, e.target.value)}
                   className="px-3 py-1 border rounded bg-white shadow-sm"
                 >
+<<<<<<< HEAD
                   <optgroup label="StaffMember">
                     <option value="user">User</option>
                     <option value="admin">Admin</option>
@@ -84,6 +89,12 @@ function Staff() {
                   ...
                 </button>
                 */}
+=======
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                  <option value="super_admin">Super Admin</option>
+                </select>
+>>>>>>> main
               </td>
             </tr>
           ))}

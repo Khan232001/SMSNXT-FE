@@ -65,8 +65,14 @@ import Step3 from "./components/Step3";
 import Lastthing from "./components/Lastthing";
 import Intro from "./components/Intro";
 import Lastpage from './components/Lastpage';
+<<<<<<< HEAD
 import DLC from "./components/dlc";
 import { ContactsProvider } from "./context/ContactsContext";
+=======
+import { ContactsProvider } from "./context/ContactsContext";
+
+// Stripe Setup
+>>>>>>> main
 const stripePromise = loadStripe("your-publishable-key-here");
 
 function App() {
@@ -80,7 +86,11 @@ function App() {
     <Elements stripe={stripePromise}>
       <Router>
         <AuthProvider>
+<<<<<<< HEAD
             <TagsProvider> 
+=======
+          <TagsProvider> 
+>>>>>>> main
             <ContactsProvider>
             <Routes>
               {/* Auth Routes */}
@@ -125,8 +135,11 @@ function App() {
                 <Route path="/lastthing" element={<Lastthing />} />
                 <Route path="/intro" element={<Intro />} />
                 <Route path="/lastpage" element={<Lastpage />} />
+<<<<<<< HEAD
                  <Route path="/dlc" element={<DLC />} />
 
+=======
+>>>>>>> main
 
                 {/* Messaging Nested Routes */}
                 <Route path="messaging">

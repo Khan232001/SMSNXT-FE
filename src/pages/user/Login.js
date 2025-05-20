@@ -37,10 +37,14 @@ const Login = () => {
   return (
     <div className="flex flex-col lg:flex-row h-screen">
       <div className="login-left w-full lg:w-1/2 flex flex-col justify-center items-center bg-white p-8">
+<<<<<<< HEAD
      
         <div className="logo mb-6 text-2xl font-bold text-primary">
         <img src="/imgs/04.png" alt="logo" className="h-10 w-auto" />
           </div>
+=======
+        <div className="logo mb-6 text-2xl font-bold text-primary">smsNXT</div>
+>>>>>>> main
         <h2 className="text-3xl font-bold mb-4 text-primary text-center">Login</h2>
         <hr className="w-2/3 border-t-2 border-primary mb-6" />
 
@@ -112,7 +116,11 @@ const Login = () => {
           </Link>
         </div>
         <div className="mt-6 text-center">
+<<<<<<< HEAD
           <Link to="/signup" className="text-sm text-blue-500 hover:underline">
+=======
+          <Link to="/sign" className="text-sm text-blue-500 hover:underline">
+>>>>>>> main
             Sign Up
           </Link>
         </div>
@@ -120,9 +128,13 @@ const Login = () => {
 
       <div className="w-full lg:w-1/2 flex justify-center items-center p-8 wave-background">
         <div className="text-white max-w-md text-center lg:text-left">
+<<<<<<< HEAD
       
           <h3 className="text-4xl font-bold mb-4">Plan a Year of SMS Campaigns in Minutes</h3>
           
+=======
+          <h3 className="text-4xl font-bold mb-4">Plan a Year of SMS Campaigns in Minutes</h3>
+>>>>>>> main
           <p className="text-lg">Try our new Campaign Calendar — set up key moments and holiday campaigns today!</p>
           <div className="bg-white text-gray-900 p-4 mt-4 rounded-lg">
             <h4 className="font-bold mb-2">Holiday Campaigns</h4>
@@ -130,6 +142,7 @@ const Login = () => {
               <li className="mb-2">🎉 <strong>New Years Day:</strong> Start the year with compassion.</li>
               <li className="mb-2">🦃 <strong>Thanksgiving:</strong> Share gratitude-filled moments.</li>
             </ul>
+<<<<<<< HEAD
            
           </div>
           <div className="w-full flex items-center justify-center  mt-6 ">
@@ -140,6 +153,9 @@ const Login = () => {
   />
 </div>
 
+=======
+          </div>
+>>>>>>> main
         </div>
       </div>
     </div>

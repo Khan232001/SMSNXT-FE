@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, CheckCheck } from "lucide-react";
+<<<<<<< HEAD
 import { Link } from "react-router-dom";
+=======
+
+>>>>>>> main
 export default function ChatApp() {
   const [messages, setMessages] = useState([]);
   const [showChat, setShowChat] = useState(false);
@@ -88,6 +92,7 @@ export default function ChatApp() {
           <p className="text-lg md:text-xl mb-6 text-gray-700 font-poppins">
             Get started today with a FREE 14-day trial and see why we are the easiest way to send bulk SMS messages in seconds.
           </p>
+<<<<<<< HEAD
           <Link to='/contact'>
           
           <button className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white p-4 rounded-2xl font-bold w-40 h-14 sm:w-48 sm:h-16 transition-all duration-300 shadow-md hover:shadow-xl text-lg flex items-center justify-center">
@@ -95,6 +100,10 @@ export default function ChatApp() {
             </Link> 
         </div>
        
+=======
+        </div>
+
+>>>>>>> main
         <AnimatePresence>
           {showChat && (
            <motion.div

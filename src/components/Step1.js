@@ -1,7 +1,13 @@
+<<<<<<< HEAD
 import React, { useState } from 'react';
 import { Briefcase, MessageCircle, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+=======
+import React from 'react';
+import { Briefcase, MessageCircle, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
+>>>>>>> main
 const options = [
   {
     icon: <Briefcase className="h-10 w-10 text-blue-600" />,
@@ -21,6 +27,7 @@ const options = [
 ];
 
 const Step1 = () => {
+<<<<<<< HEAD
   const [clickedIndex, setClickedIndex] = useState(null);
 
   const handleCardClick = (index) => {
@@ -28,6 +35,8 @@ const Step1 = () => {
     setTimeout(() => setClickedIndex(null), 300); // reset after animation
   };
 
+=======
+>>>>>>> main
   return (
     <div className="px-4 sm:px-8">
       <div className="text-center mb-8">
@@ -42,12 +51,16 @@ const Step1 = () => {
         {options.map((option, index) => (
           <div
             key={index}
+<<<<<<< HEAD
             onClick={() => handleCardClick(index)}
             className={`bg-white rounded-2xl shadow-md p-6 transition duration-300 border border-gray-100 cursor-pointer
               hover:shadow-xl transform hover:-translate-y-1
               hover:border-black
               ${clickedIndex === index ? 'scale-95' : ''}
             `}
+=======
+            className="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition duration-300 border border-gray-100"
+>>>>>>> main
           >
             <div className="mb-4">{option.icon}</div>
             <h2 className="text-xl font-semibold mb-2">{option.title}</h2>
@@ -55,6 +68,7 @@ const Step1 = () => {
           </div>
         ))}
       </div>
+<<<<<<< HEAD
 
       <Link to="/step2">
         <button
@@ -64,6 +78,16 @@ const Step1 = () => {
           Continue
         </button>
       </Link>
+=======
+     <Link to='/step2'>
+      <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl transition-all shadow-md mt-10"
+            >
+              Continue
+            </button>
+            </Link>  
+>>>>>>> main
     </div>
   );
 };

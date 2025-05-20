@@ -35,12 +35,17 @@ import {
 } from "@mui/icons-material";
 
 const sidebarItems = [
+<<<<<<< HEAD
   { label: "Getting Started", icon: <RocketLaunch />, href: "/getting-started" },
+=======
+  { label: "Getting Started", icon: <RocketLaunch />, href: "/getting-started" }, // Updated with RocketLaunch icon
+>>>>>>> main
   { label: "Dashboard", icon: <Dashboard />, href: "/dashboard" },
   { label: "Compose", icon: <Mail />, href: "/compose" },
   { label: "Two way Messaging", icon: <Message />, href: "/messaging" },
   { label: "Campaign", icon: <Campaign />, href: "/campaign" },
   { label: "Subscriptions", icon: <People />, href: "/subscription-plans" },
+<<<<<<< HEAD
   { label: "10DLC", icon: <People />, href: "/dlc" },
 
   { label: "Contacts", icon: <People />, href: "/contact-management" },
@@ -48,6 +53,14 @@ const sidebarItems = [
   { label: "Reports", icon: <PieChart />, href: "/reporting" },
   { label: "Tags", icon: <Settings />, href: "/tags-management" },
   { label: "Guides", icon: <Dashboard />, href: "" },
+=======
+  { label: "Contacts", icon: <People />, href: "/contact-management" },
+  { label: "Templates", icon: <Folder />, href: "/templates" },
+  { label: "Reports", icon: <PieChart />, href: "/reporting" },
+  { label: 'Tags', icon: <Settings />, href: '/tags-management' },
+  { label: 'Guides', icon: <Dashboard />, href: '' },
+  // { label: "Admin", icon: <Settings />, href: "/admin/dashboard" },
+>>>>>>> main
 ];
 
 const tabItemsMap = [
@@ -60,7 +73,11 @@ const tabItemsMap = [
       { label: "Completed", icon: <Archive />, count: 1 },
       { label: "Calendar", icon: <CalendarMonth /> },
     ],
+<<<<<<< HEAD
     bgColor: "hsl(11deg 69.89% 59.73%)",
+=======
+    bgColor: "hsl(11deg 69.89% 59.73%)"
+>>>>>>> main
   },
   {
     path: "/messaging",
@@ -72,6 +89,7 @@ const tabItemsMap = [
       { label: "Solved", icon: <CheckCircleOutline />, count: 0 },
       { label: "All chats", icon: <Folder />, count: 1 },
     ],
+<<<<<<< HEAD
     bgColor: "hsl(206deg 66.55% 44.44%)",
   },
 ];
@@ -85,6 +103,17 @@ export default function Sidebar({
   const activePath = location.pathname.replace(/\/$/, ""); // ✅ Remove trailing slash
 
   const [runTour, setRunTour] = useState(true);
+=======
+    bgColor: "hsl(206deg 66.55% 44.44%)"
+  },
+];
+
+export default function Sidebar({ collapsed, toggleCollapse, hiddenRoutes = ["/login", "/sign", "/forgot-password"] }) {
+  const location = useLocation();
+  const activePath = location.pathname;
+
+  const [runTour, setRunTour] = useState(true); // You can set this based on localStorage or a button toggle
+>>>>>>> main
 
   if (!Array.isArray(hiddenRoutes)) {
     console.error("hiddenRoutes should be an array");
@@ -95,7 +124,10 @@ export default function Sidebar({
 
   const activeTab = tabItemsMap.find((tab) => activePath.includes(tab.path));
   const activeTabItems = activeTab ? activeTab.items : null;
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
   const steps = [
     {
       target: ".sidebar-step-getting-started",
@@ -149,10 +181,15 @@ export default function Sidebar({
       placement: "right",
     },
   ];
+<<<<<<< HEAD
+=======
+  
+>>>>>>> main
 
   return (
     <>
       <Joyride
+<<<<<<< HEAD
         steps={steps}
         run={runTour}
         showSkipButton
@@ -200,6 +237,55 @@ export default function Sidebar({
           }
         }}
       />
+=======
+  steps={steps}
+  run={runTour}
+  showSkipButton
+  showProgress
+  continuous
+  styles={{
+    options: {
+      zIndex: 1300,
+      arrowColor: "#ffffff",
+      backgroundColor: "#ffffff",
+      overlayColor: "rgba(0, 0, 0, 0.5)",
+      primaryColor: "#ff6d00", // vibrant orange accent
+      textColor: "#333",
+      width: 320,
+      borderRadius: 12,
+    },
+    tooltipContainer: {
+      textAlign: "left",
+      padding: "16px",
+      fontFamily: "'Inter', sans-serif",
+      boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
+    },
+    buttonNext: {
+      backgroundColor: "#ff6d00",
+      borderRadius: "6px",
+    },
+    buttonBack: {
+      color: "#888",
+      marginRight: 10,
+    },
+    tooltip: {
+      transform: "translateX(10px)", // shifts tooltip a bit to the right
+    },
+  }}
+  locale={{
+    back: "Previous",
+    close: "Close",
+    last: "Finish",
+    next: "Next →",
+    skip: "Skip Tour",
+  }}
+  callback={(data) => {
+    if (["finished", "skipped"].includes(data.status)) {
+      setRunTour(false);
+    }
+  }}
+/>
+>>>>>>> main
 
       <Drawer
         variant="permanent"

@@ -24,6 +24,7 @@ const UserLayout = ({collapsed, activeTab, setActiveTab, toggleCollapse}) => {
         "/reporting": "Reporting",
     };
 
+<<<<<<< HEAD
     const hiddenRoutes = [
         "/login",
         "/sign",
@@ -39,6 +40,10 @@ const UserLayout = ({collapsed, activeTab, setActiveTab, toggleCollapse}) => {
         "/signupquest",
         '/contact'
       ];
+=======
+    const hiddenRoutes = ["/login", "/sign", "/forgot-password"];
+
+>>>>>>> main
     // Check if the current route is in the hiddenRoutes array
     const hideLayout = hiddenRoutes.includes(location.pathname);
 

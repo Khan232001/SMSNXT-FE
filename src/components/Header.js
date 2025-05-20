@@ -8,9 +8,13 @@ const Header = () => {
     <nav className="bg-white shadow-md p-5 text-gray-900 flex justify-between items-center fixed w-full top-0 z-50">
       {/* Logo */}
       <div className="font-bold text-2xl text- ml-10">
+<<<<<<< HEAD
       <Link to="/">
   <img src="/imgs/04.png" alt="logo" className="h-10 w-auto" />
 </Link>
+=======
+        <Link to="/">NXT</Link>
+>>>>>>> main
       </div>
 
       {/* Links for larger screens */}
@@ -70,9 +74,15 @@ const Header = () => {
            Login
           </button>
           </a>
+<<<<<<< HEAD
         <a href="Signup">
           <button className="bg-black text-white px-4 py-2 rounded-lg hover:bg-blue-500 mr-10">
             Signup
+=======
+        <a href="contact">
+          <button className="bg-black text-white px-4 py-2 rounded-lg hover:bg-blue-500 mr-10">
+            Start Free
+>>>>>>> main
           </button>
         </a>
       </div>

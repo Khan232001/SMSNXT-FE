@@ -29,6 +29,7 @@ const Businesspage = () => {
         {/* Input Fields */}
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           {[
+<<<<<<< HEAD
             { label: 'Company Name', id: 'company',type:'text' },
             { label: 'Display Name', id: 'display-name',type:'text' },
             { label: 'Country Registration', id: 'country-registration',type:'text' },
@@ -88,6 +89,22 @@ const Businesspage = () => {
     </div>
   ))}
 </div>
+=======
+            { label: 'Company Name', id: 'company' },
+            { label: 'Display Name', id: 'display-name' },
+            { label: 'Country Registration', id: 'country-registration' },
+            { label: 'EIN', id: 'ein' },
+            { label: 'Website', id: 'website' }
+          ].map(({ label, id }) => (
+            <div key={id}>
+              <label className='block text-lg font-semibold text-gray-700 mb-2'>
+                {label} <span className="text-red-500">*</span>
+              </label>
+              <input type="text" id={id} className='w-full h-12 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500' />
+            </div>
+          ))}
+        </div>
+>>>>>>> main
 
         {/* Address Information */}
         <h4 className='text-2xl font-bold text-black mt-8 mb-4'>Address Information</h4>

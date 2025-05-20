@@ -77,8 +77,12 @@ const Step3 = () => {
         {options.map((option, index) => (
           <div
             key={index}
+<<<<<<< HEAD
             className="bg-white rounded-2xl shadow-md p-6 l transition duration-300 border border-gray-100  hover:shadow-xl transform hover:-translate-y-1
     hover:border-black"
+=======
+            className="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition duration-300 border border-gray-100"
+>>>>>>> main
           >
             <div className="mb-4">{option.icon}</div>
             <h2 className="text-xl font-semibold mb-2">{option.title}</h2>

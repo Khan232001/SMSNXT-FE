@@ -13,7 +13,11 @@ const TrialMessage = () => {
         with the carriers as an approved sender and you’ll have the full power of texting
         at your fingertips.
       </p>
+<<<<<<< HEAD
        <Link to ='/lastthing'>
+=======
+       <Link to ='/intro'>
+>>>>>>> main
             <button
                     type="submit"
                     className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl transition-all shadow-md mt-10"
